@@ -200,9 +200,9 @@ is missing versus what is deliberate.
 2. **Fonts are `.otf`/`.ttf`, ~340 KB.** Converting to `woff2` would cut that
    by roughly 60%. PP Neue Montreal is also gitignored, so the heading falls
    back on a fresh clone — see below.
-3. **`public/` is 15 MB of unoptimised PNG/JPG.** The atlas downsamples to 512px
-   cells, so these are far larger than needed — webp at ~150 KB each would cut
-   it to under 2 MB with no visible loss.
+3. **The art is webp but still oversized.** ~3.3 MB across eighteen files. The
+   atlas downsamples every one to a 512px cell, so resizing the sources to
+   match would cut it again by a large margin.
 4. **`prefers-reduced-motion` is unhandled.** Six seconds of animated blur with
    no escape hatch.
 5. **No keyboard control.** Arrow keys should step the ring; the project column

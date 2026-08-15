@@ -106,7 +106,7 @@ ref`** button that fixes this in one click.
 Everything lives in one array, `components/ring/projects.js`:
 
 ```js
-{ file: "10.jpg", name: "Matchday", type: "Motion", year: "2025" }
+{ file: "10.webp", name: "Matchday", type: "Motion", year: "2025" }
 ```
 
 Drop an image in `public/`, add a row, done. The array does four jobs at once —

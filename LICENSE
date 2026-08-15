@@ -40,7 +40,7 @@ The contents of `public/` are NOT covered by it:
     Licence 1.1. Copyright 2024 The Geist Project Authors.
     https://github.com/vercel/geist-font
 
-  - Project imagery (`public/*.jpg|png|webp`) is not mine. It was collected
+  - Project imagery (`public/*.webp`) is not mine. It was collected
     from Behance, more or less at random, purely so there was real work to
     build and judge the layout against. I claim no ownership of any of it, no
     licence over it is granted by the terms above, and its use here is not an
