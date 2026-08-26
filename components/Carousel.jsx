@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import gsap from "gsap";
 
@@ -38,6 +39,7 @@ const blankTexture = () => {
 };
 
 export default function Carousel() {
+  const router = useRouter();
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const itemsRef = useRef([]);
@@ -195,6 +197,17 @@ export default function Carousel() {
     // Up front, not on completion: the cell each plane wears is derived from
     // this and has to be right from the first frame, blank cells or not.
     const imageCount = atlas.count;
+    // Art is dealt by ring slot, not plane index. Planes are numbered in fan
+    // order, so dealing by index puts every other project side by side and
+    // steps the column two names per slot. Negated because turning the ring
+    // forward walks the front slot backwards. The offset is read at call time
+    // because the dev panel can rotate the deal live.
+    const cellOf = (slot) => {
+      const imgOff = Math.round(params.imageOffset);
+      return imageCount > 0
+        ? (((imgOff - slot) % imageCount) + imageCount) % imageCount
+        : 0;
+    };
 
     atlas.first.then(() => {
       if (!disposed) firstIn = true;
@@ -275,6 +288,7 @@ export default function Carousel() {
     // styleMeta too, because the breakpoint bumps are steps that vw units
     // cannot express on their own.
     const onResize = () => {
+      cancelPendingOpen();
       resize();
       styleMeta();
     };
@@ -303,6 +317,8 @@ export default function Carousel() {
     // A click is turning the ring to a card. While this is up the momentum
     // above is suspended entirely, so the two cannot both drive spin.
     let picking = false;
+    let activePick = null;
+    let pendingOpen = null;
 
     let pointerTravel = 0; // tells a click from a drag
     let travelX = 0;
@@ -314,9 +330,15 @@ export default function Carousel() {
       return Math.atan2(-dy, dx);
     };
 
+    const cancelPendingOpen = () => {
+      pendingOpen = null;
+    };
+
     const stopPick = () => {
+      cancelPendingOpen();
       if (!picking) return;
       gsap.killTweensOf(state);
+      activePick = null;
       picking = false;
     };
 
@@ -324,7 +346,10 @@ export default function Carousel() {
     // handed to the snap: the snap is a run-in for a throw that is nearly
     // spent and is shaped so it can only slow down, but a pick starts from a
     // standstill and has to accelerate.
-    const pick = (i) => {
+    const pick = (i, onOpen) => {
+      // A new pick supersedes any old tween and its route callback.
+      stopPick();
+
       const slot = TAU / Math.round(params.count);
       // Spread, plane i sits at seed + signedOffset(i) * slot + spin.
       const base = frontAngle - params.seed * DEG - signedOffset(i) * slot;
@@ -334,11 +359,17 @@ export default function Carousel() {
 
       const slots = Math.abs(target - state.spin) / slot;
       // Already there. Opening the project belongs here eventually.
-      if (slots < 0.01) return;
+      if (slots < 0.01) {
+        if (!disposed) onOpen?.();
+        return;
+      }
 
       spinVel = 0;
       settling = false;
       picking = true;
+      const run = {};
+      activePick = run;
+      pendingOpen = run;
       gsap.killTweensOf(state);
       gsap.to(state, {
         spin: target,
@@ -347,7 +378,12 @@ export default function Carousel() {
         duration: params.pickTime * Math.sqrt(Math.max(1, slots)),
         ease: params.pickEase,
         onComplete: () => {
+          if (activePick !== run) return;
+          activePick = null;
           picking = false;
+          const shouldOpen = pendingOpen === run;
+          pendingOpen = null;
+          if (shouldOpen && !disposed) onOpen?.();
         },
       });
     };
@@ -477,9 +513,21 @@ export default function Carousel() {
     // A drag ends in a click too, so only a near-stationary press counts.
     // `over` comes from the same hit test that decides the tag, so a click
     // only ever lands on the card the tag was offering.
+    const openForPlane = (plane) => {
+      if (imageCount <= 0) return null;
+      const project = PROJECTS[cellOf(signedOffset(plane))];
+      if (!project?.slug) return null;
+      return () => {
+        if (!disposed) router.push(`/work/${project.slug}`);
+      };
+    };
+
     const onClick = () => {
-      if (!interactive || pointerTravel >= 5 || over < 0) return;
-      pick(over);
+      if (!interactive || pointerTravel >= 5 || !pointer.inside) return;
+      const plane = planeAt(pointer.x, pointer.y);
+      if (plane < 0) return;
+      const open = openForPlane(plane);
+      if (open) pick(plane, open);
     };
 
     container.addEventListener("wheel", onWheel, { passive: false });
@@ -594,6 +642,34 @@ export default function Carousel() {
       }
     };
 
+    // The animation cursor intentionally lags the pointer, but a click must
+    // use the coordinates from the press itself rather than the last frame's
+    // hover result.
+    const planeAt = (x, y) => {
+      const count = Math.round(params.count);
+      const W = uniforms.uSize.value.x;
+      const H = uniforms.uSize.value.y;
+
+      for (let i = 0; i < count; i++) {
+        const scale = uniforms.uScale.value[i];
+        const pos = uniforms.uPos.value[i];
+        const rot = uniforms.uRot.value[i];
+        const qx = x - pos.x;
+        const qy = y - pos.y;
+        const cr = Math.cos(rot);
+        const sr = Math.sin(rot);
+
+        if (
+          Math.abs(qx * cr + qy * sr) <= W * 0.5 * scale.x &&
+          Math.abs(-qx * sr + qy * cr) <= H * 0.5 * scale.y
+        ) {
+          return i;
+        }
+      }
+
+      return -1;
+    };
+
     const layout = (dt) => {
       const count = Math.round(params.count);
       uniforms.uCount.value = count;
@@ -684,16 +760,6 @@ export default function Carousel() {
       let frontI = -1;
       let frontD = 1e9;
       let frontCell = 0;
-
-      // Art is dealt by ring slot, not plane index. Planes are numbered in fan
-      // order, so dealing by index puts every other project side by side and
-      // steps the column two names per slot. Negated because turning the ring
-      // forward walks the front slot backwards.
-      const imgOff = Math.round(params.imageOffset);
-      const cellOf = (slot) =>
-        imageCount > 0
-          ? (((imgOff - slot) % imageCount) + imageCount) % imageCount
-          : 0;
 
       // Which card the cursor is on. Independent of the hover falloff above:
       // turning the goo off should not take the tag with it.
@@ -1271,6 +1337,7 @@ export default function Carousel() {
 
     return () => {
       disposed = true;
+      stopPick();
       clearTimeout(holdTimer);
       clearTimeout(fontFallback);
       renderer.setAnimationLoop(null);
@@ -1307,7 +1374,7 @@ export default function Carousel() {
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, []);
+  }, [router]);
 
   return (
     <>
@@ -1323,6 +1390,7 @@ export default function Carousel() {
       <ul
         ref={listRef}
         aria-label="Projects"
+        aria-hidden="true"
         style={{
           fontFamily: '"Satoshi", ui-sans-serif, system-ui, sans-serif',
         }}
@@ -1342,6 +1410,27 @@ export default function Carousel() {
           </li>
         ))}
       </ul>
+
+      {/* The canvas is the visual control, but these links keep every project
+          reachable without a pointer. They stay visually quiet until focused,
+          so the index keeps its role as a readout rather than becoming a menu. */}
+      <nav
+        aria-label="Project navigation"
+        className="pointer-events-none fixed left-0 top-0 z-50"
+      >
+        <ul>
+          {PROJECTS.map((p, i) => (
+            <li key={`accessible-${p.file}`}>
+              <a
+                href={`/work/${p.slug}`}
+                className="sr-only rounded-sm bg-[#fafafa] px-4 py-3 text-sm text-[#0a0a0a] outline-2 outline-offset-2 outline-[#0a0a0a] focus:pointer-events-auto focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"
+              >
+                {String(i + 1).padStart(2, "0")} {p.name}, {p.type}, {p.year}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       {/* Three rows per side, identical in structure and all carrying both
           words: two inside the filtered wrapper that melt into each other, and
