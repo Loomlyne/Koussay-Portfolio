@@ -225,17 +225,12 @@ export default function Carousel() {
         if (!disposed) loadProg = p;
       },
       {
-        cell: loFi ? 256 : 512,
-        mipmaps: !loFi,
         launchAt: Math.min(IMAGE_FILES.length, params.atlasLaunch),
-        concurrency: loFi ? 3 : 6,
       },
     );
 
     uniforms.uAtlas.value.dispose();
-    atlas.texture.anisotropy = loFi
-      ? 1
-      : renderer.capabilities.getMaxAnisotropy();
+    atlas.texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
     uniforms.uAtlas.value = atlas.texture;
     uniforms.uGrid.value.set(atlas.grid[0], atlas.grid[1]);
     // Up front, not on completion: the cell each plane wears is derived from
@@ -320,9 +315,7 @@ export default function Carousel() {
       const cap = loFi ? params.dprCapLo : params.dprCap;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, cap));
       if (atlas.texture) {
-        atlas.texture.anisotropy = loFi
-          ? 1
-          : renderer.capabilities.getMaxAnisotropy();
+        atlas.texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
       }
     };
 
@@ -1299,7 +1292,7 @@ export default function Carousel() {
       uniforms.uTextured.value = params.textured && firstIn ? 1 : 0;
       uniforms.uBlend.value = Math.max(0.5, params.blend * planeK * g);
 
-      const on = params.glass && !loFi;
+      const on = params.glass;
       uniforms.uBandTop.value = on ? params.bandTop * viewH : 0;
       uniforms.uBandBottom.value = on ? params.bandBottom * viewH : 0;
       uniforms.uGlass.value.set(
@@ -1646,11 +1639,10 @@ export default function Carousel() {
         state.shift >= 0.999 &&
         state.progress >= 0.999;
 
-      // Skip layout and draw while parked, but keep the GL context warm.
-      // iOS drops programs after a pause; the first swipe then hitch-stutters.
+      atlas.setPaused(pressing || dragging || settling);
+
       if (params.idleSkip && parked && !justParked) {
         idleFrames++;
-        if (idleFrames % 8 !== 0) return;
       } else {
         idleFrames = 0;
       }
@@ -1687,8 +1679,14 @@ export default function Carousel() {
         meta.show(shown);
       }
 
-      uniforms.uTime.value = (now - start) * 0.001;
-      renderer.render(scene, camera);
+      // Draw every frame while the ring is moving. While parked, skip most
+      // draws so the phone is not cooking a full-screen shader at 60fps, but
+      // never skip the layout above — and keep a keep-alive draw so iOS does
+      // not drop the program and hitch the next swipe.
+      if (!(params.idleSkip && parked && !justParked && idleFrames % 8 !== 0)) {
+        uniforms.uTime.value = (now - start) * 0.001;
+        renderer.render(scene, camera);
+      }
     });
 
     return () => {

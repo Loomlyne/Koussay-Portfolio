@@ -42,10 +42,13 @@ export function defaultParams() {
     // coarse. Antialias is chosen at context create from this same test.
     loFiAt: 1024,
     dprCap: 2,
-    dprCapLo: 1.5,
-    // Images that must land before the counter opens. The rest stream in
-    // during the entry, in fan order, so the facing arc is never blank.
-    atlasLaunch: 6,
+    // Same as dprCap. Dropping this below 2 made the facing card soft on a
+    // 2–3x phone screen; do not use it as a swipe-smoothness lever.
+    dprCapLo: 2,
+    // The counter is the gate: it used to mean every cell is on the sheet.
+    // Opening it early left decode and a full-sheet GPU upload running after
+    // the ring had landed, which is the ~10s freeze after the first flick.
+    atlasLaunch: PROJECTS.length,
     // Keep the facing card inside the viewport when minScale pins the ring
     // larger than the window would otherwise allow.
     edgePad: 20,

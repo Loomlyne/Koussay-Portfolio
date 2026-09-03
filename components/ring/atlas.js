@@ -2,36 +2,15 @@ import * as THREE from "three";
 import { IMAGE_FILES } from "./projects";
 import { signedOffset } from "./utils";
 
-const loadBitmap = (src, priority) => {
-  const fetchOne = async () => {
-    const res = await fetch(src, { priority, mode: "same-origin" });
-    if (!res.ok) throw new Error(`failed to load ${src}`);
-    const blob = await res.blob();
-    if (typeof createImageBitmap === "function") {
-      return createImageBitmap(blob);
-    }
-    return await new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error(`failed to load ${src}`));
-      img.src = URL.createObjectURL(blob);
-    });
-  };
-  return fetchOne();
-};
-
-const runPool = async (items, limit, fn) => {
-  let cursor = 0;
-  const n = Math.min(Math.max(1, limit), items.length);
-  await Promise.all(
-    Array.from({ length: n }, async () => {
-      while (cursor < items.length) {
-        const i = cursor++;
-        await fn(items[i]);
-      }
-    }),
-  );
-};
+const load = (src, priority) =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    // Must be set before src or the request is already away.
+    if (priority) img.fetchPriority = priority;
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`failed to load ${src}`));
+    img.src = src;
+  });
 
 /**
  * Packs every image into one texture. A single atlas rather than one texture
@@ -43,9 +22,13 @@ const runPool = async (items, limit, fn) => {
  * while the rest are still coming.
  *
  * Images are fetched in fan order (the facing card, then either side) so the
- * visible arc is painted before the ones still off-screen. `onProgress` is
- * scaled to `launchAt`, not the full set, so the counter can hit 100 and the
- * ring can start without waiting on every file. Remaining cells keep streaming.
+ * visible arc is painted first. The GPU sees the sheet twice only: once when
+ * cell 0 lands, and once when the set the counter is waiting on is painted.
+ * Marking dirty per image re-sends the whole sheet for cells nobody is
+ * looking at, which is what froze the tab after the ring had already landed.
+ *
+ * If `launchAt` is below the full set, remaining cells wait until `setPaused`
+ * is false (no press, drag, or snap) and flush in one upload when they finish.
  *
  * `first` settles once cell 0 is on the texture, `ready` once all of them are.
  * Neither rejects — a missing file leaves its cell blank and still counts as
@@ -55,19 +38,16 @@ export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
   const cellW = options.cell ?? 512;
   const cellH = Math.round(cellW / 1.5);
   const mipmaps = options.mipmaps !== false;
-  const launchAt = Math.min(
-    files.length,
-    Math.max(1, options.launchAt ?? files.length),
-  );
-  const concurrency = options.concurrency ?? 4;
+  const n = files.length;
+  const launchAt = Math.min(n, Math.max(1, options.launchAt ?? n));
 
-  const cols = Math.ceil(Math.sqrt(files.length));
-  const rows = Math.ceil(files.length / cols);
+  const cols = Math.ceil(Math.sqrt(n));
+  const rows = Math.ceil(n / cols);
 
   const canvas = document.createElement("canvas");
   canvas.width = cols * cellW;
   canvas.height = rows * cellH;
-  const ctx = canvas.getContext("2d", { alpha: false });
+  const ctx = canvas.getContext("2d");
 
   const texture = new THREE.CanvasTexture(canvas);
   // The shader flips each cell itself, so leave the sheet as drawn.
@@ -90,13 +70,11 @@ export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
   const paint = (img, i) => {
     const x = (i % cols) * cellW;
     const y = Math.floor(i / cols) * cellH;
-    const iw = img.width;
-    const ih = img.height;
 
     // Cover fit: fill the cell, crop the overflow, never squash.
-    const scale = Math.max(cellW / iw, cellH / ih);
-    const dw = iw * scale;
-    const dh = ih * scale;
+    const scale = Math.max(cellW / img.width, cellH / img.height);
+    const dw = img.width * scale;
+    const dh = img.height * scale;
 
     ctx.save();
     ctx.beginPath();
@@ -104,35 +82,36 @@ export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
     ctx.clip();
     ctx.drawImage(img, x + (cellW - dw) / 2, y + (cellH - dh) / 2, dw, dh);
     ctx.restore();
-    if (typeof img.close === "function") img.close();
   };
 
   let settled = 0;
-  let uploadQueued = false;
-  const requestUpload = () => {
-    if (uploadQueued) return;
-    uploadQueued = true;
-    requestAnimationFrame(() => {
-      uploadQueued = false;
-      texture.needsUpdate = true;
-    });
+  let paused = false;
+  const resumeWaiters = [];
+
+  const setPaused = (next) => {
+    paused = next;
+    if (!paused && resumeWaiters.length) {
+      const waiting = resumeWaiters.splice(0);
+      for (const resume of waiting) resume();
+    }
+  };
+
+  const whenFree = () => {
+    if (!paused) return Promise.resolve();
+    return new Promise((resolve) => resumeWaiters.push(resolve));
   };
 
   const tick = () => onProgress?.(Math.min(1, settled / launchAt));
 
   const fetchInto = (i, priority) =>
-    loadBitmap(`/${files[i]}`, priority)
-      .then((img) => {
-        paint(img, i);
-        requestUpload();
-      })
+    load(`/${files[i]}`, priority)
+      .then((img) => paint(img, i))
       .catch((err) => console.warn("[atlas]", err.message))
       .finally(() => {
         settled++;
         tick();
       });
 
-  const n = files.length;
   // Fan order, same deal the ring uses: facing cell first, then alternating
   // neighbours, so the arc on screen is what lands before the counter opens.
   const fan = [];
@@ -142,18 +121,30 @@ export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
   }
 
   const seed = fan[0];
-  const rest = fan.slice(1);
+  const gate = fan.slice(1, launchAt);
+  const tail = fan.slice(launchAt);
 
   const first = fetchInto(seed, "high").then(() => {
     texture.needsUpdate = true;
   });
 
   const ready = (async () => {
-    await first;
-    await runPool(rest, concurrency, (i) => fetchInto(i, "low"));
+    await Promise.all([first, ...gate.map((i) => fetchInto(i, "low"))]);
+    if (tail.length) texture.needsUpdate = true;
+    for (const i of tail) {
+      await whenFree();
+      await fetchInto(i, "low");
+    }
     texture.needsUpdate = true;
   })();
 
   tick();
-  return { texture, grid: [cols, rows], count: files.length, first, ready };
+  return {
+    texture,
+    grid: [cols, rows],
+    count: n,
+    first,
+    ready,
+    setPaused,
+  };
 }
