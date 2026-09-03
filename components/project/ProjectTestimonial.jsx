@@ -12,21 +12,25 @@ export default function ProjectTestimonial({ testimonial }) {
         <h2 className={styles.sectionTitle}>Testimonial</h2>
       </div>
       <figure className={styles.testimonialFigure}>
-        <blockquote className={styles.testimonialQuote}>
-          <p>{`“${testimonial.quote}”`}</p>
-        </blockquote>
-        {(testimonial.author || testimonial.role) && (
-          <figcaption className={styles.testimonialAttribution}>
-            {testimonial.author ? (
-              <span className={styles.testimonialAuthor}>
-                {testimonial.author}
-              </span>
-            ) : null}
-            {testimonial.role ? (
-              <span className={styles.testimonialRole}>{testimonial.role}</span>
-            ) : null}
-          </figcaption>
-        )}
+        <div className={styles.testimonialCopy}>
+          <blockquote className={styles.testimonialQuote}>
+            <p>{`“${testimonial.quote}”`}</p>
+          </blockquote>
+          {(testimonial.author || testimonial.role) && (
+            <figcaption className={styles.testimonialAttribution}>
+              {testimonial.author ? (
+                <span className={styles.testimonialAuthor}>
+                  {testimonial.author}
+                </span>
+              ) : null}
+              {testimonial.role ? (
+                <span className={styles.testimonialRole}>
+                  {testimonial.role}
+                </span>
+              ) : null}
+            </figcaption>
+          )}
+        </div>
       </figure>
     </section>
   );

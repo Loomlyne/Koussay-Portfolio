@@ -44,6 +44,7 @@ const blankTexture = () => {
 export default function Carousel() {
   const router = useRouter();
   const startTransition = useSharedTransition()?.start;
+  const pickProjectRef = useRef(null);
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const itemsRef = useRef([]);
@@ -390,6 +391,20 @@ export default function Carousel() {
           if (shouldOpen && !disposed) onOpen?.();
         },
       });
+    };
+
+    const planeForProject = (projectIndex) => {
+      const count = Math.round(params.count);
+      for (let i = 0; i < count; i++) {
+        if (cellOf(signedOffset(i)) === projectIndex) return i;
+      }
+      return -1;
+    };
+
+    pickProjectRef.current = (projectIndex) => {
+      if (!interactive) return;
+      const plane = planeForProject(projectIndex);
+      if (plane >= 0) pick(plane);
     };
 
     /* ------------------------------------------------------------ pointer */
@@ -1415,6 +1430,7 @@ export default function Carousel() {
 
     return () => {
       disposed = true;
+      pickProjectRef.current = null;
       stopPick();
       clearTimeout(holdTimer);
       clearTimeout(fontFallback);
@@ -1467,12 +1483,12 @@ export default function Carousel() {
           takes the narrow bump with every other label. */}
       <ul
         ref={listRef}
+        role="list"
         aria-label="Projects"
-        aria-hidden="true"
         style={{
           fontFamily: '"Satoshi", ui-sans-serif, system-ui, sans-serif',
         }}
-        className="pointer-events-none fixed right-[12vw] top-[2.4vh] z-10 flex flex-col items-start text-right leading-[1.4] tracking-[0.01em] text-[#0a0a0a] opacity-0 max-sm:hidden"
+        className="pointer-events-auto fixed right-[12vw] top-[2.4vh] z-10 flex flex-col items-end text-right leading-[1.4] tracking-[0.01em] text-[#0a0a0a] opacity-0 max-sm:hidden"
       >
         {PROJECTS.map((p, i) => (
           <li
@@ -1484,7 +1500,14 @@ export default function Carousel() {
             // the ring passes the halfway point between two slots.
             style={{ opacity: 0.2 }}
           >
-            {p.name}
+            <button
+              type="button"
+              onClick={() => pickProjectRef.current?.(i)}
+              className="cursor-pointer border-0 bg-transparent p-0 text-right font-[inherit] text-[length:inherit] leading-[inherit] tracking-[inherit] text-[#0a0a0a] [font-family:inherit]"
+              aria-label={`Show ${p.name}`}
+            >
+              {p.name}
+            </button>
           </li>
         ))}
       </ul>
@@ -1584,7 +1607,10 @@ export default function Carousel() {
 
       <Link
         href="/book"
-        className="pointer-events-auto fixed bottom-[2.4vh] left-[4vw] z-20 inline-flex min-h-11 items-center gap-2.5 border border-[#0a0a0a]/18 bg-[#fafafa]/88 px-5 py-3 text-[0.72rem] font-medium uppercase tracking-[0.08em] text-[#0a0a0a] backdrop-blur-sm transition-opacity hover:opacity-55 focus-visible:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0a0a0a]"
+        style={{
+          fontFamily: '"Satoshi", ui-sans-serif, system-ui, sans-serif',
+        }}
+        className="pointer-events-auto fixed bottom-[2.4vh] right-[4vw] z-20 inline-flex min-h-11 items-center gap-2.5 rounded-[0.65rem] border border-[#0a0a0a]/18 bg-[#fafafa]/88 px-5 py-3 text-[0.72rem] font-medium uppercase tracking-[0.08em] text-[#0a0a0a] backdrop-blur-sm transition-opacity hover:opacity-55 focus-visible:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0a0a0a]"
       >
         Start a project
         <span aria-hidden="true">→</span>

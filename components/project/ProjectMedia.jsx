@@ -60,15 +60,12 @@ export default function ProjectMedia({ project, preload = false }) {
             alt={`${project.name} — placeholder artwork`}
             fill
             preload={preload}
-            sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 72vw, 52vw"
+            sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 86vw, 62vw"
             className={styles.mediaImage}
             onError={() => setFailedSrc(imageSrc)}
           />
         )}
       </div>
-      <figcaption className={styles.mediaCaption}>
-        Placeholder artwork <span aria-hidden="true">·</span> {project.file}
-      </figcaption>
     </figure>
   );
 }

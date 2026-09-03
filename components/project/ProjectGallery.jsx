@@ -22,7 +22,7 @@ export default function ProjectGallery({ project, gallery = [] }) {
         </p>
         <h2 className={styles.sectionTitle}>Gallery</h2>
       </div>
-      <ul className={styles.galleryGrid}>
+      <ul className={styles.galleryStack}>
         {items.map((item, index) => {
           const src = imageSrc(item.file ?? item);
           const alt =
@@ -35,7 +35,7 @@ export default function ProjectGallery({ project, gallery = [] }) {
                   src={src}
                   alt={alt}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  sizes="(max-width: 640px) 70vw, 70vw"
                   className={styles.galleryImage}
                 />
               </div>
