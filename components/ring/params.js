@@ -170,6 +170,7 @@ export function defaultParams() {
     hover: true,
     touchHold: 0.16, // seconds of near-still press before a finger counts
     touchSlop: 10, // px of travel inside that window that calls it a swipe
+    tapSlop: 28, // Manhattan px; a thumb tap travels more than a mouse click
     lag: 0.3, // cursor smoothing, per 60fps frame
     melt: 34, // px added to the ring's own blend at the cursor
     meltReach: 260, // px the softening and the wake carry

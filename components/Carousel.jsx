@@ -111,7 +111,9 @@ export default function Carousel() {
       return;
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, params.dprCap));
+    renderer.domElement.style.touchAction = "none";
     container.appendChild(renderer.domElement);
+    const canvas = renderer.domElement;
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -100, 100);
@@ -244,6 +246,8 @@ export default function Carousel() {
     /* --------------------------------------------------------------- size */
     let viewW = 1;
     let viewH = 1;
+    let fitW = 0;
+    let fitH = 0;
     // Cached: the pointer is tracked on every move, and reading the rect each
     // time is a forced layout. Only a resize can invalidate it.
     const bounds = { left: 0, top: 0 };
@@ -303,8 +307,20 @@ export default function Carousel() {
     };
 
     const resize = () => {
-      viewW = container.clientWidth;
-      viewH = container.clientHeight;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      // iOS URL-bar show/hide is a ~50px height jitter. Rebuilding the GL
+      // surface for that is the hitch you feel mid-swipe.
+      if (fitW && Math.abs(w - fitW) < 2 && Math.abs(h - fitH) < 120) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        bounds.left = rect.left;
+        bounds.top = rect.top;
+        return;
+      }
+      fitW = w;
+      fitH = h;
+      viewW = w;
+      viewH = h;
       refit();
       applyQuality();
       renderer.setSize(viewW, viewH);
@@ -322,15 +338,28 @@ export default function Carousel() {
     };
 
     // styleMeta too, because the breakpoint bumps are steps that vw units
-    // cannot express on their own.
+    // cannot express on their own. URL-bar jitter must not abort a pick
+    // that is already turning toward the tapped card.
     const onResize = () => {
-      cancelPendingOpen();
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      const chromeOnly =
+        fitW && Math.abs(w - fitW) < 2 && Math.abs(h - fitH) < 120;
+      if (!chromeOnly) cancelPendingOpen();
       resize();
       styleMeta();
     };
 
+    const onViewportShift = () => {
+      const rect = canvas.getBoundingClientRect();
+      bounds.left = rect.left;
+      bounds.top = rect.top;
+    };
+
     resize();
     window.addEventListener("resize", onResize);
+    window.visualViewport?.addEventListener("resize", onViewportShift);
+    window.visualViewport?.addEventListener("scroll", onViewportShift);
     coarseMQ.addEventListener?.("change", onResize);
 
     /* ------------------------------------------------------- spin & input */
@@ -340,9 +369,14 @@ export default function Carousel() {
     let frontAngle = 0;
     let interactive = false;
     let spinVel = 0; // rad/s
+    let pressing = false;
     let dragging = false;
     let dragPrevAngle = 0;
     let dragPrevTime = 0;
+    let tapLimit = 6;
+    let tapConsumed = false;
+    let pressX = 0;
+    let pressY = 0;
 
     // The snap is a phase, not a force that is always on: a flick coasts
     // untouched, and once it is nearly spent the ring commits to a slot and
@@ -436,7 +470,9 @@ export default function Carousel() {
     pickProjectRef.current = (projectIndex) => {
       if (!interactive) return;
       const plane = planeForProject(projectIndex);
-      if (plane >= 0) pick(plane);
+      if (plane < 0) return;
+      const open = openForPlane(plane);
+      pick(plane, open);
     };
 
     /* ------------------------------------------------------------ pointer */
@@ -489,7 +525,16 @@ export default function Carousel() {
     };
 
     const onPointerLeave = () => {
+      // Capture release on touch synthesises a leave even though the press is
+      // still being handled. Swallow that or the tap test thinks the finger left.
+      if (pressing) return;
       pointer.inside = false;
+    };
+
+    // iOS will otherwise treat the swipe as document pan, fire pointercancel,
+    // and the ring both hitch-scrolls and never sees the tap that should open.
+    const lockTouchScroll = (e) => {
+      if (e.cancelable) e.preventDefault();
     };
 
     const onWheel = (e) => {
@@ -505,22 +550,29 @@ export default function Carousel() {
     };
 
     const onPointerDown = (e) => {
+      if (e.cancelable && e.pointerType === "touch") e.preventDefault();
+      coarse = e.pointerType === "touch";
       pointerTravel = 0;
+      tapConsumed = false;
       travelX = e.clientX;
       travelY = e.clientY;
+      tapLimit = coarse ? params.tapSlop : 6;
       trackPointer(e);
+      pressX = pointer.x;
+      pressY = pointer.y;
+      pressing = true;
+      dragging = false;
       if (!interactive) return;
-      stopPick();
       if (coarse) beginHold();
-      dragging = true;
-      settling = false;
-      spinVel = 0;
       dragPrevAngle = pointerAngle(e);
       dragPrevTime = performance.now();
-      renderer.domElement.setPointerCapture?.(e.pointerId);
+      canvas.setPointerCapture?.(e.pointerId);
     };
 
     const onPointerMove = (e) => {
+      if (e.cancelable && (pressing || e.pointerType === "touch")) {
+        e.preventDefault();
+      }
       trackPointer(e);
 
       // From coordinates, not movementX/Y: those are zero for touch in Safari,
@@ -533,7 +585,20 @@ export default function Carousel() {
       // melt together, same as a drag with the cursor down.
       if (coarse && !held && pointerTravel > params.touchSlop) endHold();
 
-      if (!dragging) return;
+      if (!pressing) return;
+
+      if (!dragging && pointerTravel > tapLimit) {
+        dragging = true;
+        if (interactive) {
+          stopPick();
+          settling = false;
+          spinVel = 0;
+          dragPrevAngle = pointerAngle(e);
+          dragPrevTime = performance.now();
+        }
+      }
+
+      if (!dragging || !interactive) return;
 
       const a = pointerAngle(e);
       let delta = a - dragPrevAngle;
@@ -550,15 +615,56 @@ export default function Carousel() {
       dragPrevTime = now;
     };
 
+    const tryOpenPlane = (x, y) => {
+      if (!interactive) return;
+      const pad = coarse ? Math.max(16, tapLimit) : 0;
+      let plane = planeAt(x, y, pad);
+      if (plane < 0) {
+        const count = Math.round(params.count);
+        const W = uniforms.uSize.value.x;
+        const H = uniforms.uSize.value.y;
+        let best = -1;
+        let bestD = Infinity;
+        for (let i = 0; i < count; i++) {
+          const scale = uniforms.uScale.value[i];
+          const pos = uniforms.uPos.value[i];
+          const dx = x - pos.x;
+          const dy = y - pos.y;
+          const d = dx * dx + dy * dy;
+          const reach = Math.hypot(W * scale.x, H * scale.y) * 0.5 + pad;
+          if (d < reach * reach && d < bestD) {
+            bestD = d;
+            best = i;
+          }
+        }
+        plane = best;
+      }
+      if (plane < 0) return;
+      const open = openForPlane(plane);
+      if (open) pick(plane, open);
+    };
+
     const onPointerUp = (e) => {
       // Releasing the capture fires a leave at the container even though the
       // cursor never went anywhere, so re-track before anything else.
       trackPointer(e);
-      // The finger is gone; a cursor is still there.
-      endHold();
-      if (!dragging) return;
+      const wasPress = pressing;
+      const wasDrag = dragging;
+      pressing = false;
       dragging = false;
-      renderer.domElement.releasePointerCapture?.(e.pointerId);
+      endHold();
+      canvas.releasePointerCapture?.(e.pointerId);
+      if (!wasPress || wasDrag) return;
+      if (pointerTravel > tapLimit) return;
+      tapConsumed = true;
+      tryOpenPlane(pressX, pressY);
+    };
+
+    const onPointerCancel = (e) => {
+      pressing = false;
+      dragging = false;
+      endHold();
+      canvas.releasePointerCapture?.(e.pointerId);
     };
 
     // A drag ends in a click too, so only a near-stationary press counts.
@@ -602,20 +708,25 @@ export default function Carousel() {
     };
 
     const onClick = () => {
-      if (!interactive || pointerTravel >= 5 || !pointer.inside) return;
-      const plane = planeAt(pointer.x, pointer.y);
-      if (plane < 0) return;
-      const open = openForPlane(plane);
-      if (open) pick(plane, open);
+      if (tapConsumed) {
+        tapConsumed = false;
+        return;
+      }
+      if (!interactive || pointerTravel > tapLimit || !pointer.inside) return;
+      tryOpenPlane(pointer.x, pointer.y);
     };
 
-    container.addEventListener("wheel", onWheel, { passive: false });
-    container.addEventListener("pointerdown", onPointerDown);
-    container.addEventListener("pointermove", onPointerMove);
-    container.addEventListener("pointerup", onPointerUp);
-    container.addEventListener("pointercancel", onPointerUp);
-    container.addEventListener("pointerleave", onPointerLeave);
-    container.addEventListener("click", onClick);
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    canvas.addEventListener("pointerdown", onPointerDown, { passive: false });
+    canvas.addEventListener("pointermove", onPointerMove, { passive: false });
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerCancel);
+    canvas.addEventListener("pointerleave", onPointerLeave);
+    canvas.addEventListener("click", onClick);
+    canvas.addEventListener("touchmove", lockTouchScroll, { passive: false });
+    document.addEventListener("touchmove", lockTouchScroll, {
+      passive: false,
+    });
 
     const updatePointer = (dt) => {
       // Held off until the entry finishes, so the cursor cannot soften the
@@ -724,7 +835,7 @@ export default function Carousel() {
     // The animation cursor intentionally lags the pointer, but a click must
     // use the coordinates from the press itself rather than the last frame's
     // hover result.
-    const planeAt = (x, y) => {
+    const planeAt = (x, y, pad = 0) => {
       const count = Math.round(params.count);
       const W = uniforms.uSize.value.x;
       const H = uniforms.uSize.value.y;
@@ -739,8 +850,8 @@ export default function Carousel() {
         const sr = Math.sin(rot);
 
         if (
-          Math.abs(qx * cr + qy * sr) <= W * 0.5 * scale.x &&
-          Math.abs(-qx * sr + qy * cr) <= H * 0.5 * scale.y
+          Math.abs(qx * cr + qy * sr) <= W * 0.5 * scale.x + pad &&
+          Math.abs(-qx * sr + qy * cr) <= H * 0.5 * scale.y + pad
         ) {
           return i;
         }
@@ -1399,7 +1510,7 @@ export default function Carousel() {
       const dt = Math.min(0.05, (now - prevT) / 1000);
       prevT = now;
 
-      if (interactive && !dragging && !picking) {
+      if (interactive && !dragging && !pressing && !picking) {
         state.spin += spinVel * dt;
         spinVel *= Math.pow(params.damping, dt * 60);
 
@@ -1483,6 +1594,7 @@ export default function Carousel() {
       let needGL =
         !params.idleSkip ||
         !interactive ||
+        pressing ||
         dragging ||
         picking ||
         settling ||
@@ -1516,14 +1628,18 @@ export default function Carousel() {
 
       document.documentElement.classList.remove("ring-lock");
       window.removeEventListener("resize", onResize);
+      window.visualViewport?.removeEventListener("resize", onViewportShift);
+      window.visualViewport?.removeEventListener("scroll", onViewportShift);
       coarseMQ.removeEventListener?.("change", onResize);
-      container.removeEventListener("wheel", onWheel);
-      container.removeEventListener("pointerdown", onPointerDown);
-      container.removeEventListener("pointermove", onPointerMove);
-      container.removeEventListener("pointerup", onPointerUp);
-      container.removeEventListener("pointercancel", onPointerUp);
-      container.removeEventListener("pointerleave", onPointerLeave);
-      container.removeEventListener("click", onClick);
+      canvas.removeEventListener("wheel", onWheel);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointercancel", onPointerCancel);
+      canvas.removeEventListener("pointerleave", onPointerLeave);
+      canvas.removeEventListener("click", onClick);
+      canvas.removeEventListener("touchmove", lockTouchScroll);
+      document.removeEventListener("touchmove", lockTouchScroll);
 
       tl?.kill();
       gsap.killTweensOf(splitText.chars);
@@ -1555,7 +1671,7 @@ export default function Carousel() {
       {/* touch-none, or the browser claims the gesture for panning and the
           pointermove stream dies mid-drag. Nothing here scrolls — the swipe
           is the carousel. */}
-      <div ref={containerRef} className="fixed inset-0 touch-none" />
+      <div ref={containerRef} className="ring-stage" />
 
       {/* Never takes the pointer: the canvas underneath handles the wheel and
           the drag, and the column has no business interrupting a throw that
