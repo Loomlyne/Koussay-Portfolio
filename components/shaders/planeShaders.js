@@ -59,6 +59,10 @@ export const fragmentShader = /* glsl */ `
   uniform float uBlend;        // px over which neighbouring art crossfades
   uniform float uTextured;
 
+  // Axis-aligned bounds of the live field, in the same px space as p.
+  // Empty page around the ring discards before the plane loop.
+  uniform vec4  uBound;        // min.xy, max.xy
+
   // --- pointer -------------------------------------------------------------
   // Nothing is ever drawn at the cursor. It only changes how the ring behaves
   // around it: the field goes soft, and a wake runs out through the surface.
@@ -228,18 +232,33 @@ export const fragmentShader = /* glsl */ `
     // the sampling position before the field is read — the same order the lip
     // works in. Flat through the middle, bending hard at the rim, which is what
     // reads as a thickness of glass rather than a smear.
-    float dTag = sdTag(ps);
     float tagOn = min(abs(uTag.z), abs(uTag.w));
-    if (tagOn > 0.001 && dTag < 0.0 && uTagP.w > 0.0) {
-      float depth = clamp(-dTag / max(uTagP.y * abs(uTag.w), 1.0), 0.0, 1.0);
-      float t = 1.0 - depth;
-      p += tagNormal(ps) * (1.0 - sqrt(max(0.0, 1.0 - t * t))) * uTagP.w;
+    float dTag = 1e6;
+    if (tagOn > 0.001) {
+      dTag = sdTag(ps);
+      if (dTag < 0.0 && uTagP.w > 0.0) {
+        float depth = clamp(-dTag / max(uTagP.y * abs(uTag.w), 1.0), 0.0, 1.0);
+        float t = 1.0 - depth;
+        p += tagNormal(ps) * (1.0 - sqrt(max(0.0, 1.0 - t * t))) * uTagP.w;
+      }
+    }
+
+    // Most of the framebuffer is empty page. Skip the field unless this pixel
+    // is inside the ring's box — except in the glass lip, which can refract a
+    // card in from just outside it.
+    if (uBound.z > uBound.x && bend < 0.001) {
+      if (p.x < uBound.x || p.x > uBound.z || p.y < uBound.y || p.y > uBound.w) {
+        if (tagOn < 0.001 || dTag > 4.0) discard;
+      }
     }
 
     // Read after the bend, so the cursor acts in the same warped space as the
     // ring: dragged into the lip, its influence is refracted with everything
     // else rather than sitting flat on top of it.
-    float toMouse = length(p - uMouse.xy);
+    float toMouse = 0.0;
+    if (uMouse.z > 0.001 || uMelt.y > 0.001) {
+      toMouse = length(p - uMouse.xy);
+    }
 
     // Blend strength is lifted in a halo around the cursor, so the ring goes
     // soft exactly where it is being touched and stays crisp everywhere else.

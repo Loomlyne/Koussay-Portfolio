@@ -42,7 +42,10 @@ export function defaultParams() {
     // coarse. Antialias is chosen at context create from this same test.
     loFiAt: 1024,
     dprCap: 2,
-    dprCapLo: 2,
+    dprCapLo: 1.5,
+    // Images that must land before the counter opens. The rest stream in
+    // during the entry, in fan order, so the facing arc is never blank.
+    atlasLaunch: 6,
     // Keep the facing card inside the viewport when minScale pins the ring
     // larger than the window would otherwise allow.
     edgePad: 20,

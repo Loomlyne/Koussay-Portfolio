@@ -98,6 +98,7 @@ export function mountGui(GUI, { params, state, info, actions }) {
   const loader = gui.addFolder("loader");
   loader.add(params, "loaderChase", 0.02, 1, 0.01).name("count speed");
   loader.add(params, "holdAfter", 0, 3, 0.05).name("beat after 100 (s)");
+  loader.add(params, "atlasLaunch", 1, 18, 1).name("images before launch");
   loader
     .add(params, "loaderBottom", 0, 20, 0.1)
     .name("from bottom (vh)")

@@ -99,7 +99,9 @@ export default function Carousel() {
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({
-        antialias: true,
+        // The field already antialiases through fwidth. MSAA on a full-screen
+        // pass that discards empty pixels is what made the swipe hitch.
+        antialias: false,
         alpha: true,
         depth: false,
         stencil: false,
@@ -110,7 +112,9 @@ export default function Carousel() {
       document.documentElement.classList.remove("ring-lock");
       return;
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, params.dprCap));
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, loFi ? params.dprCapLo : params.dprCap),
+    );
     renderer.domElement.style.touchAction = "none";
     container.appendChild(renderer.domElement);
     const canvas = renderer.domElement;
@@ -154,6 +158,7 @@ export default function Carousel() {
       uGrid: { value: new THREE.Vector2(1, 1) },
       uBlend: { value: params.blend },
       uTextured: { value: 0 },
+      uBound: { value: new THREE.Vector4() },
       uBandTop: { value: 0 },
       uBandBottom: { value: 0 },
       uGlass: { value: new THREE.Vector4() },
@@ -182,6 +187,7 @@ export default function Carousel() {
     );
     // Above the type, so the planes occlude it as the ring sweeps past.
     mesh.renderOrder = 10;
+    mesh.frustumCulled = false;
     scene.add(mesh);
 
     const textGroup = new THREE.Group();
@@ -213,12 +219,23 @@ export default function Carousel() {
     const readyWaiters = [];
     const whenReady = (fn) => (launchReady ? fn() : readyWaiters.push(fn));
 
-    const atlas = buildAtlas(IMAGE_FILES, (p) => {
-      if (!disposed) loadProg = p;
-    });
+    const atlas = buildAtlas(
+      IMAGE_FILES,
+      (p) => {
+        if (!disposed) loadProg = p;
+      },
+      {
+        cell: loFi ? 256 : 512,
+        mipmaps: !loFi,
+        launchAt: Math.min(IMAGE_FILES.length, params.atlasLaunch),
+        concurrency: loFi ? 3 : 6,
+      },
+    );
 
     uniforms.uAtlas.value.dispose();
-    atlas.texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    atlas.texture.anisotropy = loFi
+      ? 1
+      : renderer.capabilities.getMaxAnisotropy();
     uniforms.uAtlas.value = atlas.texture;
     uniforms.uGrid.value.set(atlas.grid[0], atlas.grid[1]);
     // Up front, not on completion: the cell each plane wears is derived from
@@ -300,7 +317,8 @@ export default function Carousel() {
     const applyQuality = () => {
       loFi = loFiNow(viewW);
       info.quality = loFi ? "lo" : "hi";
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, params.dprCap));
+      const cap = loFi ? params.dprCapLo : params.dprCap;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, cap));
       if (atlas.texture) {
         atlas.texture.anisotropy = loFi
           ? 1
@@ -1292,6 +1310,28 @@ export default function Carousel() {
       );
       uniforms.uFringe.value = on ? params.fringe : 0;
       uniforms.uSheen.value = on ? params.sheen : 0;
+
+      const fieldPad = uniforms.uK.value + uniforms.uWobble.value + 20;
+      let fieldMinX = Infinity;
+      let fieldMinY = Infinity;
+      let fieldMaxX = -Infinity;
+      let fieldMaxY = -Infinity;
+      for (let i = 0; i < count; i++) {
+        const sc = uniforms.uScale.value[i];
+        if (Math.max(sc.x, sc.y) < 0.0001) continue;
+        const pos = uniforms.uPos.value[i];
+        const hx = W * sc.x * 0.5 + fieldPad;
+        const hy = H * sc.y * 0.5 + fieldPad;
+        if (pos.x - hx < fieldMinX) fieldMinX = pos.x - hx;
+        if (pos.y - hy < fieldMinY) fieldMinY = pos.y - hy;
+        if (pos.x + hx > fieldMaxX) fieldMaxX = pos.x + hx;
+        if (pos.y + hy > fieldMaxY) fieldMaxY = pos.y + hy;
+      }
+      if (fieldMinX === Infinity) {
+        uniforms.uBound.value.set(0, 0, 0, 0);
+      } else {
+        uniforms.uBound.value.set(fieldMinX, fieldMinY, fieldMaxX, fieldMaxY);
+      }
     };
 
     /* ------------------------------------------------------- entry timeline */
