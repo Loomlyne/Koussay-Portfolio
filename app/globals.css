@@ -59,6 +59,10 @@ html.shared-transition {
   overflow: hidden;
 }
 
+html.shared-transition body {
+  overflow: hidden;
+}
+
 .shared-transition-root {
   pointer-events: none;
 }
@@ -68,7 +72,7 @@ html.shared-transition {
   inset: 0;
   z-index: 60;
   background: #fafafa;
-  opacity: 0;
+  opacity: 1;
 }
 
 .shared-transition-flyer {
@@ -76,6 +80,7 @@ html.shared-transition {
   z-index: 61;
   overflow: hidden;
   box-shadow: 0 24px 80px rgba(10, 10, 10, 0.14);
+  backface-visibility: hidden;
 }
 
 .shared-transition-flyer img {

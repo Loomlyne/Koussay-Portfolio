@@ -4,7 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -13,7 +13,7 @@ import gsap from "gsap";
 
 const SharedTransitionContext = createContext(null);
 
-const DURATION = 0.9;
+const DURATION = 0.88;
 const EASE = "power3.inOut";
 
 function prefersReducedMotion() {
@@ -21,8 +21,23 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+function preloadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
 export function useSharedTransition() {
   return useContext(SharedTransitionContext);
+}
+
+export function isSharedTransitionActive() {
+  if (typeof document === "undefined") return false;
+  return document.documentElement.classList.contains("shared-transition");
 }
 
 export function SharedTransitionProvider({ children }) {
@@ -31,6 +46,12 @@ export function SharedTransitionProvider({ children }) {
   const scrimRef = useRef(null);
   const animatingRef = useRef(false);
   const landedRef = useRef(false);
+  const activeRef = useRef(null);
+  const paintReadyRef = useRef(null);
+
+  useLayoutEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
   const finish = useCallback(() => {
     animatingRef.current = false;
@@ -41,21 +62,29 @@ export function SharedTransitionProvider({ children }) {
   }, []);
 
   const start = useCallback(({ slug, src, from }) => {
-    if (prefersReducedMotion()) return false;
+    if (prefersReducedMotion()) return Promise.resolve(false);
 
-    landedRef.current = false;
-    animatingRef.current = false;
-    setActive({ slug, src, from });
-    document.documentElement.classList.add("shared-transition");
-    document.documentElement.dataset.sharedTransition = "active";
-    return true;
+    return preloadImage(src)
+      .catch(() => null)
+      .then(
+        () =>
+          new Promise((resolve) => {
+            paintReadyRef.current = resolve;
+            landedRef.current = false;
+            animatingRef.current = false;
+            setActive({ slug, src, from });
+            document.documentElement.classList.add("shared-transition");
+            document.documentElement.dataset.sharedTransition = "holding";
+          }),
+      );
   }, []);
 
   const land = useCallback(
     (targetEl, slug) => {
+      const current = activeRef.current;
       if (
-        !active ||
-        active.slug !== slug ||
+        !current ||
+        current.slug !== slug ||
         !targetEl ||
         !flyerRef.current ||
         animatingRef.current ||
@@ -66,56 +95,87 @@ export function SharedTransitionProvider({ children }) {
 
       landedRef.current = true;
       animatingRef.current = true;
+      document.documentElement.dataset.sharedTransition = "animating";
 
       const flyer = flyerRef.current;
-      const scrim = scrimRef.current;
+      const from = current.from;
       const to = targetEl.getBoundingClientRect();
       const toRadius = parseFloat(getComputedStyle(targetEl).borderRadius) || 12;
+      const scaleX = to.width / from.width;
+      const scaleY = to.height / from.height;
+
+      gsap.killTweensOf(flyer);
+      gsap.set(flyer, {
+        left: from.left,
+        top: from.top,
+        width: from.width,
+        height: from.height,
+        borderRadius: from.borderRadius ?? 12,
+        x: 0,
+        y: 0,
+        scaleX: 1,
+        scaleY: 1,
+        transformOrigin: "0 0",
+        opacity: 1,
+        willChange: "transform, border-radius",
+      });
 
       gsap.to(flyer, {
-        left: to.left,
-        top: to.top,
-        width: to.width,
-        height: to.height,
+        x: to.left - from.left,
+        y: to.top - from.top,
+        scaleX,
+        scaleY,
         borderRadius: toRadius,
         duration: DURATION,
         ease: EASE,
         onComplete: () => {
-          gsap.to([flyer, scrim], {
+          document.documentElement.dataset.sharedTransition = "complete";
+          gsap.to(flyer, {
             opacity: 0,
-            duration: 0.22,
+            duration: 0.18,
             ease: "power2.out",
             onComplete: finish,
           });
-          document.documentElement.dataset.sharedTransition = "complete";
         },
       });
-
-      gsap.to(scrim, {
-        opacity: 1,
-        duration: DURATION * 0.55,
-        ease: "power2.out",
-      });
     },
-    [active, finish],
+    [finish],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!active || !flyerRef.current) return;
 
     const { from } = active;
-    gsap.set(flyerRef.current, {
+    const flyer = flyerRef.current;
+    const scrim = scrimRef.current;
+
+    gsap.killTweensOf(flyer);
+    gsap.set(flyer, {
       left: from.left,
       top: from.top,
       width: from.width,
       height: from.height,
       borderRadius: from.borderRadius ?? 12,
+      x: 0,
+      y: 0,
+      scaleX: 1,
+      scaleY: 1,
+      transformOrigin: "0 0",
       opacity: 1,
+      clearProps: "willChange",
     });
 
-    if (scrimRef.current) {
-      gsap.set(scrimRef.current, { opacity: 0.92 });
+    if (scrim) {
+      gsap.set(scrim, { opacity: 1 });
     }
+
+    const ready = paintReadyRef.current;
+    paintReadyRef.current = null;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        ready?.(true);
+      });
+    });
   }, [active]);
 
   const value = {
@@ -133,9 +193,19 @@ export function SharedTransitionProvider({ children }) {
         createPortal(
           <div className="shared-transition-root" aria-hidden="true">
             <div ref={scrimRef} className="shared-transition-scrim" />
-            <div ref={flyerRef} className="shared-transition-flyer">
+            <div
+              ref={flyerRef}
+              className="shared-transition-flyer"
+              style={{
+                left: active.from.left,
+                top: active.from.top,
+                width: active.from.width,
+                height: active.from.height,
+                borderRadius: active.from.borderRadius ?? 12,
+              }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={active.src} alt="" draggable={false} />
+              <img src={active.src} alt="" draggable={false} decoding="sync" />
             </div>
           </div>,
           document.body,

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import { useSharedTransition } from "@/components/SharedTransitionProvider";
 import styles from "@/app/work/[slug]/page.module.css";
@@ -16,14 +16,18 @@ export default function ProjectMedia({ project, preload = false }) {
   const sharedTransition = useSharedTransition();
   const isTransitionTarget = sharedTransition?.isTarget(project.slug) ?? false;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isTransitionTarget || !frameRef.current || !sharedTransition) return;
 
     let cancelled = false;
+
     const run = () => {
-      if (!cancelled) sharedTransition.land(frameRef.current, project.slug);
+      if (!cancelled) {
+        sharedTransition.land(frameRef.current, project.slug);
+      }
     };
 
+    // Two frames so the hero frame has its final layout before we measure it.
     const id = requestAnimationFrame(() => {
       requestAnimationFrame(run);
     });

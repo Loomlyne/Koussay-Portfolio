@@ -1,6 +1,32 @@
+"use client";
+
+import { useSyncExternalStore } from "react";
+
+import { isSharedTransitionActive } from "@/components/SharedTransitionProvider";
+
 import styles from "./page.module.css";
 
+function subscribe(onStoreChange) {
+  if (typeof document === "undefined") return () => {};
+
+  const observer = new MutationObserver(onStoreChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class", "data-shared-transition"],
+  });
+
+  return () => observer.disconnect();
+}
+
 export default function Loading() {
+  const transitioning = useSyncExternalStore(
+    subscribe,
+    isSharedTransitionActive,
+    () => false,
+  );
+
+  if (transitioning) return null;
+
   return (
     <main className={styles.page} aria-busy="true" aria-label="Loading project">
       <div className={styles.loadingState}>

@@ -520,27 +520,35 @@ export default function Carousel() {
       if (imageCount <= 0) return null;
       const project = PROJECTS[cellOf(signedOffset(plane))];
       if (!project?.slug) return null;
-      return () => {
+      return async () => {
         if (disposed) return;
 
         const imageSrc = project.file.startsWith("/")
           ? project.file
           : `/${project.file}`;
         const from = rectForPlane(plane);
-        const animated = startTransition?.({
+
+        if (!startTransition) {
+          router.push(`/work/${project.slug}`);
+          return;
+        }
+
+        const animated = await startTransition({
           slug: project.slug,
           src: imageSrc,
           from,
         });
 
-        if (animated) {
-          gsap.to(renderer.domElement, {
-            opacity: 0,
-            duration: 0.35,
-            ease: "power2.out",
-          });
+        if (!animated) {
+          router.push(`/work/${project.slug}`);
+          return;
         }
 
+        // Hide the WebGL card immediately once the flyer covers it. A fade
+        // here leaves a frame where neither layer is visible.
+        gsap.set(renderer.domElement, { opacity: 0 });
+
+        document.documentElement.dataset.sharedTransition = "navigating";
         router.push(`/work/${project.slug}`);
       };
     };
