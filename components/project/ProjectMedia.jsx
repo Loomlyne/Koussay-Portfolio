@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { useSharedTransition } from "@/components/SharedTransitionProvider";
 import styles from "@/app/work/[slug]/page.module.css";
 
 export default function ProjectMedia({ project, preload = false }) {
@@ -11,10 +12,33 @@ export default function ProjectMedia({ project, preload = false }) {
     : `/${project.file}`;
   const [failedSrc, setFailedSrc] = useState(null);
   const imageFailed = failedSrc === imageSrc;
+  const frameRef = useRef(null);
+  const sharedTransition = useSharedTransition();
+  const isTransitionTarget = sharedTransition?.isTarget(project.slug) ?? false;
+
+  useEffect(() => {
+    if (!isTransitionTarget || !frameRef.current || !sharedTransition) return;
+
+    let cancelled = false;
+    const run = () => {
+      if (!cancelled) sharedTransition.land(frameRef.current, project.slug);
+    };
+
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(run);
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(id);
+    };
+  }, [isTransitionTarget, project.slug, sharedTransition]);
 
   return (
-    <figure className={styles.mediaFigure}>
-      <div className={styles.mediaFrame}>
+    <figure
+      className={`${styles.mediaFigure} ${isTransitionTarget ? styles.mediaFigureTransitioning : ""}`}
+    >
+      <div ref={frameRef} className={styles.mediaFrame}>
         {imageFailed ? (
           <div
             className={styles.mediaFallback}

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import gsap from "gsap";
 
+import { useSharedTransition } from "./SharedTransitionProvider";
+
 import {
   vertexShader,
   fragmentShader,
@@ -40,6 +42,7 @@ const blankTexture = () => {
 
 export default function Carousel() {
   const router = useRouter();
+  const startTransition = useSharedTransition()?.start;
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const itemsRef = useRef([]);
@@ -518,7 +521,27 @@ export default function Carousel() {
       const project = PROJECTS[cellOf(signedOffset(plane))];
       if (!project?.slug) return null;
       return () => {
-        if (!disposed) router.push(`/work/${project.slug}`);
+        if (disposed) return;
+
+        const imageSrc = project.file.startsWith("/")
+          ? project.file
+          : `/${project.file}`;
+        const from = rectForPlane(plane);
+        const animated = startTransition?.({
+          slug: project.slug,
+          src: imageSrc,
+          from,
+        });
+
+        if (animated) {
+          gsap.to(renderer.domElement, {
+            opacity: 0,
+            duration: 0.35,
+            ease: "power2.out",
+          });
+        }
+
+        router.push(`/work/${project.slug}`);
       };
     };
 
@@ -668,6 +691,52 @@ export default function Carousel() {
       }
 
       return -1;
+    };
+
+    // Screen-space bounds of a plane, for the shared-element handoff to the
+    // project hero. Same box the shader draws and planeAt tests against.
+    const rectForPlane = (i) => {
+      const scale = uniforms.uScale.value[i];
+      const pos = uniforms.uPos.value[i];
+      const rot = uniforms.uRot.value[i];
+      const W = uniforms.uSize.value.x;
+      const H = uniforms.uSize.value.y;
+      const hw = W * scale.x * 0.5;
+      const hh = H * scale.y * 0.5;
+      const cr = Math.cos(rot);
+      const sr = Math.sin(rot);
+      const bounds = container.getBoundingClientRect();
+      const ox = bounds.left + bounds.width * 0.5;
+      const oy = bounds.top + bounds.height * 0.5;
+
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+
+      for (const [lx, ly] of [
+        [-hw, -hh],
+        [hw, -hh],
+        [hw, hh],
+        [-hw, hh],
+      ]) {
+        const wx = pos.x + lx * cr - ly * sr;
+        const wy = pos.y + lx * sr + ly * cr;
+        const sx = ox + wx;
+        const sy = oy - wy;
+        minX = Math.min(minX, sx);
+        minY = Math.min(minY, sy);
+        maxX = Math.max(maxX, sx);
+        maxY = Math.max(maxY, sy);
+      }
+
+      return {
+        left: minX,
+        top: minY,
+        width: maxX - minX,
+        height: maxY - minY,
+        borderRadius: uniforms.uRadius.value,
+      };
     };
 
     const layout = (dt) => {
@@ -1374,7 +1443,7 @@ export default function Carousel() {
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [router]);
+  }, [router, startTransition]);
 
   return (
     <>

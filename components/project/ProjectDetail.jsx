@@ -18,7 +18,7 @@ export default function ProjectDetail({
       <article className={styles.article}>
         <ProjectHero project={project} displayIndex={displayIndex} />
 
-        <div className={styles.content}>
+        <div className={`${styles.content} project-transition-content`}>
           <header className={styles.intro}>
             <div className={styles.introMeta}>
               <p className={styles.eyebrow}>
@@ -36,7 +36,9 @@ export default function ProjectDetail({
           <ProjectSections sections={sections} />
         </div>
 
-        <ProjectPager previous={previous} next={next} />
+        <div className="project-transition-content">
+          <ProjectPager previous={previous} next={next} />
+        </div>
       </article>
     </main>
   );

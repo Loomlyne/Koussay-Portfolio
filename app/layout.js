@@ -1,5 +1,7 @@
 import "./globals.css";
 
+import { Providers } from "./providers";
+
 export const metadata = {
   title: "Viscose",
   description:
@@ -9,7 +11,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

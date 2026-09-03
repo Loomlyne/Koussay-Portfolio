@@ -88,6 +88,48 @@
   max-width: 52rem;
 }
 
+.mediaFigureTransitioning {
+  animation: none;
+}
+
+.mediaFigureTransitioning .mediaFrame,
+.mediaFigureTransitioning .mediaImage {
+  opacity: 0;
+}
+
+.mediaFigureTransitioning .mediaCaption {
+  opacity: 0;
+}
+
+html[data-shared-transition="active"] .heroMeta,
+html[data-shared-transition="active"] .heroInfo {
+  opacity: 0;
+}
+
+html[data-shared-transition="complete"] .heroMeta,
+html[data-shared-transition="complete"] .heroInfo {
+  animation: heroMetaReveal 650ms cubic-bezier(0.2, 0.75, 0.25, 1) 120ms both;
+}
+
+@keyframes heroMetaReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaFrame,
+html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage,
+html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption {
+  opacity: 1;
+  transition: opacity 220ms ease;
+}
+
 .mediaFigure {
   margin: 0;
   animation: heroReveal 950ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
@@ -680,6 +722,20 @@
 
   .mediaFigure,
   .loadingFrame {
+    animation: none;
+  }
+
+  .mediaFigureTransitioning .mediaFrame,
+  .mediaFigureTransitioning .mediaImage,
+  .mediaFigureTransitioning .mediaCaption {
+    opacity: 1;
+  }
+
+  :global(html[data-shared-transition="active"] .heroMeta),
+  :global(html[data-shared-transition="active"] .heroInfo),
+  :global(html[data-shared-transition="complete"] .heroMeta),
+  :global(html[data-shared-transition="complete"] .heroInfo) {
+    opacity: 1;
     animation: none;
   }
 
