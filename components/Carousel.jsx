@@ -1607,7 +1607,7 @@ export default function Carousel() {
 
       <Link
         href="/book"
-        className="glass-btn glass-btn--cta pointer-events-auto fixed bottom-[2.4vh] right-[4vw] z-20"
+        className="glass-btn glass-btn--cta glass-btn--solid pointer-events-auto fixed bottom-[2.4vh] right-[4vw] z-20"
       >
         Start a project
         <span aria-hidden="true">→</span>

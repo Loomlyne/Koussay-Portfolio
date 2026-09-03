@@ -156,8 +156,6 @@ export function createMeta(refs, params) {
   // layout: { textK, tight, viewW } — the band state, passed in rather than
   // read, so this stays a pure function of the window it is told about.
   const style = ({ textK, tight, viewW }) => {
-    // Everything downstream is derived from this one figure: the box height,
-    // so the filter region, so where the corner offset has to drop the box to.
     const bigVw = params.nameSize * textK * (tight ? params.tightName : 1);
     const big = `${bigVw}vw`;
     const small = `${params.idxSize * textK}vw`;
@@ -165,18 +163,14 @@ export function createMeta(refs, params) {
     const smallFace = `"${params.idxFont}", ui-sans-serif, system-ui, sans-serif`;
     const bigWeight = `${params.nameWeight}`;
     const smallWeight = `${params.idxWeight}`;
-    // Roomy, because this box is what the filter region is measured off and
-    // the blur needs somewhere to go.
     const h = bigVw * 3;
+    const cornerH = bigVw * 1.35;
 
     for (const side of SIDES) {
       const g = groups[side];
       if (!g?.box) continue;
       const isRight = side === "right";
 
-      // In the tight band the ring is most of the screen and there is nowhere
-      // for two lockups to sit, so three of the four labels go and the name
-      // alone moves to the bottom-right corner.
       const corner = tight && !isRight;
       if (tight && isRight) {
         g.box.style.display = "none";
@@ -185,18 +179,13 @@ export function createMeta(refs, params) {
       g.box.style.display = "";
 
       g.box.style.width = `${corner ? params.tightMetaWidth : params.metaWidth}vw`; // prettier-ignore
-      g.box.style.height = `${h}vw`;
+      g.box.style.height = `${corner ? cornerH : h}vw`;
 
       if (corner) {
-        // The box is three times the type's height, so placing it at the
-        // offset asked for would sit the words half a box too high. Drop it by
-        // the difference and the type lands where the number says.
-        const boxPx = (h * viewW) / 100;
-        const emPx = (bigVw * viewW) / 100;
-        g.box.style.top = "auto";
-        g.box.style.left = "auto";
+        g.box.style.top = `${params.tightNameTop}px`;
         g.box.style.right = `${params.tightNameRight}px`;
-        g.box.style.bottom = `${params.tightNameBottom + emPx * 0.5 - boxPx * 0.5}px`;
+        g.box.style.bottom = "auto";
+        g.box.style.left = "auto";
         g.box.style.transform = "none";
       } else {
         // Cleared rather than set, so the class on the element takes it back.
@@ -215,6 +204,7 @@ export function createMeta(refs, params) {
       // a word would jump as it moved between them.
       for (const layer of [...g.layers, g.plain]) {
         if (!layer) continue;
+        layer.style.alignItems = corner ? "flex-start" : "";
         layer.style.justifyContent =
           corner || isRight ? "flex-end" : "flex-start";
         const row = layer.firstElementChild;

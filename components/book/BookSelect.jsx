@@ -53,7 +53,7 @@ export default function BookSelect({ value, options, onChange, ariaLabel }) {
                 <button
                   type="button"
                   className={`${styles.selectOption} ${
-                    selected ? styles.selectOptionActive : ""
+                    selected ? styles.pickerSolid : ""
                   }`}
                   onClick={() => {
                     onChange(option);

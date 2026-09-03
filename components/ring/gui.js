@@ -71,7 +71,7 @@ export function mountGui(GUI, { params, state, info, actions }) {
   const onMetaFit = (k, lo, hi, step, label) =>
     fit.add(params, k, lo, hi, step).name(label).onChange(styleMeta);
   onMetaFit("tightName", 0.3, 3, 0.01, "tight name x");
-  onMetaFit("tightNameBottom", 0, 200, 1, "tight name bottom");
+  onMetaFit("tightNameTop", 0, 200, 1, "tight name top");
   onMetaFit("tightNameRight", 0, 200, 1, "tight name right");
   onMetaFit("tightMetaWidth", 10, 100, 1, "tight box (vw)");
 

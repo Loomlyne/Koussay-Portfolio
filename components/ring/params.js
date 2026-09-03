@@ -51,8 +51,8 @@ export function defaultParams() {
     tightPosX: -3.5,
     tightSplit: 0.8, // the heading, competing with the ring for centre screen
     tightName: 1.5, // the name is the only label left, so it takes the billing
-    tightNameBottom: 16, // px
-    tightNameRight: 16, // px
+    tightNameTop: 40, // px
+    tightNameRight: 32, // px
     tightMetaWidth: 70, // vw of box, and so of filter region, around it
 
     // -- geometry, all at the reference window ---------------------------

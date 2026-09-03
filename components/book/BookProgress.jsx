@@ -1,17 +1,26 @@
 import styles from "@/app/book/page.module.css";
 
 export default function BookProgress({ step, total }) {
-  const progress = Math.max(0, Math.min(1, (step + 1) / total));
+  const current = step;
+  const lastIndex = total - 1;
+  const remaining = Math.max(0, total - step - 1);
+  const progress = lastIndex > 0 ? current / lastIndex : 0;
 
   return (
     <div
       className={styles.progress}
       role="progressbar"
-      aria-valuemin={1}
-      aria-valuemax={total}
-      aria-valuenow={step + 1}
-      aria-label={`Step ${step + 1} of ${total}`}
+      aria-valuemin={0}
+      aria-valuemax={lastIndex}
+      aria-valuenow={current}
+      aria-label={`Step ${current} of ${total}`}
     >
+      <div className={styles.progressMeta}>
+        <span>
+          {current} of {total}
+        </span>
+        <span>{remaining} left</span>
+      </div>
       <div className={styles.progressTrack}>
         <div
           className={styles.progressFill}

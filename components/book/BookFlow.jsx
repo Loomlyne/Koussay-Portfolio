@@ -91,7 +91,10 @@ export default function BookFlow() {
               Your project brief is in. We will confirm your call time and follow
               up at {form.email}.
             </p>
-            <Link href="/" className={`${styles.primaryButton} ${styles.soloButton}`}>
+            <Link
+              href="/"
+              className={`${styles.primaryButton} ${styles.primaryButtonActive} ${styles.soloButton}`}
+            >
               Back to works
             </Link>
           </div>
@@ -111,13 +114,21 @@ export default function BookFlow() {
                 Book a call and let&apos;s figure out if we&apos;re the right fit
                 for your project.
               </p>
-              <button
-                type="button"
-                className={styles.primaryButton}
-                onClick={goNext}
-              >
-                Start a project
-              </button>
+              <div className={styles.introActions}>
+                <Link
+                  href="/"
+                  className={`${styles.primaryButton} ${styles.soloButton}`}
+                >
+                  Back to works
+                </Link>
+                <button
+                  type="button"
+                  className={`${styles.primaryButton} ${styles.primaryButtonActive} ${styles.soloButton}`}
+                  onClick={goNext}
+                >
+                  Start a project
+                </button>
+              </div>
             </>
           ) : null}
 
@@ -231,7 +242,7 @@ export default function BookFlow() {
                       key={service}
                       type="button"
                       className={`${styles.chip} ${
-                        active ? styles.chipActive : ""
+                        active ? styles.pickerSolid : ""
                       }`}
                       onClick={() =>
                         update({ services: toggleService(form.services, service) })
@@ -256,7 +267,7 @@ export default function BookFlow() {
                     key={option}
                     type="button"
                     className={`${styles.chip} ${
-                      form.budget === option ? styles.chipActive : ""
+                      form.budget === option ? styles.pickerSolid : ""
                     }`}
                     onClick={() => update({ budget: option })}
                   >
@@ -278,7 +289,7 @@ export default function BookFlow() {
                     key={option}
                     type="button"
                     className={`${styles.chip} ${
-                      form.deadline === option ? styles.chipActive : ""
+                      form.deadline === option ? styles.pickerSolid : ""
                     }`}
                     onClick={() => update({ deadline: option })}
                   >
@@ -339,7 +350,7 @@ export default function BookFlow() {
                   type="button"
                   className={
                     form.website.trim()
-                      ? styles.continueButton
+                      ? `${styles.continueButton} ${styles.continueButtonActive}`
                       : styles.primaryButton
                   }
                   onClick={form.website.trim() ? goNext : skipWebsite}
@@ -350,7 +361,9 @@ export default function BookFlow() {
                 <button
                   type="button"
                   className={`${styles.continueButton} ${
-                    canContinue ? "" : styles.continueButtonDisabled
+                    canContinue
+                      ? styles.continueButtonActive
+                      : styles.continueButtonDisabled
                   }`}
                   disabled={!canContinue}
                   onClick={goNext}

@@ -28,7 +28,7 @@ export default function BookTimePicker({
   const slots = timeFormat === "24h" ? TIME_SLOTS_24H : TIME_SLOTS_12H;
 
   return (
-    <div className={`${styles.calendarCard} ${styles.timeCard}`}>
+    <div className={styles.calendarCard}>
       <div className={styles.calendarHeader}>
         <span className={styles.calendarName}>Koussay</span>
         <div className={styles.timeToggle} role="group" aria-label="Time format">
@@ -37,7 +37,7 @@ export default function BookTimePicker({
               key={format}
               type="button"
               className={`${styles.timeToggleButton} ${
-                timeFormat === format ? styles.timeToggleButtonActive : ""
+                timeFormat === format ? styles.pickerSolid : ""
               }`}
               onClick={() => onTimeFormatChange(format)}
             >
@@ -57,7 +57,7 @@ export default function BookTimePicker({
             key={slot}
             type="button"
             className={`${styles.timeSlot} ${
-              value === slot ? styles.timeSlotSelected : ""
+              value === slot ? styles.pickerSolid : ""
             }`}
             onClick={() => onChange(slot)}
           >

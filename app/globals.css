@@ -112,7 +112,41 @@ html[data-shared-transition="complete"] .project-transition-content {
   }
 }
 
-/* DOM buttons that echo the ring's frosted-glass "View" tag (tagFrost/tagRim). */
+/* DOM controls that echo the ring's frosted-glass "View" tag (tagFrost/tagRim). */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.16);
+  --glass-bg-strong: rgba(255, 255, 255, 0.3);
+  --glass-bg-muted: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.44);
+  --glass-rim: rgba(10, 10, 10, 0.05);
+  --glass-highlight: rgba(255, 255, 255, 0.52);
+  --glass-blur: blur(14px) saturate(1.12);
+  --glass-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 0 0 1px var(--glass-rim);
+  --glass-dark-bg: #0a0a0a;
+  --glass-dark-bg-hover: #161616;
+  --glass-dark-border: rgba(255, 255, 255, 0.22);
+  --glass-dark-highlight: rgba(255, 255, 255, 0.2);
+  --glass-dark-shadow:
+    inset 0 1px 0 var(--glass-dark-highlight),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  --ink: #0a0a0a;
+  --on-ink: #ffffff;
+  --surface-muted: rgba(10, 10, 10, 0.08);
+  --surface-hover: rgba(10, 10, 10, 0.12);
+  --line-subtle: rgba(10, 10, 10, 0.08);
+}
+
+.glass-surface {
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
 .glass-btn {
   display: inline-flex;
   align-items: center;
@@ -120,29 +154,36 @@ html[data-shared-transition="complete"] .project-transition-content {
   gap: 0.45rem;
   min-height: 40px;
   padding: 0 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.44);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.52),
-    0 0 0 1px rgba(10, 10, 10, 0.05);
-  backdrop-filter: blur(14px) saturate(1.12);
-  -webkit-backdrop-filter: blur(14px) saturate(1.12);
-  color: #0a0a0a;
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: var(--ink, #0a0a0a);
   font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1;
   text-decoration: none;
+  cursor: pointer;
   transition:
     opacity 180ms ease,
-    transform 180ms ease;
+    transform 180ms ease,
+    background 180ms ease;
 }
 
-.glass-btn:hover,
-.glass-btn:focus-visible {
-  opacity: 0.8;
+.glass-btn:hover:not(.glass-btn--solid),
+.glass-btn:focus-visible:not(.glass-btn--solid) {
+  background: var(--glass-bg-strong);
+}
+
+.glass-btn:disabled,
+.glass-btn--disabled {
+  background: var(--glass-bg-muted);
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .glass-btn--cta {
@@ -153,9 +194,53 @@ html[data-shared-transition="complete"] .project-transition-content {
   text-transform: uppercase;
 }
 
+.glass-btn--solid,
+.glass-btn.glass-btn--solid {
+  border-color: var(--glass-dark-border);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.02) 42%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    var(--glass-dark-bg);
+  box-shadow: var(--glass-dark-shadow);
+  color: var(--on-ink);
+  font-weight: 600;
+}
+
+.glass-btn--solid:hover,
+.glass-btn--solid:focus-visible,
+.glass-btn.glass-btn--solid:hover,
+.glass-btn.glass-btn--solid:focus-visible {
+  border-color: var(--glass-dark-border);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.03) 42%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    var(--glass-dark-bg-hover);
+  box-shadow: var(--glass-dark-shadow);
+  color: var(--on-ink);
+}
+
 .glass-btn--muted {
   opacity: 0.42;
   pointer-events: none;
+}
+
+.glass-btn--ghost {
+  background: transparent;
+  box-shadow: none;
+}
+
+.glass-btn--ghost:hover,
+.glass-btn--ghost:focus-visible {
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
 }
 
 @media (prefers-reduced-motion: reduce) {

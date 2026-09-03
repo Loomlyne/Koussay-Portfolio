@@ -87,7 +87,20 @@ export default function BookCalendar({
           onClick={() => shiftMonth(-1)}
           aria-label="Previous month"
         >
-          ←
+          <svg
+            className={styles.calendarNavIcon}
+            viewBox="0 0 12 12"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M7.5 2.25L4.25 6L7.5 9.75"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
         <p className={styles.calendarMonthLabel}>{monthLabel}</p>
         <button
@@ -96,7 +109,20 @@ export default function BookCalendar({
           onClick={() => shiftMonth(1)}
           aria-label="Next month"
         >
-          →
+          <svg
+            className={styles.calendarNavIcon}
+            viewBox="0 0 12 12"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M4.5 2.25L7.75 6L4.5 9.75"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
       </div>
 
@@ -120,7 +146,7 @@ export default function BookCalendar({
               key={day.toISOString()}
               type="button"
               className={`${styles.calendarDay} ${
-                selected ? styles.calendarDaySelected : ""
+                selected ? styles.pickerSolid : ""
               } ${selectable ? "" : styles.calendarDayDisabled}`}
               disabled={!selectable}
               onClick={() => onChange(day)}

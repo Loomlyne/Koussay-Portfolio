@@ -50,7 +50,7 @@ export default function ProjectHero({ project, displayIndex }) {
               <span aria-hidden="true">↗</span>
             </span>
           )}
-          <Link href="/book" className="glass-btn glass-btn--cta">
+          <Link href="/book" className="glass-btn glass-btn--cta glass-btn--solid">
             Start a project
             <span aria-hidden="true">→</span>
           </Link>
