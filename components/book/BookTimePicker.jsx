@@ -28,14 +28,9 @@ export default function BookTimePicker({
   const slots = timeFormat === "24h" ? TIME_SLOTS_24H : TIME_SLOTS_12H;
 
   return (
-    <div className={styles.calendarCard}>
+    <div className={`${styles.calendarCard} ${styles.timeCard}`}>
       <div className={styles.calendarHeader}>
-        <div className={styles.calendarProfile}>
-          <span className={styles.calendarAvatar} aria-hidden="true">
-            K
-          </span>
-          <span className={styles.calendarName}>Koussay</span>
-        </div>
+        <span className={styles.calendarName}>Koussay</span>
         <div className={styles.timeToggle} role="group" aria-label="Time format">
           {["12h", "24h"].map((format) => (
             <button

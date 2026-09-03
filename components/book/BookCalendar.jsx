@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import BookSelect from "@/components/book/BookSelect";
 import { TIMEZONES } from "@/lib/book/config";
 
 import styles from "@/app/book/page.module.css";
@@ -70,26 +71,13 @@ export default function BookCalendar({
   return (
     <div className={styles.calendarCard}>
       <div className={styles.calendarHeader}>
-        <div className={styles.calendarProfile}>
-          <span className={styles.calendarAvatar} aria-hidden="true">
-            K
-          </span>
-          <span className={styles.calendarName}>Koussay</span>
-        </div>
-        <label className={styles.timezoneField}>
-          <span className="sr-only">Timezone</span>
-          <select
-            className={styles.timezoneSelect}
-            value={timezone}
-            onChange={(event) => onTimezoneChange(event.target.value)}
-          >
-            {TIMEZONES.map((zone) => (
-                <option key={zone} value={zone}>
-                  {zone}
-                </option>
-            ))}
-          </select>
-        </label>
+        <span className={styles.calendarName}>Koussay</span>
+        <BookSelect
+          value={timezone}
+          options={TIMEZONES}
+          onChange={onTimezoneChange}
+          ariaLabel="Timezone"
+        />
       </div>
 
       <div className={styles.calendarMonth}>

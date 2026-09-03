@@ -56,7 +56,7 @@ export default function BookFlow() {
       case 9:
         return Boolean(form.deadline);
       case 10:
-        return form.details.trim().length > 10;
+        return form.details.trim().length > 0 || Boolean(form.attachment);
       default:
         return false;
     }
@@ -297,12 +297,35 @@ export default function BookFlow() {
                 <textarea
                   className={`${styles.input} ${styles.textarea}`}
                   name="details"
-                  rows={6}
+                  rows={5}
                   placeholder="Share goals, scope, references, or anything else that helps us prepare."
                   value={form.details}
                   onChange={(event) => update({ details: event.target.value })}
                 />
               </label>
+              <div className={styles.attachField}>
+                <input
+                  id="book-attachment"
+                  className={styles.attachInput}
+                  type="file"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.key,.zip,image/*"
+                  onChange={(event) =>
+                    update({ attachment: event.target.files?.[0] ?? null })
+                  }
+                />
+                <label htmlFor="book-attachment" className={styles.attachButton}>
+                  {form.attachment ? form.attachment.name : "Attach document"}
+                </label>
+                {form.attachment ? (
+                  <button
+                    type="button"
+                    className={styles.attachClear}
+                    onClick={() => update({ attachment: null })}
+                  >
+                    Remove
+                  </button>
+                ) : null}
+              </div>
             </>
           ) : null}
 
@@ -312,24 +335,17 @@ export default function BookFlow() {
                 Back
               </button>
               {step === 6 ? (
-                <>
-                  {form.website.trim() ? (
-                    <button
-                      type="button"
-                      className={styles.continueButton}
-                      onClick={goNext}
-                    >
-                      Continue
-                    </button>
-                  ) : null}
-                  <button
-                    type="button"
-                    className={styles.primaryButton}
-                    onClick={skipWebsite}
-                  >
-                    Skip for now
-                  </button>
-                </>
+                <button
+                  type="button"
+                  className={
+                    form.website.trim()
+                      ? styles.continueButton
+                      : styles.primaryButton
+                  }
+                  onClick={form.website.trim() ? goNext : skipWebsite}
+                >
+                  {form.website.trim() ? "Continue" : "Skip for now"}
+                </button>
               ) : (
                 <button
                   type="button"
