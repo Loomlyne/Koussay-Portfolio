@@ -1607,10 +1607,7 @@ export default function Carousel() {
 
       <Link
         href="/book"
-        style={{
-          fontFamily: '"Satoshi", ui-sans-serif, system-ui, sans-serif',
-        }}
-        className="pointer-events-auto fixed bottom-[2.4vh] right-[4vw] z-20 inline-flex min-h-11 items-center gap-2.5 rounded-[0.65rem] border border-[#0a0a0a]/18 bg-[#fafafa]/88 px-5 py-3 text-[0.72rem] font-medium uppercase tracking-[0.08em] text-[#0a0a0a] backdrop-blur-sm transition-opacity hover:opacity-55 focus-visible:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0a0a0a]"
+        className="glass-btn glass-btn--cta pointer-events-auto fixed bottom-[2.4vh] right-[4vw] z-20"
       >
         Start a project
         <span aria-hidden="true">→</span>

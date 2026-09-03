@@ -39,18 +39,18 @@ export default function ProjectHero({ project, displayIndex }) {
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={styles.heroAction}
+              className="glass-btn glass-btn--cta"
             >
               View live project
               <span aria-hidden="true">↗</span>
             </a>
           ) : (
-            <span className={`${styles.heroAction} ${styles.heroActionMuted}`}>
+            <span className="glass-btn glass-btn--cta glass-btn--muted">
               View live project
               <span aria-hidden="true">↗</span>
             </span>
           )}
-          <Link href="/book" className={styles.heroAction}>
+          <Link href="/book" className="glass-btn glass-btn--cta">
             Start a project
             <span aria-hidden="true">→</span>
           </Link>

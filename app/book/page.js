@@ -11,7 +11,7 @@ export default function BookPage() {
   return (
     <main className={styles.page}>
       <div className={styles.shell}>
-        <Link href="/" className={styles.backLink}>
+        <Link href="/" className="glass-btn glass-btn--cta">
           <span aria-hidden="true">←</span>
           Back to works
         </Link>
