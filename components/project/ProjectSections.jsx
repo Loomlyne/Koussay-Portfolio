@@ -1,16 +1,27 @@
 import styles from "@/app/work/[slug]/page.module.css";
 
-export default function ProjectSections({ sections }) {
-  if (sections.length === 0) return null;
+const NARRATIVE = [
+  { key: "overview", title: "Overview" },
+  { key: "challenge", title: "Challenge" },
+  { key: "outcome", title: "Outcome" },
+];
+
+export default function ProjectSections({ detail }) {
+  const blocks = NARRATIVE.map(({ key, title }) => ({
+    title,
+    body: detail?.[key],
+  })).filter((block) => block.body);
+
+  if (blocks.length === 0) return null;
 
   return (
-    <section className={styles.sections} aria-label="Project details">
-      {sections.map((section, index) => {
+    <section className={styles.sections} aria-label="Project narrative">
+      {blocks.map((section, index) => {
         const headingId = `project-section-${index + 1}`;
 
         return (
           <section
-            key={`${section.title}-${index}`}
+            key={section.title}
             className={styles.detailSection}
             aria-labelledby={headingId}
           >

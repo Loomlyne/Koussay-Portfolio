@@ -9,13 +9,21 @@
 // `slug` is identity, not presentation: keep it explicit so a URL survives a
 // later reorder of this ring. `detail` is deliberately marked as prototype
 // content; it must not be read as a claim about the placeholder artwork.
+// `detail` fields: overview, challenge, outcome, gallery, testimonial, tools.
+// Placeholder copy only — replace before publishing.
 const prototypeDetail = (summary, sections) => ({
-  isPrototype: true,
-  label: "Prototype / speculative",
-  notice:
-    "Prototype/speculative content. Replace this example copy and the placeholder artwork with verified project material before publishing.",
   summary,
-  sections,
+  overview: sections[0]?.body ?? "",
+  challenge: sections[1]?.body ?? "",
+  outcome: sections[2]?.body ?? "",
+  gallery: [],
+  testimonial: {
+    quote:
+      "Placeholder client feedback for this speculative case study. Replace with a verified quote before publishing.",
+    author: "Client name",
+    role: "Role · Company",
+  },
+  tools: ["Figma", "After Effects", "Cinema 4D"],
 });
 
 export const PROJECTS = [

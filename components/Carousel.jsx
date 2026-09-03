@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import gsap from "gsap";
@@ -1580,6 +1581,14 @@ export default function Carousel() {
       />
 
       <div ref={liveRef} aria-live="polite" className="sr-only" />
+
+      <Link
+        href="/book"
+        className="pointer-events-auto fixed bottom-[2.4vh] left-[4vw] z-20 inline-flex min-h-11 items-center gap-2.5 border border-[#0a0a0a]/18 bg-[#fafafa]/88 px-5 py-3 text-[0.72rem] font-medium uppercase tracking-[0.08em] text-[#0a0a0a] backdrop-blur-sm transition-opacity hover:opacity-55 focus-visible:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0a0a0a]"
+      >
+        Start a project
+        <span aria-hidden="true">→</span>
+      </Link>
 
       {/* Alpha multiplied up hard and biased down, so a pixel is either fully
           opaque or gone. That is what fuses two blurred words into one

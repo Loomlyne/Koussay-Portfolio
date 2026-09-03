@@ -1,8 +1,11 @@
 import styles from "@/app/work/[slug]/page.module.css";
 
+import ProjectGallery from "./ProjectGallery";
 import ProjectHero from "./ProjectHero";
 import ProjectPager from "./ProjectPager";
 import ProjectSections from "./ProjectSections";
+import ProjectTestimonial from "./ProjectTestimonial";
+import ProjectTools from "./ProjectTools";
 
 export default function ProjectDetail({
   project,
@@ -11,7 +14,6 @@ export default function ProjectDetail({
   next,
 }) {
   const detail = project.detail ?? {};
-  const sections = Array.isArray(detail.sections) ? detail.sections : [];
 
   return (
     <main className={styles.page}>
@@ -19,21 +21,16 @@ export default function ProjectDetail({
         <ProjectHero project={project} displayIndex={displayIndex} />
 
         <div className={`${styles.content} project-transition-content`}>
-          <header className={styles.intro}>
-            <div className={styles.introMeta}>
-              <p className={styles.eyebrow}>
-                {detail.label ?? "Prototype / speculative"}
-              </p>
-              {detail.notice ? (
-                <aside className={styles.prototypeNotice}>
-                  <p>{detail.notice}</p>
-                </aside>
-              ) : null}
-            </div>
-            <p className={styles.summary}>{detail.summary}</p>
-          </header>
+          {detail.summary ? (
+            <header className={styles.intro}>
+              <p className={styles.summary}>{detail.summary}</p>
+            </header>
+          ) : null}
 
-          <ProjectSections sections={sections} />
+          <ProjectSections detail={detail} />
+          <ProjectGallery project={project} gallery={detail.gallery} />
+          <ProjectTestimonial testimonial={detail.testimonial} />
+          <ProjectTools tools={detail.tools} />
         </div>
 
         <div className="project-transition-content">

@@ -22,11 +22,8 @@
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(9rem, 1fr) minmax(20rem, 52rem) minmax(
-      9rem,
-      1fr
-    );
-  grid-template-rows: 1fr;
+  grid-template-columns: minmax(9rem, 1fr) minmax(20rem, 52rem) minmax(9rem, 1fr);
+  grid-template-rows: auto auto;
   align-items: center;
   gap: clamp(1.5rem, 3.5vw, 5rem);
   min-height: min(100svh, 960px);
@@ -229,13 +226,16 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
 }
 
 .heroTitle {
-  max-width: 7ch;
-  margin: 0.75rem 0 1.4rem;
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
+  width: 100%;
+  max-width: none;
+  margin: clamp(0.5rem, 1.5vw, 1.25rem) 0 0;
   font-size: clamp(3.25rem, 6vw, 7.5rem);
   font-weight: 500;
   letter-spacing: -0.085em;
   line-height: 0.84;
-  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
@@ -250,42 +250,13 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
 }
 
 .intro {
-  display: grid;
-  grid-template-columns: minmax(10rem, 0.65fr) minmax(0, 1.85fr);
-  gap: clamp(2rem, 7vw, 9rem);
-  padding: 1.4rem 0 clamp(5rem, 11vw, 10rem);
+  padding: 1.4rem 0 clamp(4rem, 9vw, 7rem);
   border-top: 1px solid var(--line);
-}
-
-.introMeta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2.5rem;
-}
-
-.eyebrow {
-  margin: 0;
-  color: rgba(10, 10, 10, 0.62);
-}
-
-.prototypeNotice {
-  max-width: 16rem;
-  margin: 0;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--line);
-}
-
-.prototypeNotice p {
-  margin: 0;
-  color: rgba(10, 10, 10, 0.58);
-  font-size: 0.78rem;
-  line-height: 1.45;
 }
 
 .summary {
   max-width: 42rem;
-  margin: -0.15em 0 0;
+  margin: 0;
   font-size: clamp(2rem, 4.4vw, 4.8rem);
   letter-spacing: -0.07em;
   line-height: 0.98;
@@ -329,37 +300,180 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
   line-height: 1.35;
 }
 
-.pager {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: min(100%, 70rem);
-  margin: clamp(5rem, 12vw, 12rem) auto 0;
+.gallerySection,
+.testimonialSection,
+.toolsSection {
+  padding: clamp(2rem, 4vw, 4.5rem) 0;
   border-top: 1px solid var(--line);
 }
 
-.pagerLink {
-  position: relative;
+.galleryHeader,
+.testimonialHeader,
+.toolsHeader {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 1rem;
-  min-height: 7rem;
-  padding: 1.4rem 0;
-  color: var(--ink);
-  text-decoration: none;
-  transition:
-    background-color 180ms ease,
-    opacity 180ms ease;
+  grid-template-columns: minmax(10rem, 0.65fr) minmax(0, 1.85fr);
+  gap: clamp(2rem, 7vw, 9rem);
+  margin-bottom: clamp(1.75rem, 3vw, 2.75rem);
 }
 
-.pagerLink + .pagerLink {
-  padding-left: clamp(1rem, 3vw, 3rem);
+.galleryHeader .sectionTitle,
+.testimonialHeader .sectionTitle,
+.toolsHeader .sectionTitle {
+  margin: 0;
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galleryItem {
+  margin: 0;
+}
+
+.galleryFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: clamp(0.55rem, 1.1vw, 1rem);
+  background: #e7e7e2;
+}
+
+.galleryImage {
+  object-fit: cover;
+}
+
+.testimonialFigure {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.65fr) minmax(0, 1.85fr);
+  gap: clamp(2rem, 7vw, 9rem);
+  margin: 0;
+}
+
+.testimonialQuote {
+  margin: 0;
+  max-width: 42rem;
+  font-size: clamp(1.6rem, 2.8vw, 3rem);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+}
+
+.testimonialQuote p {
+  margin: 0;
+}
+
+.testimonialAttribution {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-self: end;
+  max-width: 16rem;
+}
+
+.testimonialAuthor {
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.testimonialRole {
+  color: rgba(10, 10, 10, 0.58);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.toolsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toolsItem {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.pager {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1rem, 2.5vw, 2rem);
+  width: min(100%, 70rem);
+  margin: clamp(5rem, 12vw, 12rem) 0 0;
+  padding-right: clamp(2rem, 10vw, 8rem);
+  border-top: 1px solid var(--line);
+}
+
+.pagerCard {
+  display: grid;
+  align-items: center;
+  gap: clamp(0.85rem, 1.5vw, 1.15rem);
+  min-height: 7.5rem;
+  padding: clamp(1rem, 2vw, 1.35rem) 0;
+  color: var(--ink);
+  text-decoration: none;
+  transition: opacity 180ms ease;
+}
+
+.pagerCardPrevious {
+  grid-template-columns: auto auto minmax(0, 1fr);
+  padding-right: clamp(1rem, 3vw, 2.5rem);
+}
+
+.pagerCardNext {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  justify-items: end;
+  padding-left: clamp(1rem, 3vw, 2.5rem);
   border-left: 1px solid var(--line);
 }
 
-.pagerLink:hover,
-.pagerLink:focus-visible {
+.pagerCard:hover,
+.pagerCard:focus-visible {
   opacity: 0.58;
+}
+
+.pagerThumb {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(4.5rem, 8vw, 7rem);
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: clamp(0.4rem, 0.8vw, 0.65rem);
+  background: #e7e7e2;
+}
+
+.pagerThumbImage {
+  object-fit: cover;
+}
+
+.pagerBody {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.pagerCardPrevious .pagerBody {
+  justify-items: start;
+  text-align: left;
+}
+
+.pagerCardNext .pagerBody {
+  justify-items: end;
+  text-align: right;
 }
 
 .pagerDirection,
@@ -368,31 +482,19 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
 }
 
 .pagerName {
-  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   font-size: clamp(1.25rem, 2.2vw, 2.4rem);
   letter-spacing: -0.065em;
   line-height: 0.95;
-  overflow-wrap: anywhere;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .pagerArrow {
+  flex: 0 0 auto;
   font-size: 1.25rem;
   line-height: 1;
-}
-
-.pagerNext {
-  text-align: right;
-}
-
-.pagerPrevious .pagerArrow {
-  order: -1;
-}
-
-.pagerNext .pagerArrow {
-  order: 4;
 }
 
 .notFoundState {
@@ -520,7 +622,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
 
   .hero {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto auto auto;
     gap: clamp(2rem, 5vw, 4rem);
     min-height: 100svh;
     padding: clamp(1.5rem, 4vw, 3rem) 0 clamp(4rem, 8vw, 6rem);
@@ -540,29 +642,44 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
     width: min(72vw, 52rem);
   }
 
-  .heroInfo {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: baseline;
-    gap: 1rem;
+  .heroTitle {
     grid-column: 1;
     grid-row: 3;
     width: 100%;
-    padding-bottom: 0;
+    max-width: none;
+    margin: 0;
+    font-size: clamp(3rem, 9vw, 6.5rem);
   }
 
-  .heroTitle {
-    margin: 0;
-    max-width: 10ch;
-    font-size: clamp(3rem, 9vw, 6.5rem);
+  .heroInfo {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    grid-column: 1;
+    grid-row: 4;
+    width: 100%;
+    padding-bottom: 0;
   }
 
   .heroType {
     color: rgba(10, 10, 10, 0.58);
   }
 
-  .heroYear {
-    justify-self: end;
+  .galleryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .galleryHeader,
+  .testimonialHeader,
+  .toolsHeader,
+  .testimonialFigure {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .testimonialAttribution {
+    align-self: start;
   }
 
   .content,
@@ -602,30 +719,18 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
   }
 
   .heroInfo {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
     gap: 0.8rem 1rem;
     width: 100%;
   }
 
-  .heroType {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
   .heroTitle {
-    grid-column: 1 / -1;
-    grid-row: 2;
     max-width: none;
-    margin: 0.2rem 0 0;
+    margin: 0;
     font-size: clamp(3.6rem, 17vw, 7rem);
     line-height: 0.83;
-  }
-
-  .heroYear {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: end;
   }
 
   .mediaCaption {
@@ -636,22 +741,21 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
     padding-top: 3.5rem;
   }
 
-  .intro,
-  .detailSection {
+  .intro {
+    padding-bottom: 4rem;
+  }
+
+  .detailSection,
+  .galleryHeader,
+  .testimonialHeader,
+  .toolsHeader,
+  .testimonialFigure {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 
-  .intro {
-    padding-bottom: 5rem;
-  }
-
-  .introMeta {
-    gap: 1.5rem;
-  }
-
-  .prototypeNotice {
-    max-width: 22rem;
+  .galleryGrid {
+    grid-template-columns: 1fr;
   }
 
   .summary {
@@ -672,22 +776,21 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
 
   .pager {
     grid-template-columns: 1fr;
-    margin-top: 5rem;
+    padding-right: 0;
   }
 
-  .pagerLink {
-    min-height: 5.5rem;
-    padding: 1.25rem 0;
-  }
-
-  .pagerLink + .pagerLink {
+  .pagerCardNext {
     padding-left: 0;
     border-top: 1px solid var(--line);
     border-left: 0;
   }
 
-  .pagerName {
-    font-size: clamp(1.5rem, 7vw, 2.1rem);
+  .pagerCardPrevious {
+    padding-right: 0;
+  }
+
+  .pagerCard {
+    min-height: 6.5rem;
   }
 
   .notFoundState {
@@ -754,7 +857,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaCaption 
   }
 
   .backLink,
-  .pagerLink {
+  .pagerCard {
     transition: none;
   }
 }

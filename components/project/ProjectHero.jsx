@@ -23,11 +23,12 @@ export default function ProjectHero({ project, displayIndex }) {
 
       <div className={styles.heroInfo}>
         <p className={styles.heroType}>{project.type}</p>
-        <h1 id="project-title" className={styles.heroTitle}>
-          {project.name}
-        </h1>
         <p className={styles.heroYear}>{project.year}</p>
       </div>
+
+      <h1 id="project-title" className={styles.heroTitle}>
+        {project.name}
+      </h1>
     </header>
   );
 }
