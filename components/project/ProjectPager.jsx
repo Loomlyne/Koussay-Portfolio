@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -17,6 +19,7 @@ function PagerLink({ project, direction }) {
   return (
     <Link
       href={`/work/${project.slug}`}
+      scroll={false}
       className={`${styles.pagerCard} ${
         previous ? styles.pagerCardPrevious : styles.pagerCardNext
       }`}

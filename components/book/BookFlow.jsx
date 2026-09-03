@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 
 import BookCalendar from "@/components/book/BookCalendar";
 import BookProgress from "@/components/book/BookProgress";
@@ -18,6 +19,11 @@ import styles from "@/app/book/page.module.css";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function focusField(node) {
+  if (!node) return;
+  node.focus();
+}
+
 function toggleService(list, service) {
   return list.includes(service)
     ? list.filter((item) => item !== service)
@@ -28,6 +34,7 @@ export default function BookFlow() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
+  const fieldRef = useRef(null);
 
   const update = (patch) => {
     setForm((current) => ({ ...current, ...patch }));
@@ -68,12 +75,26 @@ export default function BookFlow() {
       setSubmitted(true);
       return;
     }
-    setStep((current) => Math.min(current + 1, BOOK_STEP_COUNT - 1));
+    // Flush before focusing so iOS still treats this as the tap that
+    // opened the field, and the keyboard comes up with it.
+    flushSync(() => {
+      setStep((current) => Math.min(current + 1, BOOK_STEP_COUNT - 1));
+    });
+    focusField(fieldRef.current);
   };
 
   const goBack = () => {
     if (step === 0) return;
-    setStep((current) => Math.max(current - 1, 0));
+    flushSync(() => {
+      setStep((current) => Math.max(current - 1, 0));
+    });
+    focusField(fieldRef.current);
+  };
+
+  const onFieldEnter = (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    goNext();
   };
 
   const skipWebsite = () => {
@@ -88,8 +109,8 @@ export default function BookFlow() {
           <div className={styles.panel}>
             <h1 className={styles.heading}>Thank you</h1>
             <p className={styles.lead}>
-              Your project brief is in. We will confirm your call time and follow
-              up at {form.email}.
+              Your project brief is in. We will confirm your call time and
+              follow up at {form.email}.
             </p>
             <Link
               href="/"
@@ -111,8 +132,8 @@ export default function BookFlow() {
             <>
               <h1 className={styles.heading}>Let&apos;s talk</h1>
               <p className={styles.lead}>
-                Book a call and let&apos;s figure out if we&apos;re the right fit
-                for your project.
+                Book a call and let&apos;s figure out if we&apos;re the right
+                fit for your project.
               </p>
               <div className={styles.introActions}>
                 <Link
@@ -138,13 +159,18 @@ export default function BookFlow() {
               <label className={styles.field}>
                 <span className="sr-only">Your name</span>
                 <input
+                  ref={fieldRef}
                   className={styles.input}
                   type="text"
                   name="name"
                   autoComplete="name"
+                  autoCapitalize="words"
+                  autoCorrect="off"
+                  enterKeyHint="next"
                   placeholder="Your name..."
                   value={form.name}
                   onChange={(event) => update({ name: event.target.value })}
+                  onKeyDown={onFieldEnter}
                 />
               </label>
             </>
@@ -156,13 +182,17 @@ export default function BookFlow() {
               <label className={styles.field}>
                 <span className="sr-only">Email</span>
                 <input
+                  ref={fieldRef}
                   className={styles.input}
                   type="email"
                   name="email"
                   autoComplete="email"
+                  enterKeyHint="next"
+                  inputMode="email"
                   placeholder="you@company.com"
                   value={form.email}
                   onChange={(event) => update({ email: event.target.value })}
+                  onKeyDown={onFieldEnter}
                 />
               </label>
             </>
@@ -198,17 +228,23 @@ export default function BookFlow() {
 
           {step === 5 ? (
             <>
-              <h1 className={styles.heading}>What is the name of your company?</h1>
+              <h1 className={styles.heading}>
+                What is the name of your company?
+              </h1>
               <label className={styles.field}>
                 <span className="sr-only">Company name</span>
                 <input
+                  ref={fieldRef}
                   className={styles.input}
                   type="text"
                   name="organization"
                   autoComplete="organization"
+                  autoCapitalize="words"
+                  enterKeyHint="next"
                   placeholder="Your company name..."
                   value={form.company}
                   onChange={(event) => update({ company: event.target.value })}
+                  onKeyDown={onFieldEnter}
                 />
               </label>
             </>
@@ -220,12 +256,18 @@ export default function BookFlow() {
               <label className={styles.field}>
                 <span className="sr-only">Website URL</span>
                 <input
+                  ref={fieldRef}
                   className={styles.input}
                   type="url"
                   name="url"
+                  inputMode="url"
+                  enterKeyHint="next"
+                  autoCapitalize="none"
+                  autoCorrect="off"
                   placeholder="https://yourcompany.com"
                   value={form.website}
                   onChange={(event) => update({ website: event.target.value })}
+                  onKeyDown={onFieldEnter}
                 />
               </label>
             </>
@@ -245,7 +287,9 @@ export default function BookFlow() {
                         active ? styles.pickerSolid : ""
                       }`}
                       onClick={() =>
-                        update({ services: toggleService(form.services, service) })
+                        update({
+                          services: toggleService(form.services, service),
+                        })
                       }
                     >
                       {service}
@@ -302,13 +346,17 @@ export default function BookFlow() {
 
           {step === 10 ? (
             <>
-              <h1 className={styles.heading}>Tell us more about your project</h1>
+              <h1 className={styles.heading}>
+                Tell us more about your project
+              </h1>
               <label className={styles.field}>
                 <span className="sr-only">Project details</span>
                 <textarea
+                  ref={fieldRef}
                   className={`${styles.input} ${styles.textarea}`}
                   name="details"
                   rows={5}
+                  enterKeyHint="enter"
                   placeholder="Share goals, scope, references, or anything else that helps us prepare."
                   value={form.details}
                   onChange={(event) => update({ details: event.target.value })}
@@ -324,7 +372,10 @@ export default function BookFlow() {
                     update({ attachment: event.target.files?.[0] ?? null })
                   }
                 />
-                <label htmlFor="book-attachment" className={styles.attachButton}>
+                <label
+                  htmlFor="book-attachment"
+                  className={styles.attachButton}
+                >
                   {form.attachment ? form.attachment.name : "Attach document"}
                 </label>
                 {form.attachment ? (
@@ -342,7 +393,11 @@ export default function BookFlow() {
 
           {step > 0 ? (
             <div className={styles.actions}>
-              <button type="button" className={styles.backButton} onClick={goBack}>
+              <button
+                type="button"
+                className={styles.backButton}
+                onClick={goBack}
+              >
                 Back
               </button>
               {step === 6 ? (

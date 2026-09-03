@@ -49,10 +49,19 @@ body {
   overflow-y: auto;
   overscroll-behavior-x: none;
   overscroll-behavior-y: auto;
+  scroll-behavior: auto;
 }
 
 canvas {
   display: block;
+}
+
+html.ring-lock,
+html.ring-lock body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  height: 100%;
+  height: 100dvh;
 }
 
 html.shared-transition {
@@ -122,16 +131,14 @@ html[data-shared-transition="complete"] .project-transition-content {
   --glass-highlight: rgba(255, 255, 255, 0.52);
   --glass-blur: blur(14px) saturate(1.12);
   --glass-shadow:
-    inset 0 1px 0 var(--glass-highlight),
-    0 0 0 1px var(--glass-rim);
+    inset 0 1px 0 var(--glass-highlight), 0 0 0 1px var(--glass-rim);
   --glass-dark-bg: #0a0a0a;
   --glass-dark-bg-hover: #161616;
   --glass-dark-border: rgba(255, 255, 255, 0.22);
   --glass-dark-highlight: rgba(255, 255, 255, 0.2);
   --glass-dark-shadow:
     inset 0 1px 0 var(--glass-dark-highlight),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
   --ink: #0a0a0a;
   --on-ink: #ffffff;
   --surface-muted: rgba(10, 10, 10, 0.08);

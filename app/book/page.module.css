@@ -323,7 +323,7 @@
     border-color var(--motion-fast);
 }
 
-.input:focus-visible {
+.input:focus {
   border-color: var(--glass-border);
   background: var(--glass-sheen-light), var(--glass-bg-strong);
   box-shadow: var(--glass-shadow);

@@ -35,6 +35,7 @@ export default function ProjectGallery({ project, gallery = [] }) {
                   src={src}
                   alt={alt}
                   fill
+                  loading="lazy"
                   sizes="(max-width: 640px) 70vw, 70vw"
                   className={styles.galleryImage}
                 />

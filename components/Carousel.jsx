@@ -76,7 +76,20 @@ export default function Carousel() {
     const state = { progress: 0, launch: 0, spread: 0, spin: 0, shift: 0 };
     // Read-only panel readouts, so an invalid ring is visible rather than
     // silent and the reference window can be matched to the live one.
-    const info = { restingGap: 0, window: "", scale: 1, band: "wide" };
+    const info = {
+      restingGap: 0,
+      window: "",
+      scale: 1,
+      band: "wide",
+      quality: "hi",
+    };
+
+    const coarseMQ = window.matchMedia("(pointer: coarse)");
+    const loFiNow = (width = window.innerWidth) =>
+      coarseMQ.matches || width <= params.loFiAt;
+    let loFi = loFiNow();
+
+    document.documentElement.classList.add("ring-lock");
 
     // Browsers cap the number of live WebGL contexts (~16 in Chrome). If that
     // is hit, this throws and the rest of the effect never runs — no canvas is
@@ -85,12 +98,19 @@ export default function Carousel() {
     // happen: the context is released explicitly rather than left to GC.
     let renderer;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        depth: false,
+        stencil: false,
+        powerPreference: "high-performance",
+      });
     } catch (err) {
       console.error("[ring] could not create a WebGL context:", err);
+      document.documentElement.classList.remove("ring-lock");
       return;
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, params.dprCap));
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -261,6 +281,7 @@ export default function Carousel() {
       info.window = `${Math.round(viewW)} x ${Math.round(viewH)}`;
       info.scale = Math.round(fit * 1000) / 1000;
       info.band = tight ? "tight" : narrow ? "narrow" : "wide";
+      info.quality = loFi ? "lo" : "hi";
 
       // The heading is rasterised per glyph, so it cannot be re-sized without
       // rebuilding every texture mid-animation. Scaling the group costs
@@ -272,10 +293,20 @@ export default function Carousel() {
     const styleMeta = () =>
       meta.style({ textK, tight: tightNow, viewW: viewW });
 
+    const applyQuality = () => {
+      loFi = loFiNow(viewW);
+      info.quality = loFi ? "lo" : "hi";
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, params.dprCap));
+      if (atlas.texture) {
+        atlas.texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      }
+    };
+
     const resize = () => {
       viewW = container.clientWidth;
       viewH = container.clientHeight;
       refit();
+      applyQuality();
       renderer.setSize(viewW, viewH);
       camera.left = -viewW / 2;
       camera.right = viewW / 2;
@@ -300,6 +331,7 @@ export default function Carousel() {
 
     resize();
     window.addEventListener("resize", onResize);
+    coarseMQ.addEventListener?.("change", onResize);
 
     /* ------------------------------------------------------- spin & input */
     const ringCentre = { x: 0, y: 0 };
@@ -783,8 +815,26 @@ export default function Carousel() {
       // is why the window fit rides in here rather than on a dozen params.
       const shift = clamp01(state.shift);
       const g = (1 + (endScale - 1) * shift) * fit;
-      const cx = posX * viewW * 0.5 * shift;
       const cy = params.posY * viewH * 0.5 * shift;
+
+      // Landed geometry, so the entry can still travel from centre and the
+      // clamp does not fight the timeline. minScale can pin the ring larger
+      // than this window; without this the facing card walks off an edge.
+      const gLand = endScale * fit;
+      const Rland = params.ringRadius * radiusK * gLand;
+      const Wland = params.planeSize * planeK * gLand;
+      let stageX = posX * viewW * 0.5;
+      const frontX = Rland + stageX;
+      const pad = params.edgePad;
+      const maxX = viewW * 0.5 - Wland * 0.5 - pad;
+      if (maxX <= 0) {
+        stageX = -Rland;
+      } else if (frontX > maxX) {
+        stageX -= frontX - maxX;
+      } else if (frontX < -maxX) {
+        stageX += -maxX - frontX;
+      }
+      const cx = stageX * shift;
 
       // Screen-space centre, for pointer maths. World Y is up, page Y is down.
       ringCentre.x = viewW * 0.5 + cx;
@@ -1308,7 +1358,11 @@ export default function Carousel() {
             info,
             actions: {
               replay,
-              refit,
+              refit: () => {
+                refit();
+                applyQuality();
+                renderer.setSize(viewW, viewH);
+              },
               styleMeta,
               setThreshold: meta.setThreshold,
               rebuildText: () => {
@@ -1323,6 +1377,8 @@ export default function Carousel() {
                 params.refWidth = Math.round(viewW);
                 params.refHeight = Math.round(viewH);
                 refit();
+                applyQuality();
+                renderer.setSize(viewW, viewH);
               },
             },
           });
@@ -1342,7 +1398,6 @@ export default function Carousel() {
       // Clamped, so a backgrounded tab does not resume with one huge step.
       const dt = Math.min(0.05, (now - prevT) / 1000);
       prevT = now;
-      uniforms.uTime.value = (now - start) * 0.001;
 
       if (interactive && !dragging && !picking) {
         state.spin += spinVel * dt;
@@ -1425,7 +1480,30 @@ export default function Carousel() {
         meta.show(shown);
       }
 
-      renderer.render(scene, camera);
+      let needGL =
+        !params.idleSkip ||
+        !interactive ||
+        dragging ||
+        picking ||
+        settling ||
+        Math.abs(spinVel) > 0.0015 ||
+        cursor.amt > 0.01 ||
+        cursor.wake > 0.01 ||
+        state.shift < 0.999 ||
+        state.progress < 0.999;
+      if (!needGL) {
+        const n = Math.round(params.count);
+        for (let i = 0; i < n; i++) {
+          if (hoverF[i] > 0.004 || sideF[i] > 0.004) {
+            needGL = true;
+            break;
+          }
+        }
+      }
+      if (needGL) {
+        uniforms.uTime.value = (now - start) * 0.001;
+        renderer.render(scene, camera);
+      }
     });
 
     return () => {
@@ -1436,7 +1514,9 @@ export default function Carousel() {
       clearTimeout(fontFallback);
       renderer.setAnimationLoop(null);
 
+      document.documentElement.classList.remove("ring-lock");
       window.removeEventListener("resize", onResize);
+      coarseMQ.removeEventListener?.("change", onResize);
       container.removeEventListener("wheel", onWheel);
       container.removeEventListener("pointerdown", onPointerDown);
       container.removeEventListener("pointermove", onPointerMove);

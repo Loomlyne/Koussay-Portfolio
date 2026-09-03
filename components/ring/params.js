@@ -38,6 +38,15 @@ export function defaultParams() {
     fitHeight: 0, // 0 = width alone drives scale, 1 = whichever axis is tighter
     minScale: 0.5, // a phone is not a small desktop; bracket the extremes
     maxScale: 1.75,
+    // Fill-rate cap once the window is phone/tablet-sized, or the pointer is
+    // coarse. Antialias is chosen at context create from this same test.
+    loFiAt: 1024,
+    dprCap: 2,
+    dprCapLo: 2,
+    // Keep the facing card inside the viewport when minScale pins the ring
+    // larger than the window would otherwise allow.
+    edgePad: 20,
+    idleSkip: true,
 
     narrowAt: 1024, // inclusive
     narrowPlane: 1.25,

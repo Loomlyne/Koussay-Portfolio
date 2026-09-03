@@ -6,6 +6,7 @@ import ProjectPager from "./ProjectPager";
 import ProjectSections from "./ProjectSections";
 import ProjectTestimonial from "./ProjectTestimonial";
 import ProjectTools from "./ProjectTools";
+import ScrollTop from "./ScrollTop";
 
 export default function ProjectDetail({
   project,
@@ -17,6 +18,7 @@ export default function ProjectDetail({
 
   return (
     <main className={styles.page}>
+      <ScrollTop id={project.slug} />
       <article className={styles.article}>
         <ProjectHero project={project} displayIndex={displayIndex} />
 

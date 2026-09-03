@@ -50,6 +50,12 @@ export function mountGui(GUI, { params, state, info, actions }) {
   onFit("fitHeight", 0, 1, 0.01, "height's say");
   onFit("minScale", 0.1, 2, 0.01, "min");
   onFit("maxScale", 0.5, 4, 0.01, "max");
+  fit.add(info, "quality").listen().disable().name("quality");
+  onFit("loFiAt", 320, 1600, 10, "lo-fi at (px)");
+  onFit("dprCap", 1, 3, 0.25, "dpr cap");
+  onFit("dprCapLo", 0.5, 2, 0.25, "dpr cap (lo-fi)");
+  fit.add(params, "edgePad", 0, 80, 1).name("edge pad (px)");
+  fit.add(params, "idleSkip").name("skip idle frames");
 
   fit.add(info, "band").listen().disable().name("band");
   onFit("narrowAt", 320, 1600, 10, "narrow at (px)");

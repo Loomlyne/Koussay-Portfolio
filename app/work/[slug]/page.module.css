@@ -1,7 +1,3 @@
-:global(html) {
-  scroll-behavior: smooth;
-}
-
 .page {
   --paper: #fafafa;
   --ink: #0a0a0a;
@@ -22,7 +18,10 @@
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(9rem, 1fr) minmax(20rem, 81rem) minmax(9rem, 1fr);
+  grid-template-columns: minmax(9rem, 1fr) minmax(20rem, 81rem) minmax(
+      9rem,
+      1fr
+    );
   grid-template-rows: auto auto auto auto;
   align-items: start;
   gap: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1.5rem, 3.5vw, 5rem);
@@ -945,10 +944,6 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :global(html) {
-    scroll-behavior: auto;
-  }
-
   .mediaFigure,
   .loadingFrame {
     animation: none;
