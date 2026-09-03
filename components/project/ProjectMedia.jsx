@@ -60,7 +60,7 @@ export default function ProjectMedia({ project, preload = false }) {
             alt={`${project.name} — placeholder artwork`}
             fill
             preload={preload}
-            sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 86vw, 62vw"
+            sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 92vw, 70vw"
             className={styles.mediaImage}
             onError={() => setFailedSrc(imageSrc)}
           />

@@ -26,7 +26,7 @@ const prototypeDetail = (summary, sections) => ({
   tools: ["Figma", "After Effects", "Cinema 4D"],
 });
 
-export const PROJECTS = [
+const PROJECTS_DATA = [
   {
     file: "10.webp",
     slug: "matchday",
@@ -460,5 +460,11 @@ export const PROJECTS = [
     ),
   },
 ];
+
+// `liveUrl` is optional — set on a project when a shipped URL exists.
+export const PROJECTS = PROJECTS_DATA.map((project) => ({
+  ...project,
+  liveUrl: project.liveUrl ?? null,
+}));
 
 export const IMAGE_FILES = PROJECTS.map((p) => p.file);

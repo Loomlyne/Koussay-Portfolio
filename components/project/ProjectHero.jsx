@@ -5,6 +5,8 @@ import styles from "@/app/work/[slug]/page.module.css";
 import ProjectMedia from "./ProjectMedia";
 
 export default function ProjectHero({ project, displayIndex }) {
+  const hasLiveUrl = Boolean(project.liveUrl);
+
   return (
     <header className={styles.hero} aria-labelledby="project-title">
       <div className={styles.heroMeta}>
@@ -26,9 +28,34 @@ export default function ProjectHero({ project, displayIndex }) {
         <p className={styles.heroYear}>{project.year}</p>
       </div>
 
-      <h1 id="project-title" className={styles.heroTitle}>
-        {project.name}
-      </h1>
+      <div className={styles.heroFoot}>
+        <h1 id="project-title" className={styles.heroTitle}>
+          {project.name}
+        </h1>
+
+        <div className={styles.heroActions}>
+          {hasLiveUrl ? (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.heroAction}
+            >
+              View live project
+              <span aria-hidden="true">↗</span>
+            </a>
+          ) : (
+            <span className={`${styles.heroAction} ${styles.heroActionMuted}`}>
+              View live project
+              <span aria-hidden="true">↗</span>
+            </span>
+          )}
+          <Link href="/book" className={styles.heroAction}>
+            Start a project
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </div>
     </header>
   );
 }

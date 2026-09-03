@@ -22,7 +22,7 @@
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(9rem, 1fr) minmax(20rem, 62.4rem) minmax(9rem, 1fr);
+  grid-template-columns: minmax(9rem, 1fr) minmax(20rem, 81rem) minmax(9rem, 1fr);
   grid-template-rows: auto auto;
   align-items: center;
   gap: clamp(1.5rem, 3.5vw, 5rem);
@@ -82,7 +82,52 @@
   grid-row: 1;
   justify-self: center;
   width: 100%;
-  max-width: 62.4rem;
+  max-width: 81rem;
+}
+
+.heroFoot {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  grid-column: 2;
+  grid-row: 2;
+  width: 100%;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.heroAction {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: var(--paper);
+  padding: 0.7rem 1.15rem;
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: opacity 180ms ease;
+}
+
+.heroAction:hover,
+.heroAction:focus-visible {
+  opacity: 0.55;
+}
+
+.heroActionMuted {
+  opacity: 0.38;
+  pointer-events: none;
 }
 
 html[data-shared-transition="holding"] .page,
@@ -216,12 +261,10 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 }
 
 .heroTitle {
-  grid-column: 2;
-  grid-row: 2;
   justify-self: start;
   width: 100%;
   max-width: none;
-  margin: clamp(0.5rem, 1.5vw, 1.25rem) 0 0;
+  margin: 0;
   font-size: clamp(3.25rem, 6vw, 7.5rem);
   font-weight: 500;
   letter-spacing: -0.085em;
@@ -411,11 +454,10 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 
 .pager {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(1rem, 2.5vw, 2rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
   width: min(100%, 70rem);
-  margin: clamp(5rem, 12vw, 12rem) 0 0;
-  padding-right: clamp(2rem, 10vw, 8rem);
+  margin: clamp(5rem, 12vw, 12rem) auto 0;
   border-top: 1px solid var(--line);
 }
 
@@ -423,8 +465,9 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   display: grid;
   align-items: center;
   gap: clamp(0.85rem, 1.5vw, 1.15rem);
-  min-height: 7.5rem;
-  padding: clamp(1rem, 2vw, 1.35rem) 0;
+  width: 100%;
+  min-height: 8rem;
+  padding: clamp(1.15rem, 2vw, 1.5rem) clamp(1rem, 2vw, 1.5rem);
   color: var(--ink);
   text-decoration: none;
   transition: opacity 180ms ease;
@@ -432,13 +475,11 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 
 .pagerCardPrevious {
   grid-template-columns: auto auto minmax(0, 1fr);
-  padding-right: clamp(1rem, 3vw, 2.5rem);
 }
 
 .pagerCardNext {
   grid-template-columns: minmax(0, 1fr) auto auto;
   justify-items: end;
-  padding-left: clamp(1rem, 3vw, 2.5rem);
   border-left: 1px solid var(--line);
 }
 
@@ -581,7 +622,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 }
 
 .loadingFrame {
-  width: min(62.4vw, 62.4rem);
+  width: min(70vw, 81rem);
   aspect-ratio: 3 / 2;
   border-radius: clamp(0.55rem, 1.1vw, 1rem);
   background: #e7e7e2;
@@ -640,15 +681,16 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   .heroMedia {
     grid-column: 1;
     grid-row: 2;
-    width: min(86.4vw, 62.4rem);
+    width: min(92vw, 81rem);
   }
 
-  .heroTitle {
+  .heroFoot {
     grid-column: 1;
     grid-row: 3;
     width: 100%;
-    max-width: none;
-    margin: 0;
+  }
+
+  .heroTitle {
     font-size: clamp(3rem, 9vw, 6.5rem);
   }
 
@@ -681,7 +723,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   }
 
   .loadingFrame {
-    width: min(86.4vw, 62.4rem);
+    width: min(92vw, 81rem);
   }
 }
 
@@ -726,6 +768,10 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
     line-height: 0.83;
   }
 
+  .heroActions {
+    gap: 0.65rem;
+  }
+
   .content {
     padding-top: 3.5rem;
   }
@@ -765,21 +811,11 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 
   .pager {
     grid-template-columns: 1fr;
-    padding-right: 0;
   }
 
   .pagerCardNext {
-    padding-left: 0;
     border-top: 1px solid var(--line);
     border-left: 0;
-  }
-
-  .pagerCardPrevious {
-    padding-right: 0;
-  }
-
-  .pagerCard {
-    min-height: 6.5rem;
   }
 
   .notFoundState {
@@ -845,7 +881,8 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   }
 
   .backLink,
-  .pagerCard {
+  .pagerCard,
+  .heroAction {
     transition: none;
   }
 }
