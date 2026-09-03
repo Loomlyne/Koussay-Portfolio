@@ -1,0 +1,353 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState } from "react";
+
+import BookCalendar from "@/components/book/BookCalendar";
+import BookProgress from "@/components/book/BookProgress";
+import BookTimePicker from "@/components/book/BookTimePicker";
+import {
+  BOOK_STEP_COUNT,
+  BUDGET_OPTIONS,
+  DEADLINE_OPTIONS,
+  EMPTY_FORM,
+  SERVICES,
+} from "@/lib/book/config";
+
+import styles from "@/app/book/page.module.css";
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function toggleService(list, service) {
+  return list.includes(service)
+    ? list.filter((item) => item !== service)
+    : [...list, service];
+}
+
+export default function BookFlow() {
+  const [step, setStep] = useState(0);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [submitted, setSubmitted] = useState(false);
+
+  const update = (patch) => {
+    setForm((current) => ({ ...current, ...patch }));
+  };
+
+  const canContinue = useMemo(() => {
+    switch (step) {
+      case 0:
+        return true;
+      case 1:
+        return form.name.trim().length > 1;
+      case 2:
+        return EMAIL_PATTERN.test(form.email.trim());
+      case 3:
+        return Boolean(form.date);
+      case 4:
+        return Boolean(form.time);
+      case 5:
+        return form.company.trim().length > 1;
+      case 6:
+        return true;
+      case 7:
+        return form.services.length > 0;
+      case 8:
+        return Boolean(form.budget);
+      case 9:
+        return Boolean(form.deadline);
+      case 10:
+        return form.details.trim().length > 10;
+      default:
+        return false;
+    }
+  }, [form, step]);
+
+  const goNext = () => {
+    if (!canContinue) return;
+    if (step === BOOK_STEP_COUNT - 1) {
+      setSubmitted(true);
+      return;
+    }
+    setStep((current) => Math.min(current + 1, BOOK_STEP_COUNT - 1));
+  };
+
+  const goBack = () => {
+    if (step === 0) return;
+    setStep((current) => Math.max(current - 1, 0));
+  };
+
+  const skipWebsite = () => {
+    update({ website: "" });
+    setStep(7);
+  };
+
+  if (submitted) {
+    return (
+      <main className={styles.page}>
+        <div className={styles.stage}>
+          <div className={styles.panel}>
+            <h1 className={styles.heading}>Thank you</h1>
+            <p className={styles.lead}>
+              Your project brief is in. We will confirm your call time and follow
+              up at {form.email}.
+            </p>
+            <Link href="/" className={`${styles.primaryButton} ${styles.soloButton}`}>
+              Back to works
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className={styles.page}>
+      <div className={styles.stage}>
+        <div className={styles.panel}>
+          {step === 0 ? (
+            <>
+              <h1 className={styles.heading}>Let&apos;s talk</h1>
+              <p className={styles.lead}>
+                Book a call and let&apos;s figure out if we&apos;re the right fit
+                for your project.
+              </p>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                onClick={goNext}
+              >
+                Start a project
+              </button>
+            </>
+          ) : null}
+
+          {step === 1 ? (
+            <>
+              <h1 className={styles.heading}>What is your name?</h1>
+              <label className={styles.field}>
+                <span className="sr-only">Your name</span>
+                <input
+                  className={styles.input}
+                  type="text"
+                  name="name"
+                  autoComplete="name"
+                  placeholder="Your name..."
+                  value={form.name}
+                  onChange={(event) => update({ name: event.target.value })}
+                />
+              </label>
+            </>
+          ) : null}
+
+          {step === 2 ? (
+            <>
+              <h1 className={styles.heading}>What is your best email?</h1>
+              <label className={styles.field}>
+                <span className="sr-only">Email</span>
+                <input
+                  className={styles.input}
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  placeholder="you@company.com"
+                  value={form.email}
+                  onChange={(event) => update({ email: event.target.value })}
+                />
+              </label>
+            </>
+          ) : null}
+
+          {step === 3 ? (
+            <>
+              <h1 className={styles.heading}>Choose a day</h1>
+              <BookCalendar
+                value={form.date}
+                timezone={form.timezone}
+                onTimezoneChange={(timezone) => update({ timezone })}
+                onChange={(date) => update({ date, time: null })}
+              />
+            </>
+          ) : null}
+
+          {step === 4 ? (
+            <>
+              <h1 className={styles.heading}>Choose a time</h1>
+              <BookTimePicker
+                date={form.date}
+                timezone={form.timezone}
+                value={form.time}
+                timeFormat={form.timeFormat}
+                onTimeFormatChange={(timeFormat) =>
+                  update({ timeFormat, time: null })
+                }
+                onChange={(time) => update({ time })}
+              />
+            </>
+          ) : null}
+
+          {step === 5 ? (
+            <>
+              <h1 className={styles.heading}>What is the name of your company?</h1>
+              <label className={styles.field}>
+                <span className="sr-only">Company name</span>
+                <input
+                  className={styles.input}
+                  type="text"
+                  name="organization"
+                  autoComplete="organization"
+                  placeholder="Your company name..."
+                  value={form.company}
+                  onChange={(event) => update({ company: event.target.value })}
+                />
+              </label>
+            </>
+          ) : null}
+
+          {step === 6 ? (
+            <>
+              <h1 className={styles.heading}>What is your website URL?</h1>
+              <label className={styles.field}>
+                <span className="sr-only">Website URL</span>
+                <input
+                  className={styles.input}
+                  type="url"
+                  name="url"
+                  placeholder="https://yourcompany.com"
+                  value={form.website}
+                  onChange={(event) => update({ website: event.target.value })}
+                />
+              </label>
+            </>
+          ) : null}
+
+          {step === 7 ? (
+            <>
+              <h1 className={styles.heading}>How can we help?</h1>
+              <div className={styles.chipGrid}>
+                {SERVICES.map((service) => {
+                  const active = form.services.includes(service);
+                  return (
+                    <button
+                      key={service}
+                      type="button"
+                      className={`${styles.chip} ${
+                        active ? styles.chipActive : ""
+                      }`}
+                      onClick={() =>
+                        update({ services: toggleService(form.services, service) })
+                      }
+                    >
+                      {service}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          ) : null}
+
+          {step === 8 ? (
+            <>
+              <h1 className={styles.heading}>
+                What is your budget for the project?
+              </h1>
+              <div className={styles.chipGrid}>
+                {BUDGET_OPTIONS.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={`${styles.chip} ${
+                      form.budget === option ? styles.chipActive : ""
+                    }`}
+                    onClick={() => update({ budget: option })}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : null}
+
+          {step === 9 ? (
+            <>
+              <h1 className={styles.heading}>
+                What is your deadline for the project?
+              </h1>
+              <div className={styles.chipGrid}>
+                {DEADLINE_OPTIONS.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={`${styles.chip} ${
+                      form.deadline === option ? styles.chipActive : ""
+                    }`}
+                    onClick={() => update({ deadline: option })}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : null}
+
+          {step === 10 ? (
+            <>
+              <h1 className={styles.heading}>Tell us more about your project</h1>
+              <label className={styles.field}>
+                <span className="sr-only">Project details</span>
+                <textarea
+                  className={`${styles.input} ${styles.textarea}`}
+                  name="details"
+                  rows={6}
+                  placeholder="Share goals, scope, references, or anything else that helps us prepare."
+                  value={form.details}
+                  onChange={(event) => update({ details: event.target.value })}
+                />
+              </label>
+            </>
+          ) : null}
+
+          {step > 0 ? (
+            <div className={styles.actions}>
+              <button type="button" className={styles.backButton} onClick={goBack}>
+                Back
+              </button>
+              {step === 6 ? (
+                <>
+                  {form.website.trim() ? (
+                    <button
+                      type="button"
+                      className={styles.continueButton}
+                      onClick={goNext}
+                    >
+                      Continue
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className={styles.primaryButton}
+                    onClick={skipWebsite}
+                  >
+                    Skip for now
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className={`${styles.continueButton} ${
+                    canContinue ? "" : styles.continueButtonDisabled
+                  }`}
+                  disabled={!canContinue}
+                  onClick={goNext}
+                >
+                  {step === BOOK_STEP_COUNT - 1 ? "Submit" : "Continue"}
+                </button>
+              )}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <BookProgress step={step} total={BOOK_STEP_COUNT} />
+    </main>
+  );
+}
