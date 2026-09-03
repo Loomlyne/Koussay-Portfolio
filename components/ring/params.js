@@ -107,6 +107,7 @@ export function defaultParams() {
     damping: 0.94, // velocity kept per 60fps frame
     maxSpeed: 12, // rad/s, so one flick cannot run away
     dragSpeed: 1,
+    dragSpeedTouch: 1.55, // the pivot sits well off-screen, so a thumb needs more
     snap: true, // settle with a plane facing front
     snapTime: 0.8, // run-in, once the flick itself is spent
     snapFrom: 1, // rad/s under which the ring commits to a slot

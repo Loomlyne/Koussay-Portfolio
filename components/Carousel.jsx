@@ -302,7 +302,9 @@ export default function Carousel() {
       info.quality = loFi ? "lo" : "hi";
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, params.dprCap));
       if (atlas.texture) {
-        atlas.texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        atlas.texture.anisotropy = loFi
+          ? 1
+          : renderer.capabilities.getMaxAnisotropy();
       }
     };
 
@@ -606,13 +608,18 @@ export default function Carousel() {
       if (delta > Math.PI) delta -= TAU;
       if (delta < -Math.PI) delta += TAU;
 
-      const turn = delta * params.dragSpeed;
+      const turn =
+        delta * params.dragSpeed * (coarse ? params.dragSpeedTouch : 1);
       state.spin += turn;
 
       const now = performance.now();
-      spinVel = turn / (Math.max(8, now - dragPrevTime) / 1000);
+      // A finger-up on iOS often sends a last move with no delta, which would
+      // zero the flick and make the ring feel like it had been grabbed.
+      if (Math.abs(turn) > 1e-6) {
+        spinVel = turn / (Math.max(8, now - dragPrevTime) / 1000);
+        dragPrevTime = now;
+      }
       dragPrevAngle = a;
-      dragPrevTime = now;
     };
 
     const tryOpenPlane = (x, y) => {
@@ -1274,7 +1281,7 @@ export default function Carousel() {
       uniforms.uTextured.value = params.textured && firstIn ? 1 : 0;
       uniforms.uBlend.value = Math.max(0.5, params.blend * planeK * g);
 
-      const on = params.glass;
+      const on = params.glass && !loFi;
       uniforms.uBandTop.value = on ? params.bandTop * viewH : 0;
       uniforms.uBandBottom.value = on ? params.bandBottom * viewH : 0;
       uniforms.uGlass.value.set(
@@ -1298,6 +1305,7 @@ export default function Carousel() {
       spinVel = 0;
       dragging = false;
       settling = false;
+      textGroup.visible = true;
       // The timeline tweens state.spin, so a pick in flight has to be off the
       // same property before it starts.
       stopPick();
@@ -1503,12 +1511,15 @@ export default function Carousel() {
     /* ---------------------------------------------------------------- loop */
     const start = performance.now();
     let prevT = start;
+    let idleFrames = 0;
 
     renderer.setAnimationLoop(() => {
       const now = performance.now();
       // Clamped, so a backgrounded tab does not resume with one huge step.
       const dt = Math.min(0.05, (now - prevT) / 1000);
       prevT = now;
+
+      let justParked = false;
 
       if (interactive && !dragging && !pressing && !picking) {
         state.spin += spinVel * dt;
@@ -1542,13 +1553,22 @@ export default function Carousel() {
             // ended up, so a plane lands facing the viewer.
             const coast = state.spin + spinVel / decay;
             const phase = params.seed * DEG - frontAngle;
-            snapTo = Math.round((coast + phase) / slot) * slot - phase;
-            // Never quicker than it was already going, so the run-in can only
-            // slow the ring down. Floored at what the worst case it can be
-            // handed needs, or committing from a standstill caps itself at
-            // zero and never moves.
-            snapCap = Math.max(Math.abs(spinVel), slot * 0.5 * rate);
-            settling = true;
+            const target = Math.round((coast + phase) / slot) * slot - phase;
+            const dist = Math.abs(target - state.spin);
+            if (dist < 0.0008 && Math.abs(spinVel) < 0.0015) {
+              // Already on the slot. Re-entering snap from a standstill would
+              // kick the ring every frame and keep the GPU drawing.
+              state.spin = target;
+              spinVel = 0;
+            } else {
+              snapTo = target;
+              // Never quicker than it was already going, so the run-in can only
+              // slow the ring down. Floored at what the worst case it can be
+              // handed needs, or committing from a standstill caps itself at
+              // zero and never moves.
+              snapCap = Math.max(Math.abs(spinVel), slot * 0.5 * rate);
+              settling = true;
+            }
           }
 
           if (settling) {
@@ -1567,14 +1587,49 @@ export default function Carousel() {
         // Parked. Left running, the last hundredth of a degree creeps on for
         // ever, so put it down exactly on the slot.
         if (Math.abs(spinVel) < 0.0015 && Math.abs(off) < 0.0008) {
+          if (settling || spinVel !== 0) justParked = true;
           spinVel = 0;
           state.spin += off;
+          settling = false;
         }
+      }
+
+      const parked =
+        interactive &&
+        !dragging &&
+        !pressing &&
+        !picking &&
+        !settling &&
+        Math.abs(spinVel) <= 0.0015 &&
+        cursor.amt <= 0.01 &&
+        cursor.wake <= 0.01 &&
+        state.shift >= 0.999 &&
+        state.progress >= 0.999;
+
+      // Skip layout and draw while parked, but keep the GL context warm.
+      // iOS drops programs after a pause; the first swipe then hitch-stutters.
+      if (params.idleSkip && parked && !justParked) {
+        idleFrames++;
+        if (idleFrames % 8 !== 0) return;
+      } else {
+        idleFrames = 0;
       }
 
       tickLoader(dt);
       updatePointer(dt);
       layout(dt);
+
+      if (textGroup.visible && state.shift > 0.99) {
+        let lit = false;
+        const fades = splitText.fades;
+        for (let i = 0; i < fades.length; i++) {
+          if (fades[i].value > 0.01) {
+            lit = true;
+            break;
+          }
+        }
+        if (!lit) textGroup.visible = false;
+      }
 
       // The name arrives with the card, not while one flicks past. A pick
       // drives spin by tween, so spinVel is zero throughout — without that
@@ -1583,6 +1638,7 @@ export default function Carousel() {
         interactive &&
         !dragging &&
         !picking &&
+        !settling &&
         spinVel === 0 &&
         shown >= 0 &&
         shown !== announced
@@ -1591,31 +1647,8 @@ export default function Carousel() {
         meta.show(shown);
       }
 
-      let needGL =
-        !params.idleSkip ||
-        !interactive ||
-        pressing ||
-        dragging ||
-        picking ||
-        settling ||
-        Math.abs(spinVel) > 0.0015 ||
-        cursor.amt > 0.01 ||
-        cursor.wake > 0.01 ||
-        state.shift < 0.999 ||
-        state.progress < 0.999;
-      if (!needGL) {
-        const n = Math.round(params.count);
-        for (let i = 0; i < n; i++) {
-          if (hoverF[i] > 0.004 || sideF[i] > 0.004) {
-            needGL = true;
-            break;
-          }
-        }
-      }
-      if (needGL) {
-        uniforms.uTime.value = (now - start) * 0.001;
-        renderer.render(scene, camera);
-      }
+      uniforms.uTime.value = (now - start) * 0.001;
+      renderer.render(scene, camera);
     });
 
     return () => {
@@ -1803,6 +1836,7 @@ export default function Carousel() {
 
       <Link
         href="/book"
+        prefetch={false}
         className="glass-btn glass-btn--cta glass-btn--solid pointer-events-auto fixed bottom-[2.4vh] right-[4vw] z-20"
       >
         Start a project

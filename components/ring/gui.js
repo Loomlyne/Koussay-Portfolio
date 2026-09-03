@@ -195,6 +195,7 @@ export function mountGui(GUI, { params, state, info, actions }) {
   scroll.add(params, "damping", 0.5, 0.999, 0.001);
   scroll.add(params, "maxSpeed", 0.5, 60, 0.5);
   scroll.add(params, "dragSpeed", 0, 5, 0.01);
+  scroll.add(params, "dragSpeedTouch", 0, 5, 0.01).name("drag speed (touch)");
   scroll.add(params, "snap");
   scroll.add(params, "snapTime", 0.2, 3, 0.05).name("snap time (s)");
   scroll.add(params, "snapFrom", 0.1, 20, 0.1).name("settle below");
