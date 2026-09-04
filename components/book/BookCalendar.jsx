@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import BookSelect from "@/components/book/BookSelect";
+import BookTimePicker from "@/components/book/BookTimePicker";
 import { TIMEZONES } from "@/lib/book/config";
 import { isDayOpen } from "@/lib/book/time";
 import { dateStamp } from "@/lib/book/validate";
@@ -37,6 +38,10 @@ export default function BookCalendar({
   timezone,
   onTimezoneChange,
   busy,
+  time,
+  onTimeChange,
+  timeFormat,
+  onTimeFormatChange,
 }) {
   const today = useMemo(() => startOfDay(new Date()), []);
   const [view, setView] = useState(() => {
@@ -162,6 +167,16 @@ export default function BookCalendar({
           );
         })}
       </div>
+
+      <BookTimePicker
+        date={value}
+        timezone={timezone}
+        value={time}
+        busy={busy}
+        timeFormat={timeFormat}
+        onTimeFormatChange={onTimeFormatChange}
+        onChange={onTimeChange}
+      />
     </div>
   );
 }

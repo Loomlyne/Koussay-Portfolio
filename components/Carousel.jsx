@@ -539,8 +539,7 @@ export default function Carousel({
       if (!interactive) return;
       const plane = planeForProject(projectIndex);
       if (plane < 0) return;
-      const open = openForPlane(plane);
-      pick(plane, open);
+      pick(plane);
     };
 
     /* ------------------------------------------------------------ pointer */

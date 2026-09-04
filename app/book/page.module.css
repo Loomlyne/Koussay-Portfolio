@@ -134,6 +134,10 @@
   text-align: center;
 }
 
+.panelPacked {
+  gap: clamp(var(--space-4), 2.5vw, var(--space-6));
+}
+
 .heading {
   margin: 0;
   max-width: 16ch;
@@ -207,6 +211,43 @@
   min-width: 6.5rem;
 }
 
+.inlineTrigger {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.18em;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.inlineTrigger:focus-visible {
+  border-radius: 0.15em;
+  outline: none;
+  box-shadow: var(--focus-ring-soft);
+}
+
+.inlineChevron {
+  display: inline-flex;
+  width: 0.55em;
+  height: 0.55em;
+  flex-shrink: 0;
+  color: currentColor;
+  translate: 0 -0.04em;
+}
+
+.inlineChevron svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .lead {
   max-width: 28rem;
   margin: 0;
@@ -217,6 +258,17 @@
 
 .field {
   width: min(100%, var(--content-form));
+}
+
+.fieldStack {
+  display: flex;
+  width: min(100%, var(--content-form));
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.fieldStack .field {
+  width: 100%;
 }
 
 .glassSurface {
@@ -413,7 +465,7 @@
 }
 
 .textarea {
-  min-height: 11rem;
+  min-height: 8rem;
   border-radius: var(--radius-input);
   padding: var(--space-4) var(--space-5);
   resize: vertical;
@@ -676,6 +728,24 @@
   font-size: var(--text-ui-sm);
 }
 
+.timeSection {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.timeSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.timeSectionHeader .timeMeta {
+  margin: 0;
+}
+
 .timeGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -712,6 +782,29 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-3) var(--space-4);
+}
+
+.group {
+  display: flex;
+  width: min(100%, var(--content-form));
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.group .chipGrid {
+  width: 100%;
+}
+
+.groupLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35em;
+  margin: 0;
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: -0.03em;
 }
 
 .chip {

@@ -15,6 +15,8 @@ export default function BookSelect({
   const rootRef = useRef(null);
   const listId = useId();
   const heading = variant === "heading";
+  const inline = variant === "inline";
+  const textish = heading || inline;
 
   useEffect(() => {
     if (!open) return;
@@ -37,26 +39,38 @@ export default function BookSelect({
 
   return (
     <div
-      className={`${styles.selectRoot} ${heading ? styles.headingSelect : ""}`}
+      className={`${styles.selectRoot} ${textish ? styles.headingSelect : ""}`}
       ref={rootRef}
     >
       <button
         type="button"
-        className={heading ? styles.headingTrigger : styles.selectTrigger}
+        className={
+          heading
+            ? styles.headingTrigger
+            : inline
+              ? styles.inlineTrigger
+              : styles.selectTrigger
+        }
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
         aria-label={ariaLabel}
         onClick={() => setOpen((current) => !current)}
       >
-        <span className={heading ? styles.headingTriggerLabel : undefined}>
+        <span className={textish ? styles.headingTriggerLabel : undefined}>
           {value}
         </span>
         <span
-          className={heading ? styles.headingChevron : styles.selectChevron}
+          className={
+            heading
+              ? styles.headingChevron
+              : inline
+                ? styles.inlineChevron
+                : styles.selectChevron
+          }
           aria-hidden="true"
         >
-          {heading ? (
+          {textish ? (
             <svg viewBox="0 0 12 12" fill="none">
               <path
                 d="M2.25 4.5L6 8.25L9.75 4.5"
@@ -76,7 +90,7 @@ export default function BookSelect({
         <ul
           id={listId}
           className={`${styles.selectMenu} ${
-            heading ? styles.headingMenu : ""
+            textish ? styles.headingMenu : ""
           }`}
           role="listbox"
           aria-label={ariaLabel}
