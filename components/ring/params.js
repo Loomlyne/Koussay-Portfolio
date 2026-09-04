@@ -50,8 +50,7 @@ export function defaultParams() {
     // sit on a white page for seconds before anything moved.
     atlasLaunch: 1,
     // Keep the facing card inside the viewport when minScale pins the ring
-    // larger than the window would otherwise allow. Same pad is used to keep
-    // the parked arc off the top and bottom canvas edges.
+    // larger than the window would otherwise allow.
     edgePad: 20,
     idleSkip: true,
 

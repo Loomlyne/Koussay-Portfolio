@@ -1040,6 +1040,12 @@ export default function Carousel({
           ? params.narrowPosX
           : params.posX;
 
+      // The stage transform. Everything in plane-pixels goes through g, which
+      // is why the window fit rides in here rather than on a dozen params.
+      const shift = clamp01(state.shift);
+      const g = (1 + (endScale - 1) * shift) * fit;
+      const cy = params.posY * viewH * 0.5 * shift;
+
       // Spacing is authored at ringRefCount; grow/shrink the circle with the
       // live set so cards keep their size and their gap.
       const ringR = radiusForCount(
@@ -1051,44 +1057,7 @@ export default function Carousel({
       // Landed geometry, so the entry can still travel from centre and the
       // clamp does not fight the timeline. minScale can pin the ring larger
       // than this window; without this the facing card walks off an edge.
-      // Width-only fit can also pin the arc taller than the canvas. Neighbour
-      // cards then clip as a hard line at the top and bottom, so shrink g
-      // until the parked arc fits, including the glass lip.
-      const extentY = (gMul) => {
-        const R = ringR * radiusK * gMul;
-        const hw = params.planeSize * planeK * gMul * 0.5;
-        const hh = hw / 1.5;
-        let maxY = 0;
-        const slots = Math.min(2, Math.floor(count / 2));
-        for (let s = -slots; s <= slots; s++) {
-          const angle = s * step;
-          const rot = params.radial ? angle : angle + HALF_PI;
-          const py = Math.sin(angle) * R;
-          const cr = Math.cos(rot);
-          const sr = Math.sin(rot);
-          for (const lx of [-hw, hw]) {
-            for (const ly of [-hh, hh]) {
-              maxY = Math.max(maxY, Math.abs(py + lx * sr + ly * cr));
-            }
-          }
-        }
-        return maxY;
-      };
-
-      const gLand0 = endScale * fit;
-      const yPad =
-        params.edgePad +
-        (params.glass
-          ? Math.max(params.bandTop, params.bandBottom) * viewH
-          : 0);
-      const yLimit = Math.max(1, viewH * 0.5 - yPad);
-      const y0 = extentY(gLand0);
-      const vertK = y0 > yLimit ? yLimit / y0 : 1;
-
-      const shift = clamp01(state.shift);
-      const g = (1 + (endScale - 1) * shift) * fit * vertK;
-      const cy = params.posY * viewH * 0.5 * shift;
-      const gLand = gLand0 * vertK;
+      const gLand = endScale * fit;
       const Rland = ringR * radiusK * gLand;
       const Wland = params.planeSize * planeK * gLand;
       const hubX = posX * viewW * 0.5;
