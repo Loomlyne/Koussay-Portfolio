@@ -18,7 +18,7 @@
 }
 
 .hero {
-  --hero-media-max: min(56rem, calc((100svh - 22rem) * 3 / 2));
+  --hero-media-max: min(45rem, calc((100svh - 22rem) * 1.2));
   display: grid;
   grid-template-columns: minmax(9rem, 1fr) minmax(16rem, var(--hero-media-max))
     minmax(9rem, 1fr);
@@ -637,7 +637,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 }
 
 .loadingFrame {
-  width: min(70vw, var(--hero-media-max, 56rem));
+  width: min(70vw, var(--hero-media-max, 45rem));
   aspect-ratio: 3 / 2;
   border-radius: clamp(0.55rem, 1.1vw, 1rem);
   background: #e7e7e2;
@@ -678,7 +678,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   }
 
   .hero {
-    --hero-media-max: min(36rem, 86vw, calc((100svh - 24rem) * 3 / 2));
+    --hero-media-max: min(29rem, 69vw, calc((100svh - 24rem) * 1.2));
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto;
     gap: clamp(1.15rem, 2.8vw, 1.75rem);
@@ -757,7 +757,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   }
 
   .loadingFrame {
-    width: var(--hero-media-max, min(86vw, 36rem));
+    width: var(--hero-media-max, min(69vw, 29rem));
   }
 }
 

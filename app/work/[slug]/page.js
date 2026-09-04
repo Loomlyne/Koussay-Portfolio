@@ -11,12 +11,16 @@ import {
 } from "@/lib/projects";
 
 export async function generateStaticParams() {
-  const projects = await getProjects();
-  return getProjectStaticParams(projects);
+  try {
+    const projects = await getProjects();
+    return getProjectStaticParams(projects);
+  } catch {
+    return [];
+  }
 }
 
 export const dynamicParams = true;
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;

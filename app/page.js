@@ -2,7 +2,7 @@ import { RegisterHome } from "@/components/HomeRing";
 import { getProjects } from "@/lib/cms/projects";
 import { projectImageSrc } from "@/lib/projects";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function Page() {
   const projects = await getProjects();

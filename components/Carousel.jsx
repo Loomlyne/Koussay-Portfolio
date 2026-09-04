@@ -282,6 +282,15 @@ export default function Carousel({
     atlas.ready.then(() => {
       if (!disposed) loadProg = 1;
     });
+    // Notion covers used to hang for a minute; the timeline pause then left
+    // CHARGING on 001. Open anyway so a bad/slow image cannot freeze the page.
+    const launchTimer = window.setTimeout(() => {
+      if (disposed || launchReady) return;
+      loadProg = 1;
+      launchReady = true;
+      for (const fn of readyWaiters) fn();
+      readyWaiters.length = 0;
+    }, 1800);
 
     /* --------------------------------------------------------------- size */
     let viewW = 1;
@@ -1271,12 +1280,12 @@ export default function Carousel({
       // closing the circle while the fan is opening: those two planes were
       // never merged, so there is nothing between them to stretch.
       //
-      // On a phone the goo, the threads and the glass lip are what smear the
-      // whole ring into a blur while it turns. Drop them for the throw and
-      // put them back once it parks — the resting look is unchanged.
+      // Goo, threads and the glass lip smear the ring into a blur while it
+      // turns. Drop them for the throw on every size and put them back once
+      // it parks — the resting look is unchanged.
       const spinning =
         dragging || picking || settling || Math.abs(spinVel) > 0.12;
-      const cheap = loFi && spinning;
+      const cheap = spinning;
 
       order.sort((a, b) => signedOffset(a) - signedOffset(b));
 
@@ -1812,6 +1821,7 @@ export default function Carousel({
       pickProjectRef.current = null;
       stopPick();
       clearTimeout(holdTimer);
+      clearTimeout(launchTimer);
       clearTimeout(fontFallback);
       renderer.setAnimationLoop(null);
 

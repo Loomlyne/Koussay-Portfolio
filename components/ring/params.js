@@ -48,7 +48,7 @@ export function defaultParams() {
     // Visible arc only. The rest of the sheet fills in while the ring is
     // idle (`setPaused`); waiting on every cell is what made the counter
     // sit on a white page for seconds before anything moved.
-    atlasLaunch: 7,
+    atlasLaunch: 1,
     // Keep the facing card inside the viewport when minScale pins the ring
     // larger than the window would otherwise allow.
     edgePad: 20,
@@ -113,8 +113,8 @@ export function defaultParams() {
     moveDelay: 0.2,
 
     // -- scroll / drag / click, live once the entry finishes --------------
-    scrollSpeed: 0.0022, // rad/s of angular velocity per px of wheel delta
-    damping: 0.94, // velocity kept per 60fps frame
+    scrollSpeed: 0.0034, // rad/s of angular velocity per px of wheel delta
+    damping: 0.91, // velocity kept per 60fps frame
     maxSpeed: 12, // rad/s, so one flick cannot run away
     dragSpeed: 1,
     dragSpeedTouch: 1.9, // the pivot sits well off-screen, so a thumb needs more

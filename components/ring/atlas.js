@@ -3,13 +3,27 @@ import { IMAGE_FILES } from "./projects";
 import { projectImageSrc } from "@/lib/projects";
 import { signedOffset } from "./utils";
 
-const load = (src, priority) =>
+const load = (src, priority, ms = 8000) =>
   new Promise((resolve, reject) => {
     const img = new Image();
     // Must be set before src or the request is already away.
     if (priority) img.fetchPriority = priority;
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`failed to load ${src}`));
+    let done = false;
+    let timer;
+    const finish = (err) => {
+      if (done) return;
+      done = true;
+      window.clearTimeout(timer);
+      if (err) {
+        img.src = "";
+        reject(err);
+      } else {
+        resolve(img);
+      }
+    };
+    timer = window.setTimeout(() => finish(new Error(`timed out ${src}`)), ms);
+    img.onload = () => finish();
+    img.onerror = () => finish(new Error(`failed to load ${src}`));
     img.src = src;
   });
 

@@ -1,7 +1,6 @@
-import { notionMediaUrl } from "@/lib/notion/projects";
+import { cachedNotionMediaUrl } from "@/lib/notion/projects";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 function notFound() {
   return new Response("Not found", { status: 404 });
@@ -16,9 +15,11 @@ export async function GET(request, { params }) {
   if (pageId.length < 32) return notFound();
   const dashed = `${pageId.slice(0, 8)}-${pageId.slice(8, 12)}-${pageId.slice(12, 16)}-${pageId.slice(16, 20)}-${pageId.slice(20, 32)}`;
 
+  const version = request.nextUrl.searchParams.get("v") || "";
+
   let fileUrl = "";
   try {
-    fileUrl = await notionMediaUrl(dashed, slot);
+    fileUrl = await cachedNotionMediaUrl(dashed, slot, version);
   } catch (error) {
     console.warn("[media]", error);
     return notFound();
@@ -26,7 +27,16 @@ export async function GET(request, { params }) {
 
   if (!fileUrl) return notFound();
 
-  const upstream = await fetch(fileUrl, { cache: "no-store" });
+  let upstream;
+  try {
+    upstream = await fetch(fileUrl, {
+      signal: AbortSignal.timeout(5000),
+      next: { revalidate: 3600 },
+    });
+  } catch (error) {
+    console.warn("[media] upstream", error);
+    return notFound();
+  }
   if (!upstream.ok || !upstream.body) return notFound();
 
   const versioned = request.nextUrl.searchParams.has("v");

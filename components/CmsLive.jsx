@@ -40,7 +40,7 @@ export default function CmsLive() {
     };
 
     tick();
-    const id = window.setInterval(tick, 1500);
+    const id = window.setInterval(tick, 20000);
     return () => {
       cancelled = true;
       window.clearInterval(id);

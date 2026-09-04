@@ -1,22 +1,24 @@
 import { isNotionProjectsConfigured } from "@/lib/env";
-import { fetchProjectsStamp } from "@/lib/notion/projects";
+import { cachedProjectsStamp } from "@/lib/notion/projects";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const revalidate = 20;
+
+const STAMP_CACHE = "public, s-maxage=20, stale-while-revalidate=40";
 
 export async function GET() {
   if (!isNotionProjectsConfigured()) {
     return Response.json(
       { stamp: "" },
-      { headers: { "Cache-Control": "no-store" } },
+      { headers: { "Cache-Control": STAMP_CACHE } },
     );
   }
 
   try {
-    const stamp = await fetchProjectsStamp();
+    const stamp = await cachedProjectsStamp();
     return Response.json(
       { stamp },
-      { headers: { "Cache-Control": "no-store" } },
+      { headers: { "Cache-Control": STAMP_CACHE } },
     );
   } catch (error) {
     console.warn("[cms-stamp]", error);
