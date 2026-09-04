@@ -1,12 +1,13 @@
 import { notionMediaUrl } from "@/lib/notion/projects";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function notFound() {
   return new Response("Not found", { status: 404 });
 }
 
-export async function GET(_request, { params }) {
+export async function GET(request, { params }) {
   const { parts } = await params;
   const [rawId, slot = "cover"] = parts ?? [];
   if (!rawId) return notFound();
@@ -28,6 +29,7 @@ export async function GET(_request, { params }) {
   const upstream = await fetch(fileUrl, { cache: "no-store" });
   if (!upstream.ok || !upstream.body) return notFound();
 
+  const versioned = request.nextUrl.searchParams.has("v");
   const headers = new Headers();
   headers.set(
     "Content-Type",
@@ -35,7 +37,7 @@ export async function GET(_request, { params }) {
   );
   headers.set(
     "Cache-Control",
-    "public, s-maxage=300, stale-while-revalidate=86400",
+    versioned ? "public, max-age=31536000, immutable" : "no-store",
   );
 
   return new Response(upstream.body, { status: 200, headers });

@@ -2,6 +2,8 @@ import Carousel from "@/components/Carousel";
 import { getProjects } from "@/lib/cms/projects";
 import { projectImageSrc } from "@/lib/projects";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const projects = await getProjects();
   const seed = projects[0]?.file;

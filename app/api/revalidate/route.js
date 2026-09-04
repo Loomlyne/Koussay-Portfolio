@@ -1,61 +1,66 @@
+import { verifyWebhookSignature } from "@notionhq/client";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 import { notionWebhookSecret } from "@/lib/env";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-function authorized(request, body) {
-  const secret = notionWebhookSecret();
-  if (!secret) {
-    // First-time Notion handshake has no secret yet.
-    return Boolean(body?.verification_token);
-  }
-
-  const header =
-    request.headers.get("authorization") ||
-    request.headers.get("x-webhook-secret") ||
-    "";
-  const bearer = header.replace(/^Bearer\s+/i, "");
-  const query = request.nextUrl.searchParams.get("secret") || "";
-  return (
-    bearer === secret || query === secret || body?.verification_token === secret
-  );
+function bust() {
+  revalidateTag("projects", { expire: 0 });
+  revalidatePath("/");
+  revalidatePath("/work", "layout");
+  revalidatePath("/api/media", "layout");
 }
 
 export async function POST(request) {
+  const raw = await request.text();
   let body = {};
   try {
-    body = await request.json();
+    body = raw ? JSON.parse(raw) : {};
   } catch {
     body = {};
   }
 
-  if (body?.verification_token && !notionWebhookSecret()) {
+  if (body?.verification_token) {
     console.info(
-      "[revalidate] Notion verification token (paste into Notion, then set NOTION_WEBHOOK_SECRET):",
+      "[revalidate] Notion verification_token — paste this into Notion Verify, then set NOTION_WEBHOOK_SECRET on Vercel:",
       body.verification_token,
     );
-    return Response.json({ ok: true });
+    return Response.json({
+      ok: true,
+      verification_token: body.verification_token,
+    });
   }
 
-  if (!authorized(request, body)) {
+  const secret = notionWebhookSecret();
+  const signature =
+    request.headers.get("x-notion-signature") ||
+    request.headers.get("X-Notion-Signature");
+
+  if (secret) {
+    const valid = await verifyWebhookSignature({
+      body: raw,
+      signature,
+      verificationToken: secret,
+    });
+    if (!valid) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  } else if (!body?.type) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  revalidateTag("projects", "max");
-  revalidatePath("/");
-  revalidatePath("/work", "layout");
-
+  bust();
   return Response.json({ ok: true, revalidated: true });
 }
 
 export async function GET(request) {
-  if (!authorized(request, {})) {
+  const secret = notionWebhookSecret();
+  const query = request.nextUrl.searchParams.get("secret") || "";
+  if (!secret || query !== secret) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  revalidateTag("projects", "max");
-  revalidatePath("/");
-  revalidatePath("/work", "layout");
+  bust();
   return Response.json({ ok: true, revalidated: true });
 }

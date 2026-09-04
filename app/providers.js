@@ -1,7 +1,13 @@
 "use client";
 
 import { SharedTransitionProvider } from "@/components/SharedTransitionProvider";
+import CmsLive from "@/components/CmsLive";
 
 export function Providers({ children }) {
-  return <SharedTransitionProvider>{children}</SharedTransitionProvider>;
+  return (
+    <SharedTransitionProvider>
+      <CmsLive />
+      {children}
+    </SharedTransitionProvider>
+  );
 }
