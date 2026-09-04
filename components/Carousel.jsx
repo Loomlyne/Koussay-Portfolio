@@ -828,7 +828,9 @@ export default function Carousel({
     const updatePointer = (dt) => {
       // Held off until the entry finishes, so the cursor cannot soften the
       // ring while the timeline is still drawing it.
-      const live = params.hover && engaged() && pointer.seeded && interactive;
+      // Melt on a phone is the smear under the thumb. Leave it off in lo-fi.
+      const live =
+        params.hover && !loFi && engaged() && pointer.seeded && interactive;
       cursor.amt += ((live ? 1 : 0) - cursor.amt) * chase(dt, 0.12);
 
       const k = chase(dt, params.lag);
