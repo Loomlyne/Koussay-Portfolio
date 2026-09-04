@@ -23,3 +23,14 @@ export const signedOffset = (i) =>
 // Relaxation factor toward a target. Rates are written per 60fps frame and
 // corrected for real frame time, so the feel holds at any refresh rate.
 export const chase = (dt, rate) => 1 - Math.pow(1 - rate, dt * 60);
+
+// Radius that keeps neighbour spacing (and therefore card size) as the
+// set grows. `baseRadius` is the circle authored at `refCount` slots;
+// more projects enlarge it, fewer shrink it. Floor at 2 so a single
+// card cannot ask for an infinite circle.
+export const radiusForCount = (baseRadius, refCount, count) => {
+  const n = Math.max(2, Math.round(count));
+  const ref = Math.max(2, Math.round(refCount));
+  if (n === ref) return baseRadius;
+  return (baseRadius * Math.sin(Math.PI / ref)) / Math.sin(Math.PI / n);
+};

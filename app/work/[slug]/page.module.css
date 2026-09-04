@@ -18,17 +18,16 @@
 }
 
 .hero {
+  --hero-media-max: min(56rem, calc((100svh - 22rem) * 3 / 2));
   display: grid;
-  grid-template-columns: minmax(9rem, 1fr) minmax(20rem, 81rem) minmax(
-      9rem,
-      1fr
-    );
+  grid-template-columns: minmax(9rem, 1fr) minmax(16rem, var(--hero-media-max))
+    minmax(9rem, 1fr);
   grid-template-rows: auto auto auto auto;
   align-items: start;
   gap: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1.5rem, 3.5vw, 5rem);
   min-height: 100vh;
   min-height: 100dvh;
-  padding: clamp(1.5rem, 3vw, 3rem) 0 clamp(4rem, 9vw, 9rem);
+  padding: clamp(1.5rem, 3vw, 3rem) 0 clamp(2rem, 4vw, 4rem);
 }
 
 .heroMeta {
@@ -115,13 +114,13 @@
   grid-row: 2;
   justify-self: center;
   width: 100%;
-  max-width: 81rem;
+  max-width: var(--hero-media-max);
 }
 
 .heroFoot {
   display: flex;
   flex-direction: column;
-  gap: clamp(2rem, 4.5vw, 3.25rem);
+  gap: clamp(1.25rem, 2.4vw, 2rem);
   grid-column: 2;
   grid-row: 4;
   width: 100%;
@@ -638,7 +637,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 }
 
 .loadingFrame {
-  width: min(70vw, 81rem);
+  width: min(70vw, var(--hero-media-max, 56rem));
   aspect-ratio: 3 / 2;
   border-radius: clamp(0.55rem, 1.1vw, 1rem);
   background: #e7e7e2;
@@ -679,12 +678,13 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   }
 
   .hero {
+    --hero-media-max: min(36rem, 86vw, calc((100svh - 24rem) * 3 / 2));
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto;
-    gap: clamp(2rem, 5vw, 4rem);
+    gap: clamp(1.15rem, 2.8vw, 1.75rem);
     min-height: 100vh;
     min-height: 100dvh;
-    padding: clamp(1.5rem, 4vw, 3rem) 0 clamp(4rem, 8vw, 6rem);
+    padding: clamp(1.5rem, 4vw, 3rem) 0 clamp(2rem, 5vw, 3.5rem);
   }
 
   .heroMeta {
@@ -699,7 +699,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   .heroMedia {
     grid-column: 1;
     grid-row: 2;
-    width: min(92vw, 81rem);
+    width: var(--hero-media-max);
   }
 
   .heroFoot {
@@ -757,7 +757,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   }
 
   .loadingFrame {
-    width: min(92vw, 81rem);
+    width: var(--hero-media-max, min(86vw, 36rem));
   }
 }
 
@@ -790,6 +790,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 
   .heroMedia {
     width: 100%;
+    max-width: none;
     flex: 0 0 auto;
   }
 

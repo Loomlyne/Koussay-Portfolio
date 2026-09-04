@@ -73,6 +73,7 @@ export function mountGui(GUI, { params, state, info, actions }) {
   onFit("tightAt", 240, 1200, 10, "tight at (px)");
   onFit("tightRadius", 0.3, 2, 0.01, "tight radius x");
   fit.add(params, "tightPosX", -6, 6, 0.005).name("tight move x");
+  fit.add(params, "tightEndScale", 0.05, 8, 0.01).name("tight end scale");
   onFit("tightSplit", 0.2, 2, 0.01, "tight heading x");
   const onMetaFit = (k, lo, hi, step, label) =>
     fit.add(params, k, lo, hi, step).name(label).onChange(styleMeta);
@@ -85,6 +86,7 @@ export function mountGui(GUI, { params, state, info, actions }) {
   const shape = gui.addFolder("shape");
   shape.add(params, "planeSize", 10, 900, 1).name("plane size");
   shape.add(params, "count", 2, MAX_PLANES, 1);
+  shape.add(params, "ringRefCount", 2, MAX_PLANES, 1).name("radius at n");
   shape.add(params, "ringRadius", 20, 2400, 1).name("ring radius");
   shape.add(params, "seed", -180, 180, 1).name("seed angle");
   shape.add(params, "radial");

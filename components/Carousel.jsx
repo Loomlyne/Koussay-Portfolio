@@ -32,6 +32,7 @@ import {
   easeOutCubic,
   signedOffset,
   smoothstep,
+  radiusForCount,
 } from "./ring/utils";
 
 // The fan starts fractionally into the spread so the seed reads first.
@@ -976,7 +977,11 @@ export default function Carousel({
 
       // Band values are picked per frame rather than latched on resize, so
       // dragging any of these sliders shows up straight away.
-      const endScale = narrowNow ? params.narrowEndScale : params.endScale;
+      const endScale = tightNow
+        ? params.tightEndScale
+        : narrowNow
+          ? params.narrowEndScale
+          : params.endScale;
       const posX = tightNow
         ? params.tightPosX
         : narrowNow
@@ -989,11 +994,19 @@ export default function Carousel({
       const g = (1 + (endScale - 1) * shift) * fit;
       const cy = params.posY * viewH * 0.5 * shift;
 
+      // Spacing is authored at ringRefCount; grow/shrink the circle with the
+      // live set so cards keep their size and their gap.
+      const ringR = radiusForCount(
+        params.ringRadius,
+        params.ringRefCount,
+        count,
+      );
+
       // Landed geometry, so the entry can still travel from centre and the
       // clamp does not fight the timeline. minScale can pin the ring larger
       // than this window; without this the facing card walks off an edge.
       const gLand = endScale * fit;
-      const Rland = params.ringRadius * radiusK * gLand;
+      const Rland = ringR * radiusK * gLand;
       const Wland = params.planeSize * planeK * gLand;
       let stageX = posX * viewW * 0.5;
       const frontX = Rland + stageX;
@@ -1030,7 +1043,7 @@ export default function Carousel({
       const sepExtent = params.radial ? H : W;
       const faceEdge = params.radial ? W : H;
 
-      const R = params.ringRadius * radiusK * g;
+      const R = ringR * radiusK * g;
       const restingGap = 2 * R * Math.sin(step / 2) - sepExtent;
       info.restingGap = Math.round((restingGap / g) * 10) / 10;
       // The whole stretch plays out across this, so it is the yardstick.
@@ -1252,6 +1265,14 @@ export default function Carousel({
       // One bridge per parent/child pair, in ring order. Deliberately none
       // closing the circle while the fan is opening: those two planes were
       // never merged, so there is nothing between them to stretch.
+      //
+      // On a phone the goo, the threads and the glass lip are what smear the
+      // whole ring into a blur while it turns. Drop them for the throw and
+      // put them back once it parks — the resting look is unchanged.
+      const spinning =
+        dragging || picking || settling || Math.abs(spinVel) > 0.12;
+      const cheap = loFi && spinning;
+
       order.sort((a, b) => signedOffset(a) - signedOffset(b));
 
       const edgeHalf = faceEdge * 0.5 * params.thread;
@@ -1259,7 +1280,9 @@ export default function Carousel({
       // link the one gap the fan never opened is the only one the cursor
       // cannot web back together.
       const closed = spread > 0.995 && count > 2;
-      const linkCount = Math.min(closed ? count : count - 1, MAX_LINKS);
+      const linkCount = cheap
+        ? 0
+        : Math.min(closed ? count : count - 1, MAX_LINKS);
 
       for (let l = 0; l < linkCount; l++) {
         const ia = order[l];
@@ -1325,7 +1348,7 @@ export default function Carousel({
 
       // Both are px into the distance field, so they scale with the ring or
       // the merge reads as a different material at a different window size.
-      uniforms.uK.value = params.goo * planeK * fit;
+      uniforms.uK.value = params.goo * planeK * fit * (cheap ? 0.12 : 1);
       uniforms.uWobble.value =
         params.wobble * fit * (1 - smoothstep(0.2, 0.95, state.progress));
 
@@ -1333,9 +1356,12 @@ export default function Carousel({
       // is bound from frame one but blank, and texturing before anything is
       // painted into it draws an empty cell.
       uniforms.uTextured.value = params.textured && firstIn ? 1 : 0;
-      uniforms.uBlend.value = Math.max(0.5, params.blend * planeK * g);
+      uniforms.uBlend.value = Math.max(
+        0.5,
+        params.blend * planeK * g * (cheap ? 0.22 : 1),
+      );
 
-      const on = params.glass;
+      const on = params.glass && !cheap;
       uniforms.uBandTop.value = on ? params.bandTop * viewH : 0;
       uniforms.uBandBottom.value = on ? params.bandBottom * viewH : 0;
       uniforms.uGlass.value.set(
@@ -1623,7 +1649,7 @@ export default function Carousel({
           const engage = Math.max(params.snapFrom, decay * slot * 0.5);
           // Half a slot down to a pixel is about 4.8 e-foldings, which is what
           // lets snapTime read back as seconds.
-          const rate = 4.8 / Math.max(0.05, params.snapTime);
+          const rate = 4.8 / Math.max(0.05, params.snapTime * (loFi ? 0.7 : 1));
 
           if (!settling && Math.abs(spinVel) < engage) {
             // Committed from where the coast alone would have left it, so it

@@ -36,7 +36,7 @@ export function defaultParams() {
     refWidth: 1512,
     refHeight: 870, // viewport, i.e. screen less menu bar and browser chrome
     fitHeight: 0, // 0 = width alone drives scale, 1 = whichever axis is tighter
-    minScale: 0.5, // a phone is not a small desktop; bracket the extremes
+    minScale: 0.38, // phones used to pin at 0.5 and the facing card ate the screen
     maxScale: 1.75,
     // Fill-rate cap once the window is phone/tablet-sized, or the pointer is
     // coarse. Antialias is chosen at context create from this same test.
@@ -62,8 +62,9 @@ export function defaultParams() {
     narrowEndScale: 4.22,
 
     tightAt: 640, // inclusive
-    tightRadius: 0.82, // multiplies narrowRadius
+    tightRadius: 0.76, // multiplies narrowRadius
     tightPosX: -3.5,
+    tightEndScale: 3.6,
     tightSplit: 0.8, // the heading, competing with the ring for centre screen
     tightName: 1.5, // the name is the only label left, so it takes the billing
     tightNameTop: 40, // px
@@ -73,6 +74,9 @@ export function defaultParams() {
     // -- geometry, all at the reference window ---------------------------
     planeSize: 90, // long edge in px; aspect locked at 1.5 : 1
     count: PROJECTS.length, // one plane per project, so the deal comes out even
+    // Radius is the circle for this many slots. Layout scales it with count
+    // so adding a project grows the ring instead of packing the cards tighter.
+    ringRefCount: 18,
     ringRadius: 340,
     seed: 0, // where plane 0 sits, degrees (0 = 3 o'clock)
     radial: true, // long edge points outward; off = long edge along the ring
@@ -113,7 +117,7 @@ export function defaultParams() {
     damping: 0.94, // velocity kept per 60fps frame
     maxSpeed: 12, // rad/s, so one flick cannot run away
     dragSpeed: 1,
-    dragSpeedTouch: 1.55, // the pivot sits well off-screen, so a thumb needs more
+    dragSpeedTouch: 1.9, // the pivot sits well off-screen, so a thumb needs more
     snap: true, // settle with a plane facing front
     snapTime: 0.8, // run-in, once the flick itself is spent
     snapFrom: 1, // rad/s under which the ring commits to a slot
