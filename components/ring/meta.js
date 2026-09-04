@@ -48,7 +48,7 @@ function fade(el, f, blur) {
   }
 }
 
-function createGroup(side, groups, params) {
+function createGroup(side, groups, params, mode) {
   const m = { t: 1 };
   // What is on screen, and which of it the morph in flight is moving. Both
   // rows are rewritten on every change rather than trading places: a word can
@@ -113,8 +113,10 @@ function createGroup(side, groups, params) {
     prev = next;
 
     // Card changed but this group did not. Nothing to melt, and no reason to
-    // switch the threshold on.
-    if (!moving[0] && !moving[1]) {
+    // switch the threshold on. On the phone the smear is the flash when a
+    // card seats, so skip it and just write the words.
+    if (mode.instant || (!moving[0] && !moving[1])) {
+      moving = [false, false];
       m.t = 1;
       draw();
       return;
@@ -139,8 +141,9 @@ function createGroup(side, groups, params) {
  */
 export function createMeta(refs, params, projects = FALLBACK_PROJECTS) {
   const { groups, list, loader, cut, live } = refs;
-  const left = createGroup("left", groups, params);
-  const right = createGroup("right", groups, params);
+  const mode = { instant: false };
+  const left = createGroup("left", groups, params, mode);
+  const right = createGroup("right", groups, params, mode);
 
   // Only the alpha row does any work; colour passes straight through.
   const setThreshold = () => {
@@ -156,6 +159,7 @@ export function createMeta(refs, params, projects = FALLBACK_PROJECTS) {
   // layout: { textK, tight, viewW } — the band state, passed in rather than
   // read, so this stays a pure function of the window it is told about.
   const style = ({ textK, tight, viewW }) => {
+    mode.instant = tight || viewW <= params.loFiAt;
     const bigVw = params.nameSize * textK * (tight ? params.tightName : 1);
     const big = `${bigVw}vw`;
     const small = `${params.idxSize * textK}vw`;

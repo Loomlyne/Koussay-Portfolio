@@ -1326,20 +1326,28 @@ export default function Carousel({
       // Goo, threads and the glass lip smear the ring into a blur while it
       // turns. Drop them for the throw and ease them back — a boolean swap
       // is the flash on every phone flick.
-      const wantCheap =
-        dragging || picking || settling || Math.abs(spinVel) > params.cheapIn;
-      if (wantCheap) cheapOn = true;
-      else if (
-        !dragging &&
-        !picking &&
-        !settling &&
-        Math.abs(spinVel) < params.cheapOut
-      ) {
-        cheapOn = false;
+      // On a phone the goo blooming back when a card seats is the same
+      // flash as the name melt. Stay cheap; do not ease the fancy look in.
+      if (loFi) {
+        cheapOn = true;
+        cheapAmt = 1;
+      } else {
+        const wantCheap =
+          dragging || picking || settling || Math.abs(spinVel) > params.cheapIn;
+        if (wantCheap) cheapOn = true;
+        else if (
+          !dragging &&
+          !picking &&
+          !settling &&
+          Math.abs(spinVel) < params.cheapOut
+        ) {
+          cheapOn = false;
+        }
+        cheapAmt +=
+          ((cheapOn ? 1 : 0) - cheapAmt) * chase(dt, params.cheapChase);
+        if (cheapAmt < 0.001) cheapAmt = 0;
+        if (cheapAmt > 0.999) cheapAmt = 1;
       }
-      cheapAmt += ((cheapOn ? 1 : 0) - cheapAmt) * chase(dt, params.cheapChase);
-      if (cheapAmt < 0.001) cheapAmt = 0;
-      if (cheapAmt > 0.999) cheapAmt = 1;
       const linkFade = 1 - cheapAmt;
 
       order.sort((a, b) => signedOffset(a) - signedOffset(b));
