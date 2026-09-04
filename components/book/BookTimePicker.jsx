@@ -4,6 +4,8 @@ import {
   TIME_SLOTS_12H,
   TIME_SLOTS_24H,
 } from "@/lib/book/config";
+import { isSlotOpen } from "@/lib/book/time";
+import { dateStamp } from "@/lib/book/validate";
 
 import styles from "@/app/book/page.module.css";
 
@@ -21,11 +23,17 @@ export default function BookTimePicker({
   date,
   timezone,
   value,
+  taken,
   onChange,
   timeFormat,
   onTimeFormatChange,
 }) {
   const slots = timeFormat === "24h" ? TIME_SLOTS_24H : TIME_SLOTS_12H;
+  const iso = dateStamp(date);
+  const takenSet = taken ?? new Set();
+  const openSlots = slots.filter((slot) =>
+    isSlotOpen(iso, slot, timezone, takenSet),
+  );
 
   return (
     <div className={styles.calendarCard}>
@@ -51,20 +59,30 @@ export default function BookTimePicker({
         {timezone} · {formatSelectedDate(date)}
       </p>
 
-      <div className={styles.timeGrid}>
-        {slots.map((slot) => (
-          <button
-            key={slot}
-            type="button"
-            className={`${styles.timeSlot} ${
-              value === slot ? styles.pickerSolid : ""
-            }`}
-            onClick={() => onChange(slot)}
-          >
-            {slot}
-          </button>
-        ))}
-      </div>
+      {openSlots.length === 0 ? (
+        <p className={styles.timeEmpty}>
+          No times left this day. Go back and pick another date.
+        </p>
+      ) : (
+        <div className={styles.timeGrid}>
+          {slots.map((slot) => {
+            const open = isSlotOpen(iso, slot, timezone, takenSet);
+            return (
+              <button
+                key={slot}
+                type="button"
+                className={`${styles.timeSlot} ${
+                  value === slot ? styles.pickerSolid : ""
+                } ${open ? "" : styles.timeSlotDisabled}`}
+                disabled={!open}
+                onClick={() => onChange(slot)}
+              >
+                {slot}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import BrandMark from "@/components/BrandMark";
 import styles from "@/app/work/[slug]/page.module.css";
 
 import ProjectMedia from "./ProjectMedia";
@@ -10,10 +11,13 @@ export default function ProjectHero({ project, displayIndex }) {
   return (
     <header className={styles.hero} aria-labelledby="project-title">
       <div className={styles.heroMeta}>
-        <Link href="/" className={styles.backLink}>
-          <span aria-hidden="true">←</span>
-          Back to works
-        </Link>
+        <div className={styles.brandRow}>
+          <BrandMark className={styles.brandMark} />
+          <Link href="/" className={styles.backLink}>
+            <span aria-hidden="true">←</span>
+            Back to works
+          </Link>
+        </div>
         <p className={styles.heroIndex} aria-label={`Project ${displayIndex}`}>
           {displayIndex}
         </p>
@@ -50,7 +54,10 @@ export default function ProjectHero({ project, displayIndex }) {
               <span aria-hidden="true">↗</span>
             </span>
           )}
-          <Link href="/book" className="glass-btn glass-btn--cta glass-btn--solid">
+          <Link
+            href="/book"
+            className="glass-btn glass-btn--cta glass-btn--solid"
+          >
             Start a project
             <span aria-hidden="true">→</span>
           </Link>

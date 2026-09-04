@@ -1,7 +1,7 @@
 import BookFlow from "@/components/book/BookFlow";
 
 export const metadata = {
-  title: "Start a project — Viscose",
+  title: { absolute: "Start a project" },
   description: "Book a call and start a new project with Koussay.",
 };
 

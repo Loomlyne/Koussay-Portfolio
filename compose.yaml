@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    image: viscose-carousel
+    image: koussay-portfolio
     ports:
       - "3000:3000"
     restart: unless-stopped

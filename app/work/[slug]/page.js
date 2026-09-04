@@ -24,14 +24,13 @@ export async function generateMetadata({ params }) {
 
   if (!project) {
     return {
-      title: "Work not found — Viscose",
-      description:
-        "The requested work is not part of the Viscose project index.",
+      title: { absolute: "Work not found" },
+      description: "This address does not match a project in the work index.",
     };
   }
 
   return {
-    title: `${project.name} — Viscose`,
+    title: { absolute: project.name },
     description:
       project.detail?.summary ??
       "Prototype / speculative material for this project.",

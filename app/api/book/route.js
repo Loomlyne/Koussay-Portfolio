@@ -4,13 +4,30 @@ import {
   isResendConfigured,
 } from "@/lib/env";
 import { sendBookingEmails } from "@/lib/mail/booking";
-import { createNotionBooking } from "@/lib/notion/bookings";
+import {
+  createNotionBooking,
+  fetchBookedStarts,
+} from "@/lib/notion/bookings";
+import {
+  claimSlot,
+  pendingSlotStarts,
+  releaseSlot,
+  slotStartMs,
+} from "@/lib/book/time";
 import { MAX_ATTACHMENT_BYTES, validateBooking } from "@/lib/book/validate";
 
 export const runtime = "nodejs";
 
 function json(data, status = 200) {
   return Response.json(data, { status });
+}
+
+async function takenStarts() {
+  const taken = isNotionBookingsConfigured()
+    ? await fetchBookedStarts()
+    : new Set();
+  for (const start of pendingSlotStarts()) taken.add(start);
+  return taken;
 }
 
 export async function POST(request) {
@@ -58,25 +75,53 @@ export async function POST(request) {
     ...booking,
     attachmentName: attachment?.filename || "",
   };
+  const start = slotStartMs(booking.date, booking.time, booking.timezone);
 
-  const results = { notion: false, email: false };
+  if (!claimSlot(start)) {
+    const taken = [...(await takenStarts())];
+    return json(
+      {
+        error: "That time was just booked. Pick the next open slot.",
+        taken,
+      },
+      409,
+    );
+  }
 
   try {
+    const booked = isNotionBookingsConfigured()
+      ? await fetchBookedStarts()
+      : new Set();
+    if (booked.has(start)) {
+      const taken = [...booked, ...pendingSlotStarts()];
+      return json(
+        {
+          error: "That time is already booked. Pick the next open slot.",
+          taken,
+        },
+        409,
+      );
+    }
+
+    const results = { notion: false, email: false };
+
     if (isNotionBookingsConfigured()) {
-      await createNotionBooking(record);
+      await createNotionBooking(record, attachment);
       results.notion = true;
     }
     if (isResendConfigured()) {
       await sendBookingEmails(record, attachment);
       results.email = true;
     }
+
+    return json({ ok: true, ...results });
   } catch (err) {
     console.error("[book]", err);
     return json(
       { error: "Could not save this booking. Try again in a moment." },
       502,
     );
+  } finally {
+    releaseSlot(start);
   }
-
-  return json({ ok: true, ...results });
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
+import BrandMark from "@/components/BrandMark";
 import BookCalendar from "@/components/book/BookCalendar";
 import BookProgress from "@/components/book/BookProgress";
 import BookTimePicker from "@/components/book/BookTimePicker";
@@ -15,6 +16,7 @@ import {
   SERVICES,
 } from "@/lib/book/config";
 import { dateStamp, EMAIL_PATTERN } from "@/lib/book/validate";
+import { isSlotOpen } from "@/lib/book/time";
 
 import styles from "@/app/book/page.module.css";
 
@@ -35,11 +37,48 @@ export default function BookFlow() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [taken, setTaken] = useState(() => new Set());
   const fieldRef = useRef(null);
 
   const update = (patch) => {
     setForm((current) => ({ ...current, ...patch }));
   };
+
+  useEffect(() => {
+    if (step !== 3 && step !== 4) return;
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        const response = await fetch("/api/book/availability", {
+          cache: "no-store",
+        });
+        const data = await response.json().catch(() => ({}));
+        if (cancelled || !Array.isArray(data.taken)) return;
+        setTaken(new Set(data.taken));
+      } catch {
+        // Keep the last known set; the submit path still re-checks.
+      }
+    };
+
+    load();
+    const timer = setInterval(load, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [step]);
+
+  useEffect(() => {
+    if (!form.date || !form.time) return;
+    if (
+      !isSlotOpen(dateStamp(form.date), form.time, form.timezone, taken)
+    ) {
+      setForm((current) =>
+        current.time ? { ...current, time: null } : current,
+      );
+    }
+  }, [form.date, form.time, form.timezone, taken]);
 
   const canContinue = useMemo(() => {
     switch (step) {
@@ -100,7 +139,11 @@ export default function BookFlow() {
         body,
       });
       const data = await response.json().catch(() => ({}));
+      if (Array.isArray(data.taken)) setTaken(new Set(data.taken));
       if (!response.ok) {
+        if (response.status === 409) {
+          setStep(4);
+        }
         setError(data.error || "Could not send this booking.");
         return;
       }
@@ -152,6 +195,7 @@ export default function BookFlow() {
   if (submitted) {
     return (
       <main className={styles.page}>
+        <BrandMark className={styles.brandMark} />
         <div className={styles.stage}>
           <div className={styles.panel}>
             <h1 className={styles.heading}>Thank you</h1>
@@ -173,6 +217,7 @@ export default function BookFlow() {
 
   return (
     <main className={styles.page}>
+      <BrandMark className={styles.brandMark} />
       <div className={styles.stage}>
         <div className={styles.panel}>
           {step === 0 ? (
@@ -251,6 +296,7 @@ export default function BookFlow() {
               <BookCalendar
                 value={form.date}
                 timezone={form.timezone}
+                taken={taken}
                 onTimezoneChange={(timezone) => update({ timezone })}
                 onChange={(date) => update({ date, time: null })}
               />
@@ -264,6 +310,7 @@ export default function BookFlow() {
                 date={form.date}
                 timezone={form.timezone}
                 value={form.time}
+                taken={taken}
                 timeFormat={form.timeFormat}
                 onTimeFormatChange={(timeFormat) =>
                   update({ timeFormat, time: null })

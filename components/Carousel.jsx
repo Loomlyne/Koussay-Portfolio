@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import gsap from "gsap";
 
+import BrandMark from "./BrandMark";
 import { useSharedTransition } from "./SharedTransitionProvider";
 
 import {
@@ -1747,6 +1748,8 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
           pointermove stream dies mid-drag. Nothing here scrolls — the swipe
           is the carousel. */}
       <div ref={containerRef} className="ring-stage" />
+
+      <BrandMark className="pointer-events-auto fixed left-[max(12px,env(safe-area-inset-left))] top-[max(12px,env(safe-area-inset-top))] z-20" />
 
       {/* Never takes the pointer: the canvas underneath handles the wheel and
           the drag, and the column has no business interrupting a throw that

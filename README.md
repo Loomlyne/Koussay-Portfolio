@@ -1,11 +1,8 @@
-# Viscose
+# Koussay Portfolio
 
 A portfolio carousel rendered as a single WebGL shader. Project cards ride a
 ring that sits mostly off-screen, so you see a tall arc of work sweeping past.
 Scroll, drag or swipe to turn it; it settles with a card facing front.
-
-_Viscose: a viscous state, and a fibre spun by drawing that state into a
-thread. Which is what the cards do when they pull apart._
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
@@ -33,8 +30,8 @@ once it moved.
 Requires **Node 20 or newer**.
 
 ```bash
-git clone https://github.com/Yousuf-developer/viscose.git
-cd viscose
+git clone https://github.com/Loomlyne/Koussay-Portfolio.git
+cd Koussay-Portfolio
 npm install
 npm run dev
 ```

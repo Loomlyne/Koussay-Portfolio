@@ -1,11 +1,22 @@
 import "./globals.css";
 
 import { Providers } from "./providers";
+import { SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
 
 export const metadata = {
-  title: "Viscose",
-  description:
-    "A portfolio carousel rendered as a single WebGL shader. Cards ride a ring and stretch into threads as they pull apart.",
+  metadataBase: new URL(SITE_URL),
+  title: "Home",
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "en_AE",
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }) {

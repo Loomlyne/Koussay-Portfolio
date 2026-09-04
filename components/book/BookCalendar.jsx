@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 
 import BookSelect from "@/components/book/BookSelect";
 import { TIMEZONES } from "@/lib/book/config";
+import { isDayOpen } from "@/lib/book/time";
+import { dateStamp } from "@/lib/book/validate";
 
 import styles from "@/app/book/page.module.css";
 
@@ -36,6 +38,7 @@ export default function BookCalendar({
   onChange,
   timezone,
   onTimezoneChange,
+  taken,
 }) {
   const today = useMemo(() => startOfDay(new Date()), []);
   const [view, setView] = useState(() => {
@@ -138,7 +141,9 @@ export default function BookCalendar({
             return <span key={`empty-${index}`} />;
           }
 
-          const selectable = isSelectable(day, today);
+          const selectable =
+            isSelectable(day, today) &&
+            isDayOpen(dateStamp(day), timezone, taken ?? new Set());
           const selected = sameDay(day, value);
 
           return (
