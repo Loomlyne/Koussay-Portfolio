@@ -56,7 +56,7 @@ export default function BookTimePicker({
       </div>
 
       <p className={styles.timeMeta}>
-        {timezone} · {formatSelectedDate(date)}
+        {timezone} · {formatSelectedDate(date)} · 1 hour
       </p>
 
       {openSlots.length === 0 ? (

@@ -233,8 +233,8 @@ export default function BookFlow() {
             <>
               <h1 className={styles.heading}>Let&apos;s talk</h1>
               <p className={styles.lead}>
-                Book a call and let&apos;s figure out if we&apos;re the right
-                fit for your project.
+                Book a 1-hour call and let&apos;s figure out if we&apos;re the
+                right fit for your project.
               </p>
               <div className={styles.introActions}>
                 <Link
