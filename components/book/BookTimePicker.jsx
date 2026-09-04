@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  TIME_SLOTS_12H,
-  TIME_SLOTS_24H,
-} from "@/lib/book/config";
+import { TIME_SLOTS_12H, TIME_SLOTS_24H } from "@/lib/book/config";
 import { isSlotOpen } from "@/lib/book/time";
 import { dateStamp } from "@/lib/book/validate";
 
@@ -39,7 +36,11 @@ export default function BookTimePicker({
     <div className={styles.calendarCard}>
       <div className={styles.calendarHeader}>
         <span className={styles.calendarName}>Koussay</span>
-        <div className={styles.timeToggle} role="group" aria-label="Time format">
+        <div
+          className={styles.timeToggle}
+          role="group"
+          aria-label="Time format"
+        >
           {["12h", "24h"].map((format) => (
             <button
               key={format}

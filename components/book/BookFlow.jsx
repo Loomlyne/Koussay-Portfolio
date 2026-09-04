@@ -55,7 +55,22 @@ export default function BookFlow() {
         });
         const data = await response.json().catch(() => ({}));
         if (cancelled || !Array.isArray(data.taken)) return;
-        setTaken(new Set(data.taken));
+        const nextTaken = new Set(data.taken);
+        setTaken(nextTaken);
+        setForm((current) => {
+          if (!current.date || !current.time) return current;
+          if (
+            isSlotOpen(
+              dateStamp(current.date),
+              current.time,
+              current.timezone,
+              nextTaken,
+            )
+          ) {
+            return current;
+          }
+          return { ...current, time: null };
+        });
       } catch {
         // Keep the last known set; the submit path still re-checks.
       }
@@ -69,17 +84,6 @@ export default function BookFlow() {
     };
   }, [step]);
 
-  useEffect(() => {
-    if (!form.date || !form.time) return;
-    if (
-      !isSlotOpen(dateStamp(form.date), form.time, form.timezone, taken)
-    ) {
-      setForm((current) =>
-        current.time ? { ...current, time: null } : current,
-      );
-    }
-  }, [form.date, form.time, form.timezone, taken]);
-
   const canContinue = useMemo(() => {
     switch (step) {
       case 0:
@@ -91,7 +95,10 @@ export default function BookFlow() {
       case 3:
         return Boolean(form.date);
       case 4:
-        return Boolean(form.time);
+        return (
+          Boolean(form.time) &&
+          isSlotOpen(dateStamp(form.date), form.time, form.timezone, taken)
+        );
       case 5:
         return form.company.trim().length > 1;
       case 6:
@@ -107,7 +114,7 @@ export default function BookFlow() {
       default:
         return false;
     }
-  }, [form, step]);
+  }, [form, step, taken]);
 
   const submit = async () => {
     if (submitting) return;
@@ -143,6 +150,7 @@ export default function BookFlow() {
       if (!response.ok) {
         if (response.status === 409) {
           setStep(4);
+          update({ time: null });
         }
         setError(data.error || "Could not send this booking.");
         return;
@@ -297,7 +305,9 @@ export default function BookFlow() {
                 value={form.date}
                 timezone={form.timezone}
                 taken={taken}
-                onTimezoneChange={(timezone) => update({ timezone })}
+                onTimezoneChange={(timezone) =>
+                  update({ timezone, time: null })
+                }
                 onChange={(date) => update({ date, time: null })}
               />
             </>

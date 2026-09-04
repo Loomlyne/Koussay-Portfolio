@@ -4,10 +4,7 @@ import {
   isResendConfigured,
 } from "@/lib/env";
 import { sendBookingEmails } from "@/lib/mail/booking";
-import {
-  createNotionBooking,
-  fetchBookedStarts,
-} from "@/lib/notion/bookings";
+import { createNotionBooking, fetchBookedStarts } from "@/lib/notion/bookings";
 import {
   claimSlot,
   pendingSlotStarts,

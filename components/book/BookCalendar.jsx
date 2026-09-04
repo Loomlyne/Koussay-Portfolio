@@ -68,7 +68,10 @@ export default function BookCalendar({
   }, [view]);
 
   const shiftMonth = (delta) => {
-    setView((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
+    setView(
+      (current) =>
+        new Date(current.getFullYear(), current.getMonth() + delta, 1),
+    );
   };
 
   return (
