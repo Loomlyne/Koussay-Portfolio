@@ -113,14 +113,22 @@ export function defaultParams() {
     moveDelay: 0.2,
 
     // -- scroll / drag / click, live once the entry finishes --------------
-    scrollSpeed: 0.0034, // rad/s of angular velocity per px of wheel delta
-    damping: 0.91, // velocity kept per 60fps frame
-    maxSpeed: 12, // rad/s, so one flick cannot run away
+    // Authored in rad/s per px at ringRefCount. Layout scales it by the live
+    // slot so a smaller set (wider step) does not take three notches to move.
+    scrollSpeed: 0.008,
+    // px of wheel that means "leave this card". A mouse notch is ~100; a
+    // short trackpad flick crosses this in a few events.
+    scrollStep: 36,
+    // Coast, as a fraction of one slot, guaranteed once scrollStep is met.
+    // Must sit past 0.5 or snap rounds back to the card you are on.
+    scrollSlot: 0.68,
+    damping: 0.93, // velocity kept per 60fps frame
+    maxSpeed: 16, // rad/s, so one flick cannot run away
     dragSpeed: 1,
     dragSpeedTouch: 1.9, // the pivot sits well off-screen, so a thumb needs more
     snap: true, // settle with a plane facing front
-    snapTime: 0.8, // run-in, once the flick itself is spent
-    snapFrom: 1, // rad/s under which the ring commits to a slot
+    snapTime: 0.42, // run-in, once the flick itself is spent
+    snapFrom: 1.4, // rad/s under which the ring commits to a slot
     pickTime: 0.55, // click-to-centre: seconds for one slot, root-scaled
     pickEase: "power3.inOut",
 

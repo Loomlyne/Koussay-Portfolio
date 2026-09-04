@@ -197,6 +197,8 @@ export function mountGui(GUI, { params, state, info, actions }) {
   // -- input ---------------------------------------------------------------
   const scroll = gui.addFolder("scroll");
   scroll.add(params, "scrollSpeed", 0, 0.05, 0.0001);
+  scroll.add(params, "scrollStep", 8, 200, 1).name("step, wheel px");
+  scroll.add(params, "scrollSlot", 0.51, 1.4, 0.01).name("step, slot kick");
   scroll.add(params, "damping", 0.5, 0.999, 0.001);
   scroll.add(params, "maxSpeed", 0.5, 60, 0.5);
   scroll.add(params, "dragSpeed", 0, 5, 0.01);

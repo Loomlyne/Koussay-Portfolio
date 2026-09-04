@@ -588,15 +588,38 @@ export default function Carousel({
       if (e.cancelable) e.preventDefault();
     };
 
+    // Leftover wheel px toward the next card. Cleared when the ring parks so
+    // a half-gesture cannot fire the moment you breathe on the pad.
+    let wheelCarry = 0;
+
     const onWheel = (e) => {
       if (!interactive) return;
       e.preventDefault();
       // Trackpads send horizontal deltas too; take whichever dominates.
-      const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      let d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      // Firefox still reports lines; one line is one notch, not one pixel.
+      if (e.deltaMode === 1) d *= 16;
+      if (e.deltaMode === 2) d *= 800;
       // Fresh input hands the ring back to its own momentum.
       stopPick();
       settling = false;
-      spinVel += d * params.scrollSpeed;
+
+      const count = Math.max(1, Math.round(params.count));
+      const slot = TAU / count;
+      const refSlot = TAU / Math.max(1, params.ringRefCount);
+      // Same px used to walk one card at 18; fewer projects have a wider step.
+      spinVel += d * params.scrollSpeed * (slot / refSlot);
+
+      wheelCarry += d;
+      const stepPx = Math.max(8, params.scrollStep);
+      if (Math.abs(wheelCarry) >= stepPx) {
+        const sign = Math.sign(wheelCarry);
+        wheelCarry = 0;
+        const decay = Math.max(0.01, -Math.log(params.damping) * 60);
+        const minKick = decay * slot * Math.max(0.51, params.scrollSlot);
+        if (sign * spinVel < minKick) spinVel = sign * minKick;
+      }
+
       spinVel = Math.max(-params.maxSpeed, Math.min(params.maxSpeed, spinVel));
     };
 
@@ -1710,6 +1733,7 @@ export default function Carousel({
           spinVel = 0;
           state.spin += off;
           settling = false;
+          wheelCarry = 0;
         }
       }
 
