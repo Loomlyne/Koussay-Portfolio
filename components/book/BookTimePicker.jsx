@@ -12,6 +12,7 @@ function formatSelectedDate(date) {
     weekday: "long",
     month: "long",
     day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -26,18 +27,14 @@ export default function BookTimePicker({
 }) {
   const slots = timeFormat === "24h" ? TIME_SLOTS_24H : TIME_SLOTS_12H;
   const iso = dateStamp(date);
-  const openSlots = date
-    ? slots.filter((slot) => isSlotOpen(iso, slot, timezone, busy))
-    : [];
+  const openSlots = slots.filter((slot) =>
+    isSlotOpen(iso, slot, timezone, busy),
+  );
 
   return (
-    <div className={styles.timeSection}>
-      <div className={styles.timeSectionHeader}>
-        <p className={styles.timeMeta}>
-          {date
-            ? `${formatSelectedDate(date)} · 1 hour`
-            : "Pick a day to see times"}
-        </p>
+    <div className={styles.calendarCard}>
+      <div className={styles.calendarHeader}>
+        <span className={styles.calendarName}>Koussay</span>
         <div
           className={styles.timeToggle}
           role="group"
@@ -58,9 +55,13 @@ export default function BookTimePicker({
         </div>
       </div>
 
-      {!date ? null : openSlots.length === 0 ? (
+      <p className={styles.timeMeta}>
+        {timezone} · {formatSelectedDate(date)} · 1 hour
+      </p>
+
+      {openSlots.length === 0 ? (
         <p className={styles.timeEmpty}>
-          No times left this day. Pick another date.
+          No times left this day. Go back and pick another date.
         </p>
       ) : (
         <div className={styles.timeGrid}>
