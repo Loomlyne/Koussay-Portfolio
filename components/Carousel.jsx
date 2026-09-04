@@ -828,9 +828,9 @@ export default function Carousel({
     const updatePointer = (dt) => {
       // Held off until the entry finishes, so the cursor cannot soften the
       // ring while the timeline is still drawing it.
-      // Melt on a phone is the smear under the thumb. Leave it off in lo-fi.
+      // Melt on a phone is the smear under the thumb. Tablet and desktop keep it.
       const live =
-        params.hover && !loFi && engaged() && pointer.seeded && interactive;
+        params.hover && !tightNow && engaged() && pointer.seeded && interactive;
       cursor.amt += ((live ? 1 : 0) - cursor.amt) * chase(dt, 0.12);
 
       const k = chase(dt, params.lag);
@@ -1040,12 +1040,6 @@ export default function Carousel({
           ? params.narrowPosX
           : params.posX;
 
-      // The stage transform. Everything in plane-pixels goes through g, which
-      // is why the window fit rides in here rather than on a dozen params.
-      const shift = clamp01(state.shift);
-      const g = (1 + (endScale - 1) * shift) * fit;
-      const cy = params.posY * viewH * 0.5 * shift;
-
       // Spacing is authored at ringRefCount; grow/shrink the circle with the
       // live set so cards keep their size and their gap.
       const ringR = radiusForCount(
@@ -1057,7 +1051,44 @@ export default function Carousel({
       // Landed geometry, so the entry can still travel from centre and the
       // clamp does not fight the timeline. minScale can pin the ring larger
       // than this window; without this the facing card walks off an edge.
-      const gLand = endScale * fit;
+      // Width-only fit can also pin the arc taller than the canvas. Neighbour
+      // cards then clip as a hard line at the top and bottom, so shrink g
+      // until the parked arc fits, including the glass lip.
+      const extentY = (gMul) => {
+        const R = ringR * radiusK * gMul;
+        const hw = params.planeSize * planeK * gMul * 0.5;
+        const hh = hw / 1.5;
+        let maxY = 0;
+        const slots = Math.min(2, Math.floor(count / 2));
+        for (let s = -slots; s <= slots; s++) {
+          const angle = s * step;
+          const rot = params.radial ? angle : angle + HALF_PI;
+          const py = Math.sin(angle) * R;
+          const cr = Math.cos(rot);
+          const sr = Math.sin(rot);
+          for (const lx of [-hw, hw]) {
+            for (const ly of [-hh, hh]) {
+              maxY = Math.max(maxY, Math.abs(py + lx * sr + ly * cr));
+            }
+          }
+        }
+        return maxY;
+      };
+
+      const gLand0 = endScale * fit;
+      const yPad =
+        params.edgePad +
+        (params.glass
+          ? Math.max(params.bandTop, params.bandBottom) * viewH
+          : 0);
+      const yLimit = Math.max(1, viewH * 0.5 - yPad);
+      const y0 = extentY(gLand0);
+      const vertK = y0 > yLimit ? yLimit / y0 : 1;
+
+      const shift = clamp01(state.shift);
+      const g = (1 + (endScale - 1) * shift) * fit * vertK;
+      const cy = params.posY * viewH * 0.5 * shift;
+      const gLand = gLand0 * vertK;
       const Rland = ringR * radiusK * gLand;
       const Wland = params.planeSize * planeK * gLand;
       const hubX = posX * viewW * 0.5;
@@ -1327,8 +1358,8 @@ export default function Carousel({
       // turns. Drop them for the throw and ease them back — a boolean swap
       // is the flash on every phone flick.
       // On a phone the goo blooming back when a card seats is the same
-      // flash as the name melt. Stay cheap; do not ease the fancy look in.
-      if (loFi) {
+      // flash as the name melt. Stay cheap there. Tablet and desktop ease it.
+      if (tightNow) {
         cheapOn = true;
         cheapAmt = 1;
       } else {
@@ -1439,7 +1470,7 @@ export default function Carousel({
 
       // The glass lip popping on and off is the hitch on a phone. Leave it
       // off in lo-fi; elsewhere fade it with the throw instead of slamming.
-      const glassK = params.glass && !loFi ? 1 - cheapAmt : 0;
+      const glassK = params.glass && !tightNow ? 1 - cheapAmt : 0;
       uniforms.uBandTop.value = glassK * params.bandTop * viewH;
       uniforms.uBandBottom.value = glassK * params.bandBottom * viewH;
       uniforms.uGlass.value.set(

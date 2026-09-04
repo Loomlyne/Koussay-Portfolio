@@ -159,7 +159,7 @@ export function createMeta(refs, params, projects = FALLBACK_PROJECTS) {
   // layout: { textK, tight, viewW } — the band state, passed in rather than
   // read, so this stays a pure function of the window it is told about.
   const style = ({ textK, tight, viewW }) => {
-    mode.instant = tight || viewW <= params.loFiAt;
+    mode.instant = tight;
     const bigVw = params.nameSize * textK * (tight ? params.tightName : 1);
     const big = `${bigVw}vw`;
     const small = `${params.idxSize * textK}vw`;

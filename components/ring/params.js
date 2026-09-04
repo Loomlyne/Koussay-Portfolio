@@ -50,7 +50,8 @@ export function defaultParams() {
     // sit on a white page for seconds before anything moved.
     atlasLaunch: 1,
     // Keep the facing card inside the viewport when minScale pins the ring
-    // larger than the window would otherwise allow.
+    // larger than the window would otherwise allow. Same pad is used to keep
+    // the parked arc off the top and bottom canvas edges.
     edgePad: 20,
     idleSkip: true,
 
@@ -116,17 +117,17 @@ export function defaultParams() {
     // -- scroll / drag / click, live once the entry finishes --------------
     // Authored in rad/s per px at ringRefCount. Layout scales it by the live
     // slot so a smaller set (wider step) does not take three notches to move.
-    scrollSpeed: 0.008,
+    scrollSpeed: 0.0044,
     // px of wheel that means "leave this card". A mouse notch is ~100; a
     // short trackpad flick crosses this in a few events.
-    scrollStep: 36,
+    scrollStep: 64,
     // Coast, as a fraction of one slot, guaranteed once scrollStep is met.
     // Must sit past 0.5 or snap rounds back to the card you are on.
-    scrollSlot: 0.68,
+    scrollSlot: 0.58,
     damping: 0.93, // velocity kept per 60fps frame
-    maxSpeed: 16, // rad/s, so one flick cannot run away
+    maxSpeed: 10, // rad/s, so one flick cannot run away
     dragSpeed: 1,
-    dragSpeedTouch: 2.3, // the pivot sits well off-screen, so a thumb needs more
+    dragSpeedTouch: 2, // the pivot sits well off-screen, so a thumb needs more
     snap: true, // settle with a plane facing front
     snapTime: 0.42, // run-in, once the flick itself is spent
     snapFrom: 1.4, // rad/s under which the ring commits to a slot
