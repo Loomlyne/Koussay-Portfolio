@@ -71,6 +71,7 @@ export function mountGui(GUI, { params, state, info, actions }) {
   fit.add(params, "narrowPosX", -4, 4, 0.005).name("narrow move x");
   fit.add(params, "narrowEndScale", 0.05, 8, 0.01).name("narrow end scale");
   onFit("tightAt", 240, 1200, 10, "tight at (px)");
+  onFit("tightPlane", 0.5, 2.5, 0.01, "tight plane x");
   onFit("tightRadius", 0.3, 2, 0.01, "tight radius x");
   fit.add(params, "tightPosX", -6, 6, 0.005).name("tight move x");
   fit.add(params, "tightEndScale", 0.05, 8, 0.01).name("tight end scale");

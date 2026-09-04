@@ -324,7 +324,8 @@ export default function Carousel({
       const tight = viewW <= params.tightAt;
       narrowNow = narrow;
       tightNow = tight;
-      planeK = narrow ? params.narrowPlane : 1;
+      planeK =
+        (narrow ? params.narrowPlane : 1) * (tight ? params.tightPlane : 1);
       // The bands stack: tight sits inside narrow and pulls the arc back in
       // from where narrow had pushed it out to.
       radiusK =

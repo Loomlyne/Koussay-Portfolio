@@ -62,7 +62,8 @@ export function defaultParams() {
     narrowEndScale: 4.22,
 
     tightAt: 640, // inclusive
-    tightRadius: 0.9, // multiplies narrowRadius
+    tightPlane: 1.24, // stacks on narrowPlane; 1 left the facing card tiny
+    tightRadius: 0.84, // multiplies narrowRadius
     tightPosX: -3.8,
     tightEndScale: 4.05,
     tightSplit: 0.8, // the heading, competing with the ring for centre screen
