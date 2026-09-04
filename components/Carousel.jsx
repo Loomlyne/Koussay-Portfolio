@@ -346,6 +346,11 @@ export default function Carousel({
     const styleMeta = () =>
       meta.style({ textK, tight: tightNow, viewW: viewW });
 
+    // Declared before resize: the URL-bar path reads these so it must not
+    // move the drag origin, and the first resize() runs before input setup.
+    let pressing = false;
+    let dragging = false;
+
     const applyQuality = () => {
       loFi = loFiNow(viewW);
       info.quality = loFi ? "lo" : "hi";
@@ -362,9 +367,12 @@ export default function Carousel({
       // iOS URL-bar show/hide is a ~50px height jitter. Rebuilding the GL
       // surface for that is the hitch you feel mid-swipe.
       if (fitW && Math.abs(w - fitW) < 2 && Math.abs(h - fitH) < 120) {
-        const rect = renderer.domElement.getBoundingClientRect();
-        bounds.left = rect.left;
-        bounds.top = rect.top;
+        // URL-bar show/hide must not move the drag origin mid-swipe.
+        if (!pressing && !dragging) {
+          const rect = renderer.domElement.getBoundingClientRect();
+          bounds.left = rect.left;
+          bounds.top = rect.top;
+        }
         return;
       }
       fitW = w;
@@ -400,10 +408,17 @@ export default function Carousel({
       styleMeta();
     };
 
-    const onViewportShift = () => {
+    const syncBounds = () => {
       const rect = canvas.getBoundingClientRect();
       bounds.left = rect.left;
       bounds.top = rect.top;
+    };
+
+    const onViewportShift = () => {
+      // iOS fires this as the URL bar hides. Updating bounds here rotates
+      // the drag origin under the finger and the ring jumps a slot.
+      if (pressing || dragging) return;
+      syncBounds();
     };
 
     resize();
@@ -419,8 +434,6 @@ export default function Carousel({
     let frontAngle = 0;
     let interactive = false;
     let spinVel = 0; // rad/s
-    let pressing = false;
-    let dragging = false;
     let dragPrevAngle = 0;
     let dragPrevTime = 0;
     let tapLimit = 6;
@@ -434,6 +447,9 @@ export default function Carousel({
     let settling = false;
     let snapTo = 0;
     let snapCap = 0;
+    // Cheap-spin amount, chased. A boolean made goo/glass/honey pop on phone.
+    let cheapOn = false;
+    let cheapAmt = 0;
 
     // A click is turning the ring to a card. While this is up the momentum
     // above is suspended entirely, so the two cannot both drive spin.
@@ -625,6 +641,7 @@ export default function Carousel({
 
     const onPointerDown = (e) => {
       if (e.cancelable && e.pointerType === "touch") e.preventDefault();
+      syncBounds();
       coarse = e.pointerType === "touch";
       pointerTravel = 0;
       tapConsumed = false;
@@ -1304,11 +1321,23 @@ export default function Carousel({
       // never merged, so there is nothing between them to stretch.
       //
       // Goo, threads and the glass lip smear the ring into a blur while it
-      // turns. Drop them for the throw on every size and put them back once
-      // it parks — the resting look is unchanged.
-      const spinning =
-        dragging || picking || settling || Math.abs(spinVel) > 0.12;
-      const cheap = spinning;
+      // turns. Drop them for the throw and ease them back — a boolean swap
+      // is the flash on every phone flick.
+      const wantCheap =
+        dragging || picking || settling || Math.abs(spinVel) > params.cheapIn;
+      if (wantCheap) cheapOn = true;
+      else if (
+        !dragging &&
+        !picking &&
+        !settling &&
+        Math.abs(spinVel) < params.cheapOut
+      ) {
+        cheapOn = false;
+      }
+      cheapAmt += ((cheapOn ? 1 : 0) - cheapAmt) * chase(dt, params.cheapChase);
+      if (cheapAmt < 0.001) cheapAmt = 0;
+      if (cheapAmt > 0.999) cheapAmt = 1;
+      const linkFade = 1 - cheapAmt;
 
       order.sort((a, b) => signedOffset(a) - signedOffset(b));
 
@@ -1317,9 +1346,8 @@ export default function Carousel({
       // link the one gap the fan never opened is the only one the cursor
       // cannot web back together.
       const closed = spread > 0.995 && count > 2;
-      const linkCount = cheap
-        ? 0
-        : Math.min(closed ? count : count - 1, MAX_LINKS);
+      const linkCount =
+        linkFade < 0.04 ? 0 : Math.min(closed ? count : count - 1, MAX_LINKS);
 
       for (let l = 0; l < linkCount; l++) {
         const ia = order[l];
@@ -1367,15 +1395,15 @@ export default function Carousel({
         uniforms.uLinkA.value[l].copy(ca);
         uniforms.uLinkB.value[l].copy(cb);
         uniforms.uLinkPar.value[l].set(
-          rEnd,
-          rMid,
+          rEnd * linkFade,
+          rMid * linkFade,
           params.sag * g * Math.pow(v, 1.5),
           // Per link, not global: with staggered generations these are all at
           // different stages. Never wider than the neck it rounds.
           Math.min(
             params.fillet * g * smoothstep(0, 0.35, v),
             Math.max(rMid, 0) * 1.5,
-          ),
+          ) * linkFade,
         );
       }
       for (let l = linkCount; l < MAX_LINKS; l++) {
@@ -1385,7 +1413,7 @@ export default function Carousel({
 
       // Both are px into the distance field, so they scale with the ring or
       // the merge reads as a different material at a different window size.
-      uniforms.uK.value = params.goo * planeK * fit * (cheap ? 0.12 : 1);
+      uniforms.uK.value = params.goo * planeK * fit * (1 - cheapAmt * 0.88);
       uniforms.uWobble.value =
         params.wobble * fit * (1 - smoothstep(0.2, 0.95, state.progress));
 
@@ -1395,20 +1423,22 @@ export default function Carousel({
       uniforms.uTextured.value = params.textured && firstIn ? 1 : 0;
       uniforms.uBlend.value = Math.max(
         0.5,
-        params.blend * planeK * g * (cheap ? 0.22 : 1),
+        params.blend * planeK * g * (1 - cheapAmt * 0.78),
       );
 
-      const on = params.glass && !cheap;
-      uniforms.uBandTop.value = on ? params.bandTop * viewH : 0;
-      uniforms.uBandBottom.value = on ? params.bandBottom * viewH : 0;
+      // The glass lip popping on and off is the hitch on a phone. Leave it
+      // off in lo-fi; elsewhere fade it with the throw instead of slamming.
+      const glassK = params.glass && !loFi ? 1 - cheapAmt : 0;
+      uniforms.uBandTop.value = glassK * params.bandTop * viewH;
+      uniforms.uBandBottom.value = glassK * params.bandBottom * viewH;
       uniforms.uGlass.value.set(
         params.refract,
         params.squeeze,
         params.ripple,
         params.rippleFreq,
       );
-      uniforms.uFringe.value = on ? params.fringe : 0;
-      uniforms.uSheen.value = on ? params.sheen : 0;
+      uniforms.uFringe.value = glassK * params.fringe;
+      uniforms.uSheen.value = glassK * params.sheen;
 
       const fieldPad = uniforms.uK.value + uniforms.uWobble.value + 20;
       let fieldMinX = Infinity;

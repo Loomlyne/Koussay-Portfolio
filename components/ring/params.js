@@ -36,7 +36,7 @@ export function defaultParams() {
     refWidth: 1512,
     refHeight: 870, // viewport, i.e. screen less menu bar and browser chrome
     fitHeight: 0, // 0 = width alone drives scale, 1 = whichever axis is tighter
-    minScale: 0.38, // phones used to pin at 0.5 and the facing card ate the screen
+    minScale: 0.46, // 0.38 left a postage-stamp card on a 390-wide phone
     maxScale: 1.75,
     // Fill-rate cap once the window is phone/tablet-sized, or the pointer is
     // coarse. Antialias is chosen at context create from this same test.
@@ -62,9 +62,9 @@ export function defaultParams() {
     narrowEndScale: 4.22,
 
     tightAt: 640, // inclusive
-    tightRadius: 0.76, // multiplies narrowRadius
-    tightPosX: -3.5,
-    tightEndScale: 3.6,
+    tightRadius: 0.9, // multiplies narrowRadius
+    tightPosX: -3.8,
+    tightEndScale: 4.05,
     tightSplit: 0.8, // the heading, competing with the ring for centre screen
     tightName: 1.5, // the name is the only label left, so it takes the billing
     tightNameTop: 40, // px
@@ -125,10 +125,15 @@ export function defaultParams() {
     damping: 0.93, // velocity kept per 60fps frame
     maxSpeed: 16, // rad/s, so one flick cannot run away
     dragSpeed: 1,
-    dragSpeedTouch: 1.9, // the pivot sits well off-screen, so a thumb needs more
+    dragSpeedTouch: 2.3, // the pivot sits well off-screen, so a thumb needs more
     snap: true, // settle with a plane facing front
     snapTime: 0.42, // run-in, once the flick itself is spent
     snapFrom: 1.4, // rad/s under which the ring commits to a slot
+    // Cheap-spin enter/exit. A boolean at 0.12 rad/s is what flashed goo,
+    // honey and the glass lip on every phone flick.
+    cheapIn: 0.2,
+    cheapOut: 0.045,
+    cheapChase: 0.14,
     pickTime: 0.55, // click-to-centre: seconds for one slot, root-scaled
     pickEase: "power3.inOut",
 

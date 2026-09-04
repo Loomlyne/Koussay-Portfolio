@@ -206,6 +206,9 @@ export function mountGui(GUI, { params, state, info, actions }) {
   scroll.add(params, "snap");
   scroll.add(params, "snapTime", 0.2, 3, 0.05).name("snap time (s)");
   scroll.add(params, "snapFrom", 0.1, 20, 0.1).name("settle below");
+  scroll.add(params, "cheapIn", 0.02, 2, 0.01).name("cheap above");
+  scroll.add(params, "cheapOut", 0.01, 1, 0.005).name("cheap below");
+  scroll.add(params, "cheapChase", 0.02, 1, 0.01).name("cheap chase");
   scroll.add(params, "pickTime", 0.1, 2, 0.05).name("pick, per slot (s)");
   scroll.add(params, "pickEase", EASES).name("pick ease");
 
