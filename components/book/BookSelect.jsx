@@ -4,10 +4,17 @@ import { useEffect, useId, useRef, useState } from "react";
 
 import styles from "@/app/book/page.module.css";
 
-export default function BookSelect({ value, options, onChange, ariaLabel }) {
+export default function BookSelect({
+  value,
+  options,
+  onChange,
+  ariaLabel,
+  variant = "default",
+}) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const listId = useId();
+  const heading = variant === "heading";
 
   useEffect(() => {
     if (!open) return;
@@ -29,23 +36,51 @@ export default function BookSelect({ value, options, onChange, ariaLabel }) {
   }, [open]);
 
   return (
-    <div className={styles.selectRoot} ref={rootRef}>
+    <div
+      className={`${styles.selectRoot} ${heading ? styles.headingSelect : ""}`}
+      ref={rootRef}
+    >
       <button
         type="button"
-        className={styles.selectTrigger}
+        className={heading ? styles.headingTrigger : styles.selectTrigger}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
+        aria-label={ariaLabel}
         onClick={() => setOpen((current) => !current)}
       >
-        <span>{value}</span>
-        <span className={styles.selectChevron} aria-hidden="true">
-          ▾
+        <span className={heading ? styles.headingTriggerLabel : undefined}>
+          {value}
+        </span>
+        <span
+          className={heading ? styles.headingChevron : styles.selectChevron}
+          aria-hidden="true"
+        >
+          {heading ? (
+            <svg viewBox="0 0 12 12" fill="none">
+              <path
+                d="M2.25 4.5L6 8.25L9.75 4.5"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            "▾"
+          )}
         </span>
       </button>
 
       {open ? (
-        <ul id={listId} className={styles.selectMenu} role="listbox" aria-label={ariaLabel}>
+        <ul
+          id={listId}
+          className={`${styles.selectMenu} ${
+            heading ? styles.headingMenu : ""
+          }`}
+          role="listbox"
+          aria-label={ariaLabel}
+        >
           {options.map((option) => {
             const selected = option === value;
             return (

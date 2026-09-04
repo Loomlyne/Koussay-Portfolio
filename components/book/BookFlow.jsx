@@ -7,13 +7,17 @@ import BrandMark from "@/components/BrandMark";
 import BackToWorks from "@/components/BackToWorks";
 import BookCalendar from "@/components/book/BookCalendar";
 import BookProgress from "@/components/book/BookProgress";
+import BookSelect from "@/components/book/BookSelect";
 import BookTimePicker from "@/components/book/BookTimePicker";
 import {
   BOOK_STEP_COUNT,
-  BUDGET_OPTIONS,
+  CURRENCIES,
   DEADLINE_OPTIONS,
   EMPTY_FORM,
   SERVICES,
+  budgetKeyFromLabel,
+  budgetOptions,
+  formatBudget,
 } from "@/lib/book/config";
 import { dateStamp, EMAIL_PATTERN } from "@/lib/book/validate";
 import { busyFromResponse, isSlotOpen } from "@/lib/book/time";
@@ -375,7 +379,7 @@ export default function BookFlow() {
 
           {step === 7 ? (
             <>
-              <h1 className={styles.heading}>How can we help?</h1>
+              <h1 className={styles.heading}>What do you need?</h1>
               <div className={styles.chipGrid}>
                 {SERVICES.map((service) => {
                   const active = form.services.includes(service);
@@ -402,11 +406,24 @@ export default function BookFlow() {
 
           {step === 8 ? (
             <>
-              <h1 className={styles.heading}>
-                What is your budget for the project?
+              <h1 className={`${styles.heading} ${styles.headingWithSelect}`}>
+                What is your budget for the project?{" "}
+                <BookSelect
+                  variant="heading"
+                  value={form.currency}
+                  options={CURRENCIES}
+                  ariaLabel="Currency"
+                  onChange={(currency) => {
+                    const key = budgetKeyFromLabel(form.budget);
+                    update({
+                      currency,
+                      budget: key ? formatBudget(key, currency) : "",
+                    });
+                  }}
+                />
               </h1>
               <div className={styles.chipGrid}>
-                {BUDGET_OPTIONS.map((option) => (
+                {budgetOptions(form.currency).map((option) => (
                   <button
                     key={option}
                     type="button"

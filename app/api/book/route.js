@@ -1,10 +1,6 @@
-import {
-  isBookingConfigured,
-  isNotionBookingsConfigured,
-  isResendConfigured,
-} from "@/lib/env";
-import { sendBookingEmails } from "@/lib/mail/booking";
-import { createNotionBooking, fetchBusyRanges } from "@/lib/notion/bookings";
+import { after } from "next/server";
+
+import { isResearchConfigured, researchBusiness } from "@/lib/book/research";
 import {
   SLOT_MS,
   claimSlot,
@@ -14,8 +10,20 @@ import {
   slotStartMs,
 } from "@/lib/book/time";
 import { MAX_ATTACHMENT_BYTES, validateBooking } from "@/lib/book/validate";
+import {
+  isBookingConfigured,
+  isNotionBookingsConfigured,
+  isResendConfigured,
+} from "@/lib/env";
+import { sendBookingEmails } from "@/lib/mail/booking";
+import {
+  createNotionBooking,
+  fetchBusyRanges,
+  fillBookingResearch,
+} from "@/lib/notion/bookings";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 function json(data, status = 200) {
   return Response.json(data, { status });
@@ -100,14 +108,34 @@ export async function POST(request) {
     }
 
     const results = { notion: false, email: false };
+    const researchPromise =
+      isNotionBookingsConfigured() && isResearchConfigured()
+        ? researchBusiness(record).catch((err) => {
+            console.error("[book] research", err);
+            return null;
+          })
+        : null;
+    let created = null;
 
     if (isNotionBookingsConfigured()) {
-      await createNotionBooking(record, attachment);
+      created = await createNotionBooking(record, attachment);
       results.notion = true;
     }
     if (isResendConfigured()) {
       await sendBookingEmails(record, attachment);
       results.email = true;
+    }
+
+    if (created?.id && researchPromise) {
+      const pageId = created.id;
+      after(async () => {
+        try {
+          const briefing = await researchPromise;
+          await fillBookingResearch(pageId, briefing);
+        } catch (err) {
+          console.error("[book] research write", err);
+        }
+      });
     }
 
     return json({ ok: true, ...results });

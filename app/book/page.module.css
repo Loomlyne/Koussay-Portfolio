@@ -144,6 +144,68 @@
   text-wrap: balance;
 }
 
+.headingWithSelect {
+  position: relative;
+  z-index: 20;
+  max-width: 22ch;
+}
+
+.headingSelect {
+  display: inline-flex;
+  position: relative;
+  z-index: 21;
+  vertical-align: baseline;
+}
+
+.headingTrigger {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.18em;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.headingTriggerLabel {
+  text-decoration: underline;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.12em;
+}
+
+.headingTrigger:focus-visible {
+  border-radius: 0.15em;
+  outline: none;
+  box-shadow: var(--focus-ring-soft);
+}
+
+.headingChevron {
+  display: inline-flex;
+  width: 0.42em;
+  height: 0.42em;
+  flex-shrink: 0;
+  color: currentColor;
+  translate: 0 -0.06em;
+}
+
+.headingChevron svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.headingMenu {
+  left: 0;
+  right: auto;
+  min-width: 6.5rem;
+}
+
 .lead {
   max-width: 28rem;
   margin: 0;

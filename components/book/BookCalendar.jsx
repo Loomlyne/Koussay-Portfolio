@@ -28,9 +28,7 @@ function sameDay(a, b) {
 }
 
 function isSelectable(day, today) {
-  if (day < today) return false;
-  const weekday = day.getDay();
-  return weekday !== 0 && weekday !== 6;
+  return day >= today;
 }
 
 export default function BookCalendar({
