@@ -20,16 +20,15 @@ export default function BookTimePicker({
   date,
   timezone,
   value,
-  taken,
+  busy,
   onChange,
   timeFormat,
   onTimeFormatChange,
 }) {
   const slots = timeFormat === "24h" ? TIME_SLOTS_24H : TIME_SLOTS_12H;
   const iso = dateStamp(date);
-  const takenSet = taken ?? new Set();
   const openSlots = slots.filter((slot) =>
-    isSlotOpen(iso, slot, timezone, takenSet),
+    isSlotOpen(iso, slot, timezone, busy),
   );
 
   return (
@@ -67,7 +66,7 @@ export default function BookTimePicker({
       ) : (
         <div className={styles.timeGrid}>
           {slots.map((slot) => {
-            const open = isSlotOpen(iso, slot, timezone, takenSet);
+            const open = isSlotOpen(iso, slot, timezone, busy);
             return (
               <button
                 key={slot}

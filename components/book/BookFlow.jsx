@@ -16,7 +16,7 @@ import {
   SERVICES,
 } from "@/lib/book/config";
 import { dateStamp, EMAIL_PATTERN } from "@/lib/book/validate";
-import { isSlotOpen } from "@/lib/book/time";
+import { busyFromResponse, isSlotOpen } from "@/lib/book/time";
 
 import styles from "@/app/book/page.module.css";
 
@@ -37,7 +37,7 @@ export default function BookFlow() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [taken, setTaken] = useState(() => new Set());
+  const [busy, setBusy] = useState(() => []);
   const fieldRef = useRef(null);
 
   const update = (patch) => {
@@ -54,9 +54,9 @@ export default function BookFlow() {
           cache: "no-store",
         });
         const data = await response.json().catch(() => ({}));
-        if (cancelled || !Array.isArray(data.taken)) return;
-        const nextTaken = new Set(data.taken);
-        setTaken(nextTaken);
+        const nextBusy = busyFromResponse(data);
+        if (cancelled || !nextBusy) return;
+        setBusy(nextBusy);
         setForm((current) => {
           if (!current.date || !current.time) return current;
           if (
@@ -64,7 +64,7 @@ export default function BookFlow() {
               dateStamp(current.date),
               current.time,
               current.timezone,
-              nextTaken,
+              nextBusy,
             )
           ) {
             return current;
@@ -77,7 +77,7 @@ export default function BookFlow() {
     };
 
     load();
-    const timer = setInterval(load, 15000);
+    const timer = setInterval(load, 30000);
     return () => {
       cancelled = true;
       clearInterval(timer);
@@ -97,7 +97,7 @@ export default function BookFlow() {
       case 4:
         return (
           Boolean(form.time) &&
-          isSlotOpen(dateStamp(form.date), form.time, form.timezone, taken)
+          isSlotOpen(dateStamp(form.date), form.time, form.timezone, busy)
         );
       case 5:
         return form.company.trim().length > 1;
@@ -114,7 +114,7 @@ export default function BookFlow() {
       default:
         return false;
     }
-  }, [form, step, taken]);
+  }, [form, step, busy]);
 
   const submit = async () => {
     if (submitting) return;
@@ -146,7 +146,8 @@ export default function BookFlow() {
         body,
       });
       const data = await response.json().catch(() => ({}));
-      if (Array.isArray(data.taken)) setTaken(new Set(data.taken));
+      const nextBusy = busyFromResponse(data);
+      if (nextBusy) setBusy(nextBusy);
       if (!response.ok) {
         if (response.status === 409) {
           setStep(4);
@@ -304,7 +305,7 @@ export default function BookFlow() {
               <BookCalendar
                 value={form.date}
                 timezone={form.timezone}
-                taken={taken}
+                busy={busy}
                 onTimezoneChange={(timezone) =>
                   update({ timezone, time: null })
                 }
@@ -320,7 +321,7 @@ export default function BookFlow() {
                 date={form.date}
                 timezone={form.timezone}
                 value={form.time}
-                taken={taken}
+                busy={busy}
                 timeFormat={form.timeFormat}
                 onTimeFormatChange={(timeFormat) =>
                   update({ timeFormat, time: null })

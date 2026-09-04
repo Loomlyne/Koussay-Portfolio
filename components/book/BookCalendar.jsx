@@ -38,7 +38,7 @@ export default function BookCalendar({
   onChange,
   timezone,
   onTimezoneChange,
-  taken,
+  busy,
 }) {
   const today = useMemo(() => startOfDay(new Date()), []);
   const [view, setView] = useState(() => {
@@ -146,7 +146,7 @@ export default function BookCalendar({
 
           const selectable =
             isSelectable(day, today) &&
-            isDayOpen(dateStamp(day), timezone, taken ?? new Set());
+            isDayOpen(dateStamp(day), timezone, busy);
           const selected = sameDay(day, value);
 
           return (

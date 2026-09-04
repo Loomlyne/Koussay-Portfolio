@@ -4,10 +4,12 @@ import {
   isResendConfigured,
 } from "@/lib/env";
 import { sendBookingEmails } from "@/lib/mail/booking";
-import { createNotionBooking, fetchBookedStarts } from "@/lib/notion/bookings";
+import { createNotionBooking, fetchBusyRanges } from "@/lib/notion/bookings";
 import {
+  SLOT_MS,
   claimSlot,
-  pendingSlotStarts,
+  isBusy,
+  pendingBusy,
   releaseSlot,
   slotStartMs,
 } from "@/lib/book/time";
@@ -19,12 +21,9 @@ function json(data, status = 200) {
   return Response.json(data, { status });
 }
 
-async function takenStarts() {
-  const taken = isNotionBookingsConfigured()
-    ? await fetchBookedStarts()
-    : new Set();
-  for (const start of pendingSlotStarts()) taken.add(start);
-  return taken;
+async function currentBusy() {
+  const busy = isNotionBookingsConfigured() ? await fetchBusyRanges() : [];
+  return [...busy, ...pendingBusy()];
 }
 
 export async function POST(request) {
@@ -75,26 +74,26 @@ export async function POST(request) {
   const start = slotStartMs(booking.date, booking.time, booking.timezone);
 
   if (!claimSlot(start)) {
-    const taken = [...(await takenStarts())];
+    const busy = await currentBusy();
     return json(
       {
         error: "That time was just booked. Pick the next open slot.",
-        taken,
+        busy,
+        taken: busy.map((range) => range.start),
       },
       409,
     );
   }
 
   try {
-    const booked = isNotionBookingsConfigured()
-      ? await fetchBookedStarts()
-      : new Set();
-    if (booked.has(start)) {
-      const taken = [...booked, ...pendingSlotStarts()];
+    const booked = isNotionBookingsConfigured() ? await fetchBusyRanges() : [];
+    if (isBusy(start, start + SLOT_MS, booked)) {
+      const busy = [...booked, ...pendingBusy()];
       return json(
         {
           error: "That time is already booked. Pick the next open slot.",
-          taken,
+          busy,
+          taken: busy.map((range) => range.start),
         },
         409,
       );
