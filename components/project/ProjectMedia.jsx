@@ -4,12 +4,11 @@ import Image from "next/image";
 import { useLayoutEffect, useRef, useState } from "react";
 
 import { useSharedTransition } from "@/components/SharedTransitionProvider";
+import { projectImageSrc } from "@/lib/projects";
 import styles from "@/app/work/[slug]/page.module.css";
 
 export default function ProjectMedia({ project, preload = false }) {
-  const imageSrc = project.file.startsWith("/")
-    ? project.file
-    : `/${project.file}`;
+  const imageSrc = projectImageSrc(project);
   const [failedSrc, setFailedSrc] = useState(null);
   const imageFailed = failedSrc === imageSrc;
   const frameRef = useRef(null);

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { IMAGE_FILES } from "./projects";
+import { projectImageSrc } from "@/lib/projects";
 import { signedOffset } from "./utils";
 
 const load = (src, priority) =>
@@ -104,7 +105,7 @@ export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
   const tick = () => onProgress?.(Math.min(1, settled / launchAt));
 
   const fetchInto = (i, priority) =>
-    load(`/${files[i]}`, priority)
+    load(projectImageSrc(files[i]), priority)
       .then((img) => paint(img, i))
       .catch((err) => console.warn("[atlas]", err.message))
       .finally(() => {

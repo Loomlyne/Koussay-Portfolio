@@ -3,13 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { getProjectDisplayIndex } from "@/lib/projects";
+import { getProjectDisplayIndex, projectImageSrc } from "@/lib/projects";
 
 import styles from "@/app/work/[slug]/page.module.css";
-
-function projectImageSrc(project) {
-  return project.file.startsWith("/") ? project.file : `/${project.file}`;
-}
 
 function PagerLink({ project, direction }) {
   const previous = direction === "previous";

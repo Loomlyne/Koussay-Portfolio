@@ -2,11 +2,9 @@
 
 import Image from "next/image";
 
-import styles from "@/app/work/[slug]/page.module.css";
+import { projectImageSrc } from "@/lib/projects";
 
-function imageSrc(file) {
-  return file.startsWith("/") ? file : `/${file}`;
-}
+import styles from "@/app/work/[slug]/page.module.css";
 
 export default function ProjectGallery({ project, gallery = [] }) {
   const items =
@@ -24,7 +22,7 @@ export default function ProjectGallery({ project, gallery = [] }) {
       </div>
       <ul className={styles.galleryStack}>
         {items.map((item, index) => {
-          const src = imageSrc(item.file ?? item);
+          const src = projectImageSrc(item.file ?? item);
           const alt =
             item.alt ?? `${project.name} — gallery image ${index + 1}`;
 

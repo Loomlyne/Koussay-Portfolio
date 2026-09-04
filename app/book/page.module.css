@@ -680,6 +680,14 @@
   -webkit-backdrop-filter: var(--glass-blur);
 }
 
+.formError {
+  width: min(100%, var(--content-form));
+  margin: 0;
+  color: #9a2f2f;
+  font-size: var(--text-ui-sm);
+  line-height: 1.4;
+}
+
 .progress {
   position: fixed;
   right: 0;

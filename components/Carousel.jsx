@@ -19,7 +19,8 @@ import { createMeta } from "./ring/meta";
 import { createSplitText } from "./ring/splitText";
 import { createTag, TAG_W, TAG_H } from "./ring/tag";
 import { defaultParams } from "./ring/params";
-import { IMAGE_FILES, PROJECTS } from "./ring/projects";
+import { PROJECTS as FALLBACK_PROJECTS } from "./ring/projects";
+import { projectImageSrc } from "@/lib/projects";
 import {
   TAU,
   HALF_PI,
@@ -41,7 +42,8 @@ const blankTexture = () => {
   return t;
 };
 
-export default function Carousel() {
+export default function Carousel({ projects = FALLBACK_PROJECTS }) {
+  const ring = projects.length > 0 ? projects : FALLBACK_PROJECTS;
   const router = useRouter();
   const startTransition = useSharedTransition()?.start;
   const pickProjectRef = useRef(null);
@@ -68,6 +70,9 @@ export default function Carousel() {
     let disposed = false;
 
     const params = defaultParams();
+    const imageFiles = ring.map((project) => project.file);
+    params.count = Math.min(MAX_PLANES, ring.length);
+    params.atlasLaunch = Math.min(params.atlasLaunch, ring.length);
     // progress: the seed is born at screen centre
     // launch:   the seed travels out to its place on the ring
     // spread:   the rest peel off it and the ring draws
@@ -204,6 +209,7 @@ export default function Carousel() {
         live: liveRef.current,
       },
       params,
+      ring,
     );
 
     /* ---------------------------------------------------------------- art */
@@ -220,12 +226,12 @@ export default function Carousel() {
     const whenReady = (fn) => (launchReady ? fn() : readyWaiters.push(fn));
 
     const atlas = buildAtlas(
-      IMAGE_FILES,
+      imageFiles,
       (p) => {
         if (!disposed) loadProg = p;
       },
       {
-        launchAt: Math.min(IMAGE_FILES.length, params.atlasLaunch),
+        launchAt: Math.min(imageFiles.length, params.atlasLaunch),
       },
     );
 
@@ -690,14 +696,12 @@ export default function Carousel() {
     // only ever lands on the card the tag was offering.
     const openForPlane = (plane) => {
       if (imageCount <= 0) return null;
-      const project = PROJECTS[cellOf(signedOffset(plane))];
+      const project = ring[cellOf(signedOffset(plane))];
       if (!project?.slug) return null;
       return async () => {
         if (disposed) return;
 
-        const imageSrc = project.file.startsWith("/")
-          ? project.file
-          : `/${project.file}`;
+        const imageSrc = projectImageSrc(project);
         const from = rectForPlane(plane);
 
         if (!startTransition) {
@@ -1735,7 +1739,7 @@ export default function Carousel() {
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [router, startTransition]);
+  }, [ring, router, startTransition]);
 
   return (
     <>
@@ -1757,9 +1761,9 @@ export default function Carousel() {
         }}
         className="pointer-events-auto fixed right-[12vw] top-[2.4vh] z-10 flex flex-col items-end text-right leading-[1.4] tracking-[0.01em] text-[#0a0a0a] opacity-0 max-sm:hidden"
       >
-        {PROJECTS.map((p, i) => (
+        {ring.map((p, i) => (
           <li
-            key={p.file}
+            key={p.slug ?? p.file}
             ref={(el) => {
               itemsRef.current[i] = el;
             }}
@@ -1787,8 +1791,8 @@ export default function Carousel() {
         className="pointer-events-none fixed left-0 top-0 z-50"
       >
         <ul>
-          {PROJECTS.map((p, i) => (
-            <li key={`accessible-${p.file}`}>
+          {ring.map((p, i) => (
+            <li key={`accessible-${p.slug ?? p.file}`}>
               <a
                 href={`/work/${p.slug}`}
                 className="sr-only rounded-sm bg-[#fafafa] px-4 py-3 text-sm text-[#0a0a0a] outline-2 outline-offset-2 outline-[#0a0a0a] focus:pointer-events-auto focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"

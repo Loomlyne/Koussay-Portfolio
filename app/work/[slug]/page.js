@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import ProjectDetail from "@/components/project/ProjectDetail";
+import { getProjects } from "@/lib/cms/projects";
 import {
   getProjectBySlug,
   getProjectDisplayIndex,
@@ -8,15 +9,17 @@ import {
   getProjectStaticParams,
 } from "@/lib/projects";
 
-export function generateStaticParams() {
-  return getProjectStaticParams();
+export async function generateStaticParams() {
+  const projects = await getProjects();
+  return getProjectStaticParams(projects);
 }
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const projects = await getProjects();
+  const project = getProjectBySlug(slug, projects);
 
   if (!project) {
     return {
@@ -36,16 +39,17 @@ export async function generateMetadata({ params }) {
 
 export default async function ProjectPage({ params }) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const projects = await getProjects();
+  const project = getProjectBySlug(slug, projects);
 
   if (!project) notFound();
 
-  const { previous, next } = getProjectNavigation(project);
+  const { previous, next } = getProjectNavigation(project, projects);
 
   return (
     <ProjectDetail
       project={project}
-      displayIndex={getProjectDisplayIndex(project)}
+      displayIndex={getProjectDisplayIndex(project, projects)}
       previous={previous}
       next={next}
     />

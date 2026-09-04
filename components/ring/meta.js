@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import { PROJECTS } from "./projects";
+import { PROJECTS as FALLBACK_PROJECTS } from "./projects";
 
 /**
  * The two lockups of type either side of the ring: [number . name] on the
@@ -137,7 +137,7 @@ function createGroup(side, groups, params) {
  * refs: { groups, list, loader, cut, live } — DOM handed over from the
  * component. `groups` is the shape the JSX populates, one entry per side.
  */
-export function createMeta(refs, params) {
+export function createMeta(refs, params, projects = FALLBACK_PROJECTS) {
   const { groups, list, loader, cut, live } = refs;
   const left = createGroup("left", groups, params);
   const right = createGroup("right", groups, params);
@@ -238,7 +238,7 @@ export function createMeta(refs, params) {
   // Both groups in one call, so the number can never drift from the name it
   // is numbering.
   const show = (i) => {
-    const p = PROJECTS[i];
+    const p = projects[i];
     if (!p) return;
     left.set([String(i + 1).padStart(2, "0"), p.name]);
     right.set([p.type, p.year]);

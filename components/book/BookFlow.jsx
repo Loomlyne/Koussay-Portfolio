@@ -14,10 +14,9 @@ import {
   EMPTY_FORM,
   SERVICES,
 } from "@/lib/book/config";
+import { dateStamp, EMAIL_PATTERN } from "@/lib/book/validate";
 
 import styles from "@/app/book/page.module.css";
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function focusField(node) {
   if (!node) return;
@@ -34,6 +33,8 @@ export default function BookFlow() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const fieldRef = useRef(null);
 
   const update = (patch) => {
@@ -63,16 +64,58 @@ export default function BookFlow() {
       case 9:
         return Boolean(form.deadline);
       case 10:
-        return form.details.trim().length > 0 || Boolean(form.attachment);
+        return true;
       default:
         return false;
     }
   }, [form, step]);
 
-  const goNext = () => {
-    if (!canContinue) return;
-    if (step === BOOK_STEP_COUNT - 1) {
+  const submit = async () => {
+    if (submitting) return;
+    setError("");
+    setSubmitting(true);
+
+    const body = new FormData();
+    body.append(
+      "payload",
+      JSON.stringify({
+        name: form.name,
+        email: form.email,
+        date: dateStamp(form.date),
+        time: form.time,
+        timezone: form.timezone,
+        company: form.company,
+        website: form.website,
+        services: form.services,
+        budget: form.budget,
+        deadline: form.deadline,
+        details: form.details,
+      }),
+    );
+    if (form.attachment) body.append("attachment", form.attachment);
+
+    try {
+      const response = await fetch("/api/book", {
+        method: "POST",
+        body,
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(data.error || "Could not send this booking.");
+        return;
+      }
       setSubmitted(true);
+    } catch {
+      setError("Could not send this booking. Check your connection.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const goNext = () => {
+    if (!canContinue || submitting) return;
+    if (step === BOOK_STEP_COUNT - 1) {
+      submit();
       return;
     }
     // Flush before focusing so iOS still treats this as the tap that
@@ -83,8 +126,12 @@ export default function BookFlow() {
     focusField(fieldRef.current);
   };
 
+  const hasProjectNotes =
+    form.details.trim().length > 0 || Boolean(form.attachment);
+  const lastStep = step === BOOK_STEP_COUNT - 1;
+
   const goBack = () => {
-    if (step === 0) return;
+    if (step === 0 || submitting) return;
     flushSync(() => {
       setStep((current) => Math.max(current - 1, 0));
     });
@@ -109,8 +156,8 @@ export default function BookFlow() {
           <div className={styles.panel}>
             <h1 className={styles.heading}>Thank you</h1>
             <p className={styles.lead}>
-              Your project brief is in. We will confirm your call time and
-              follow up at {form.email}.
+              Your booking is in. We will confirm the call time and follow up at{" "}
+              {form.email}.
             </p>
             <Link
               href="/"
@@ -349,6 +396,10 @@ export default function BookFlow() {
               <h1 className={styles.heading}>
                 Tell us more about your project
               </h1>
+              <p className={styles.lead}>
+                Optional — skip if you&apos;d rather talk it through on the
+                call.
+              </p>
               <label className={styles.field}>
                 <span className="sr-only">Project details</span>
                 <textarea
@@ -392,41 +443,59 @@ export default function BookFlow() {
           ) : null}
 
           {step > 0 ? (
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.backButton}
-                onClick={goBack}
-              >
-                Back
-              </button>
-              {step === 6 ? (
+            <>
+              <div className={styles.actions}>
                 <button
                   type="button"
-                  className={
-                    form.website.trim()
-                      ? `${styles.continueButton} ${styles.continueButtonActive}`
-                      : styles.primaryButton
-                  }
-                  onClick={form.website.trim() ? goNext : skipWebsite}
+                  className={styles.backButton}
+                  onClick={goBack}
+                  disabled={submitting}
                 >
-                  {form.website.trim() ? "Continue" : "Skip for now"}
+                  Back
                 </button>
-              ) : (
-                <button
-                  type="button"
-                  className={`${styles.continueButton} ${
-                    canContinue
-                      ? styles.continueButtonActive
-                      : styles.continueButtonDisabled
-                  }`}
-                  disabled={!canContinue}
-                  onClick={goNext}
-                >
-                  {step === BOOK_STEP_COUNT - 1 ? "Submit" : "Continue"}
-                </button>
-              )}
-            </div>
+                {step === 6 ? (
+                  <button
+                    type="button"
+                    className={
+                      form.website.trim()
+                        ? `${styles.continueButton} ${styles.continueButtonActive}`
+                        : styles.primaryButton
+                    }
+                    onClick={form.website.trim() ? goNext : skipWebsite}
+                    disabled={submitting}
+                  >
+                    {form.website.trim() ? "Continue" : "Skip for now"}
+                  </button>
+                ) : lastStep && !hasProjectNotes ? (
+                  <button
+                    type="button"
+                    className={styles.primaryButton}
+                    onClick={goNext}
+                    disabled={submitting}
+                  >
+                    {submitting ? "Sending..." : "Skip for now"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className={`${styles.continueButton} ${
+                      canContinue && !submitting
+                        ? styles.continueButtonActive
+                        : styles.continueButtonDisabled
+                    }`}
+                    disabled={!canContinue || submitting}
+                    onClick={goNext}
+                  >
+                    {submitting
+                      ? "Sending..."
+                      : lastStep
+                        ? "Submit"
+                        : "Continue"}
+                  </button>
+                )}
+              </div>
+              {error ? <p className={styles.formError}>{error}</p> : null}
+            </>
           ) : null}
         </div>
       </div>
