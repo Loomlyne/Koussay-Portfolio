@@ -1,5 +1,6 @@
 import "./globals.css";
 
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "./providers";
 import { SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
 
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
