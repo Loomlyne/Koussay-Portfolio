@@ -209,8 +209,7 @@ export default function BookFlow() {
           <div className={styles.panel}>
             <h1 className={styles.heading}>Thank you</h1>
             <p className={styles.lead}>
-              Your booking is in. We will confirm the call time and follow up at{" "}
-              {form.email}.
+              Your booking is in. We emailed the details to {form.email}.
             </p>
             <Link
               href="/"
