@@ -4,17 +4,20 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 
 const SharedTransitionContext = createContext(null);
 
 const DURATION = 0.88;
 const EASE = "power3.inOut";
+const FAILSAFE = 4200;
 
 function prefersReducedMotion() {
   if (typeof window === "undefined") return false;
@@ -41,6 +44,7 @@ export function isSharedTransitionActive() {
 }
 
 export function SharedTransitionProvider({ children }) {
+  const pathname = usePathname();
   const [active, setActive] = useState(null);
   const flyerRef = useRef(null);
   const scrimRef = useRef(null);
@@ -48,6 +52,7 @@ export function SharedTransitionProvider({ children }) {
   const landedRef = useRef(false);
   const activeRef = useRef(null);
   const paintReadyRef = useRef(null);
+  const startGenRef = useRef(0);
 
   useLayoutEffect(() => {
     activeRef.current = active;
@@ -61,22 +66,33 @@ export function SharedTransitionProvider({ children }) {
     document.documentElement.dataset.sharedTransition = "";
   }, []);
 
+  const abort = useCallback(() => {
+    startGenRef.current += 1;
+    paintReadyRef.current?.(false);
+    paintReadyRef.current = null;
+    if (flyerRef.current) gsap.killTweensOf(flyerRef.current);
+    if (scrimRef.current) gsap.killTweensOf(scrimRef.current);
+    finish();
+  }, [finish]);
+
   const start = useCallback(({ slug, src, from }) => {
     if (prefersReducedMotion()) return Promise.resolve(false);
 
+    const gen = ++startGenRef.current;
+
     return preloadImage(src)
       .catch(() => null)
-      .then(
-        () =>
-          new Promise((resolve) => {
-            paintReadyRef.current = resolve;
-            landedRef.current = false;
-            animatingRef.current = false;
-            setActive({ slug, src, from });
-            document.documentElement.classList.add("shared-transition");
-            document.documentElement.dataset.sharedTransition = "holding";
-          }),
-      );
+      .then(() => {
+        if (gen !== startGenRef.current) return false;
+        return new Promise((resolve) => {
+          paintReadyRef.current = resolve;
+          landedRef.current = false;
+          animatingRef.current = false;
+          setActive({ slug, src, from });
+          document.documentElement.classList.add("shared-transition");
+          document.documentElement.dataset.sharedTransition = "holding";
+        });
+      });
   }, []);
 
   const land = useCallback(
@@ -100,7 +116,8 @@ export function SharedTransitionProvider({ children }) {
       const flyer = flyerRef.current;
       const from = current.from;
       const to = targetEl.getBoundingClientRect();
-      const toRadius = parseFloat(getComputedStyle(targetEl).borderRadius) || 12;
+      const toRadius =
+        parseFloat(getComputedStyle(targetEl).borderRadius) || 12;
       const scaleX = to.width / from.width;
       const scaleY = to.height / from.height;
 
@@ -142,6 +159,19 @@ export function SharedTransitionProvider({ children }) {
     [finish],
   );
 
+  useEffect(() => {
+    const current = activeRef.current;
+    if (!current) return;
+    if (pathname === `/work/${current.slug}`) return;
+    abort();
+  }, [pathname, abort]);
+
+  useEffect(() => {
+    if (!active) return undefined;
+    const id = window.setTimeout(() => abort(), FAILSAFE);
+    return () => window.clearTimeout(id);
+  }, [active, abort]);
+
   useLayoutEffect(() => {
     if (!active || !flyerRef.current) return;
 
@@ -182,6 +212,7 @@ export function SharedTransitionProvider({ children }) {
     active,
     start,
     land,
+    abort,
     isTarget: (slug) => active?.slug === slug,
   };
 

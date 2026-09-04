@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { RegisterHome } from "@/components/HomeRing";
 import ProjectDetail from "@/components/project/ProjectDetail";
 import { getProjects } from "@/lib/cms/projects";
 import {
@@ -47,11 +48,14 @@ export default async function ProjectPage({ params }) {
   const { previous, next } = getProjectNavigation(project, projects);
 
   return (
-    <ProjectDetail
-      project={project}
-      displayIndex={getProjectDisplayIndex(project, projects)}
-      previous={previous}
-      next={next}
-    />
+    <>
+      <RegisterHome projects={projects} />
+      <ProjectDetail
+        project={project}
+        displayIndex={getProjectDisplayIndex(project, projects)}
+        previous={previous}
+        next={next}
+      />
+    </>
   );
 }

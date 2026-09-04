@@ -1,13 +1,16 @@
 "use client";
 
-import { SharedTransitionProvider } from "@/components/SharedTransitionProvider";
 import CmsLive from "@/components/CmsLive";
+import { HomeRingProvider } from "@/components/HomeRing";
+import { SharedTransitionProvider } from "@/components/SharedTransitionProvider";
 
 export function Providers({ children }) {
   return (
     <SharedTransitionProvider>
-      <CmsLive />
-      {children}
+      <HomeRingProvider>
+        <CmsLive />
+        {children}
+      </HomeRingProvider>
     </SharedTransitionProvider>
   );
 }

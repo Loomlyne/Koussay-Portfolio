@@ -227,9 +227,6 @@ export function createMeta(refs, params, projects = FALLBACK_PROJECTS) {
     if (list) list.style.fontSize = `${params.listSize * textK}vw`;
     if (loader) {
       loader.style.bottom = `${params.loaderBottom}vh`;
-      loader.style.fontFamily = smallFace;
-      loader.style.fontSize = small;
-      loader.style.fontWeight = smallWeight;
     }
 
     setThreshold();

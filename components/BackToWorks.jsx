@@ -1,18 +1,20 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { useHomeRing } from "./homeRingContext";
 
-export default function BrandMark({ className = "", size = 40 }) {
+export default function BackToWorks({
+  className,
+  children = "Back to works",
+  arrow = true,
+}) {
   const home = useHomeRing();
 
   return (
     <Link
       href="/"
-      aria-label="Koussay Zayani — home"
-      className={`inline-block leading-none transition-opacity hover:opacity-70 ${className}`.trim()}
+      className={className}
       onClick={(event) => {
         if (
           event.metaKey ||
@@ -27,7 +29,8 @@ export default function BrandMark({ className = "", size = 40 }) {
         home?.prepareHome?.();
       }}
     >
-      <Image src="/logo.png" alt="" width={size} height={size} priority />
+      {arrow ? <span aria-hidden="true">←</span> : null}
+      {children}
     </Link>
   );
 }

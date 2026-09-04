@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
 import BrandMark from "@/components/BrandMark";
+import BackToWorks from "@/components/BackToWorks";
 import BookCalendar from "@/components/book/BookCalendar";
 import BookProgress from "@/components/book/BookProgress";
 import BookTimePicker from "@/components/book/BookTimePicker";
@@ -211,12 +211,10 @@ export default function BookFlow() {
             <p className={styles.lead}>
               Your booking is in. We emailed the details to {form.email}.
             </p>
-            <Link
-              href="/"
+            <BackToWorks
+              arrow={false}
               className={`${styles.primaryButton} ${styles.primaryButtonActive} ${styles.soloButton}`}
-            >
-              Back to works
-            </Link>
+            />
           </div>
         </div>
       </main>
@@ -236,12 +234,10 @@ export default function BookFlow() {
                 right fit for your project.
               </p>
               <div className={styles.introActions}>
-                <Link
-                  href="/"
+                <BackToWorks
+                  arrow={false}
                   className={`${styles.primaryButton} ${styles.soloButton}`}
-                >
-                  Back to works
-                </Link>
+                />
                 <button
                   type="button"
                   className={`${styles.primaryButton} ${styles.primaryButtonActive} ${styles.soloButton}`}

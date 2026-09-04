@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import BrandMark from "@/components/BrandMark";
+import BackToWorks from "@/components/BackToWorks";
 import styles from "@/app/work/[slug]/page.module.css";
 
 export default function ProjectNotFound() {
@@ -20,10 +19,7 @@ export default function ProjectNotFound() {
           <p className={styles.notFoundDescription}>
             This address does not match a project in the current work index.
           </p>
-          <Link href="/" className={styles.backLink}>
-            <span aria-hidden="true">←</span>
-            Back to works
-          </Link>
+          <BackToWorks className={styles.backLink} />
         </div>
       </section>
     </main>

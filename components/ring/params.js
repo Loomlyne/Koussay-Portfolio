@@ -45,10 +45,10 @@ export function defaultParams() {
     // Same as dprCap. Dropping this below 2 made the facing card soft on a
     // 2–3x phone screen; do not use it as a swipe-smoothness lever.
     dprCapLo: 2,
-    // The counter is the gate: it used to mean every cell is on the sheet.
-    // Opening it early left decode and a full-sheet GPU upload running after
-    // the ring had landed, which is the ~10s freeze after the first flick.
-    atlasLaunch: PROJECTS.length,
+    // Visible arc only. The rest of the sheet fills in while the ring is
+    // idle (`setPaused`); waiting on every cell is what made the counter
+    // sit on a white page for seconds before anything moved.
+    atlasLaunch: 7,
     // Keep the facing card inside the viewport when minScale pins the ring
     // larger than the window would otherwise allow.
     edgePad: 20,
@@ -85,8 +85,8 @@ export function defaultParams() {
     // The counter is the gate: the entry launches on the frame it reads 100.
     // holdAfter is a beat held after that and wants to stay near zero.
     holdAfter: 0,
-    loaderChase: 0.18,
-    loaderBottom: 1, // vh
+    loaderChase: 0.28,
+    loaderBottom: 5, // vh
     loaderOut: 0.45, // seconds to fade once the hold lets go
 
     // -- entry timing ----------------------------------------------------

@@ -43,11 +43,19 @@ const blankTexture = () => {
   return t;
 };
 
-export default function Carousel({ projects = FALLBACK_PROJECTS }) {
+export default function Carousel({
+  projects = FALLBACK_PROJECTS,
+  active = true,
+}) {
   const ring = projects.length > 0 ? projects : FALLBACK_PROJECTS;
+  const ringKey = ring.map((p) => `${p.slug ?? ""}:${p.file}`).join("|");
   const router = useRouter();
   const startTransition = useSharedTransition()?.start;
+  const activeRef = useRef(active);
+  const routerRef = useRef(router);
+  const startTransitionRef = useRef(startTransition);
   const pickProjectRef = useRef(null);
+  const stageApiRef = useRef(null);
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const itemsRef = useRef([]);
@@ -61,6 +69,16 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
     left: { box: null, goo: null, layers: [], plain: null },
     right: { box: null, goo: null, layers: [], plain: null },
   });
+
+  useEffect(() => {
+    activeRef.current = active;
+    routerRef.current = router;
+    startTransitionRef.current = startTransition;
+  }, [active, router, startTransition]);
+
+  useEffect(() => {
+    stageApiRef.current?.(active);
+  }, [active]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -95,7 +113,9 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
       coarseMQ.matches || width <= params.loFiAt;
     let loFi = loFiNow();
 
-    document.documentElement.classList.add("ring-lock");
+    // ring-lock is applied in applyStage once the effect has a renderer, and
+    // only while this instance is the visible home — parking must not freeze
+    // scroll on a project page.
 
     // Browsers cap the number of live WebGL contexts (~16 in Chrome). If that
     // is hit, this throws and the rest of the effect never runs — no canvas is
@@ -410,6 +430,7 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
     let picking = false;
     let activePick = null;
     let pendingOpen = null;
+    let openGen = 0;
 
     let pointerTravel = 0; // tells a click from a drag
     let travelX = 0;
@@ -700,24 +721,29 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
       const project = ring[cellOf(signedOffset(plane))];
       if (!project?.slug) return null;
       return async () => {
-        if (disposed) return;
+        if (disposed || !activeRef.current) return;
+        const gen = ++openGen;
 
         const imageSrc = projectImageSrc(project);
         const from = rectForPlane(plane);
+        const push = () => routerRef.current.push(`/work/${project.slug}`);
+        const start = startTransitionRef.current;
 
-        if (!startTransition) {
-          router.push(`/work/${project.slug}`);
+        if (!start) {
+          push();
           return;
         }
 
-        const animated = await startTransition({
+        const animated = await start({
           slug: project.slug,
           src: imageSrc,
           from,
         });
 
+        if (disposed || gen !== openGen || !activeRef.current) return;
+
         if (!animated) {
-          router.push(`/work/${project.slug}`);
+          push();
           return;
         }
 
@@ -726,7 +752,7 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
         gsap.set(renderer.domElement, { opacity: 0 });
 
         document.documentElement.dataset.sharedTransition = "navigating";
-        router.push(`/work/${project.slug}`);
+        push();
       };
     };
 
@@ -747,9 +773,6 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
     canvas.addEventListener("pointerleave", onPointerLeave);
     canvas.addEventListener("click", onClick);
     canvas.addEventListener("touchmove", lockTouchScroll, { passive: false });
-    document.addEventListener("touchmove", lockTouchScroll, {
-      passive: false,
-    });
 
     const updatePointer = (dt) => {
       // Held off until the entry finishes, so the cursor cannot soften the
@@ -791,6 +814,9 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
     // launch, so counting bytes alone leaves the number sitting on 100 waiting
     // for a condition nobody told the viewer about.
     const loading = { shown: 0 };
+    const chargeAt = performance.now();
+    const loaderCountEl = loaderEl?.querySelector("[data-loader-count]");
+    const loaderTimeEl = loaderEl?.querySelector("[data-loader-time]");
 
     const tickLoader = (dt) => {
       const target = Math.min(loadProg, clamp01(state.progress));
@@ -798,7 +824,19 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
 
       // Never 000; that reads as nothing happening.
       const n = Math.min(100, Math.max(1, Math.round(loading.shown * 100)));
-      if (loaderEl) loaderEl.textContent = String(n).padStart(3, "0");
+      const total = Math.max(
+        0,
+        Math.floor((performance.now() - chargeAt) / 1000),
+      );
+      const clock = `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+      if (loaderCountEl) loaderCountEl.textContent = String(n).padStart(3, "0");
+      if (loaderTimeEl) loaderTimeEl.textContent = clock;
+      if (loaderEl) {
+        loaderEl.setAttribute(
+          "aria-label",
+          `Charging ${String(n).padStart(3, "0")} percent, ${clock}`,
+        );
+      }
 
       if (!launchReady && n >= 100) {
         launchReady = true;
@@ -1357,6 +1395,7 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
         delay: 0.25,
         onComplete: () => {
           interactive = true;
+          if (!activeRef.current) renderer.setAnimationLoop(null);
         },
       });
 
@@ -1550,8 +1589,10 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
     const start = performance.now();
     let prevT = start;
     let idleFrames = 0;
+    let looping = false;
+    let docLocked = false;
 
-    renderer.setAnimationLoop(() => {
+    const tick = () => {
       const now = performance.now();
       // Clamped, so a backgrounded tab does not resume with one huge step.
       const dt = Math.min(0.05, (now - prevT) / 1000);
@@ -1692,10 +1733,51 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
         uniforms.uTime.value = (now - start) * 0.001;
         renderer.render(scene, camera);
       }
-    });
+    };
+
+    const setLoop = (on) => {
+      if (on === looping) return;
+      looping = on;
+      renderer.setAnimationLoop(on ? tick : null);
+    };
+
+    const applyStage = (on) => {
+      if (disposed) return;
+      if (on) {
+        document.documentElement.classList.add("ring-lock");
+        if (!docLocked) {
+          document.addEventListener("touchmove", lockTouchScroll, {
+            passive: false,
+          });
+          docLocked = true;
+        }
+        gsap.set(canvas, { opacity: 1 });
+        refit();
+        applyQuality();
+        renderer.setSize(viewW, viewH);
+        setLoop(true);
+        return;
+      }
+
+      document.documentElement.classList.remove("ring-lock");
+      if (docLocked) {
+        document.removeEventListener("touchmove", lockTouchScroll);
+        docLocked = false;
+      }
+      openGen += 1;
+      stopPick();
+      // Keep ticking until the entry can finish; otherwise the counter never
+      // opens and the timeline stays paused at the seed.
+      if (interactive) setLoop(false);
+    };
+
+    stageApiRef.current = applyStage;
+    setLoop(true);
+    applyStage(activeRef.current);
 
     return () => {
       disposed = true;
+      stageApiRef.current = null;
       pickProjectRef.current = null;
       stopPick();
       clearTimeout(holdTimer);
@@ -1740,7 +1822,10 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [ring, router, startTransition]);
+    // ringKey is the deal's identity. Listing `ring` would tear the GL
+    // context down on every parent render even when nothing in it changed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ringKey]);
 
   return (
     <>
@@ -1870,12 +1955,22 @@ export default function Carousel({ projects = FALLBACK_PROJECTS }) {
         );
       })}
 
-      {/* 001 to 100. Holds the entry at the seed until it gets there. */}
+      {/* Charging clock + 001–100. Holds the entry at the seed until 100. */}
       <div
         ref={loaderRef}
-        aria-hidden="true"
-        className="pointer-events-none fixed left-1/2 z-10 -translate-x-1/2 tracking-[-0.01em] text-[#0a0a0a]"
-      />
+        role="status"
+        aria-live="polite"
+        aria-label="Charging"
+        className="ring-loader pointer-events-none"
+      >
+        <span className="ring-loader-label">Charging</span>
+        <span data-loader-count className="ring-loader-count">
+          001
+        </span>
+        <span data-loader-time className="ring-loader-time">
+          0:00
+        </span>
+      </div>
 
       <div ref={liveRef} aria-live="polite" className="sr-only" />
 

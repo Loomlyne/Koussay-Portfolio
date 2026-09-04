@@ -1,4 +1,4 @@
-import Carousel from "@/components/Carousel";
+import { RegisterHome } from "@/components/HomeRing";
 import { getProjects } from "@/lib/cms/projects";
 import { projectImageSrc } from "@/lib/projects";
 
@@ -18,7 +18,7 @@ export default async function Page() {
           fetchPriority="high"
         />
       ) : null}
-      <Carousel projects={projects} />
+      <RegisterHome projects={projects} />
     </>
   );
 }
