@@ -299,7 +299,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   width: 100%;
   max-width: none;
   margin: 0;
-  font-size: clamp(1.2rem, 2.64vw, 2.88rem);
+  font-size: clamp(1.8rem, 3.96vw, 4.32rem);
   letter-spacing: -0.07em;
   line-height: 0.98;
   text-wrap: balance;
@@ -867,7 +867,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   }
 
   .summary {
-    font-size: clamp(1.2rem, 6vw, 2.1rem);
+    font-size: clamp(1.8rem, 9vw, 3.15rem);
   }
 
   .detailSection {
