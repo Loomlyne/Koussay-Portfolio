@@ -1008,7 +1008,12 @@ export default function Carousel({
       const gLand = endScale * fit;
       const Rland = ringR * radiusK * gLand;
       const Wland = params.planeSize * planeK * gLand;
-      let stageX = posX * viewW * 0.5;
+      const hubX = posX * viewW * 0.5;
+      // posX was authored against ringRefCount. Keep the facing card where
+      // that composition put it (near centre) and only move the hub, so a
+      // smaller set cannot slide the open card into the left edge.
+      const frontTarget = params.ringRadius * radiusK * gLand + hubX;
+      let stageX = frontTarget - Rland;
       const frontX = Rland + stageX;
       const pad = params.edgePad;
       const maxX = viewW * 0.5 - Wland * 0.5 - pad;
