@@ -296,13 +296,12 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 }
 
 .summary {
-  width: 80%;
-  max-width: 56rem;
+  max-width: 42rem;
   margin: 0;
-  font-size: clamp(1.2rem, 1.85vw, 1.7rem);
-  letter-spacing: -0.03em;
-  line-height: 1.28;
-  text-wrap: pretty;
+  font-size: clamp(2rem, 4.4vw, 4.8rem);
+  letter-spacing: -0.07em;
+  line-height: 0.98;
+  text-wrap: balance;
 }
 
 .sections {
@@ -867,8 +866,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   }
 
   .summary {
-    width: 100%;
-    font-size: clamp(1.15rem, 4.4vw, 1.45rem);
+    font-size: clamp(2rem, 10vw, 3.5rem);
   }
 
   .detailSection {
