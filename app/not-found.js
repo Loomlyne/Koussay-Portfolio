@@ -1,8 +1,6 @@
 import ProjectNotFound from "@/components/project/ProjectNotFound";
-import { shareImages } from "@/lib/seo";
 
 const description = "This address does not match a project in the current index.";
-const images = shareImages();
 
 export const metadata = {
   title: "Project not found",
@@ -14,13 +12,11 @@ export const metadata = {
   openGraph: {
     title: "Project not found",
     description,
-    images,
   },
   twitter: {
     card: "summary_large_image",
     title: "Project not found",
     description,
-    images,
   },
 };
 

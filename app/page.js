@@ -2,15 +2,12 @@ import { RegisterHome } from "@/components/HomeRing";
 import JsonLd from "@/components/JsonLd";
 import { getProjects } from "@/lib/cms/projects";
 import { projectImageSrc } from "@/lib/projects";
-import { graph, projectListSchema, shareImages } from "@/lib/seo";
+import { graph, projectListSchema } from "@/lib/seo";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const revalidate = 60;
 
 export async function generateMetadata() {
-  const projects = await getProjects();
-  const featured = projects.find((project) => projectImageSrc(project));
-  const images = shareImages(featured);
   const title = `${SITE_NAME} — Identities and digital experiences`;
 
   return {
@@ -23,13 +20,11 @@ export async function generateMetadata() {
       title,
       description: SITE_DESCRIPTION,
       url: SITE_URL,
-      images,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: SITE_DESCRIPTION,
-      images,
     },
   };
 }

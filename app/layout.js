@@ -7,12 +7,10 @@ import {
   graph,
   localBusinessSchema,
   personSchema,
-  SITE_SHARE_IMAGE,
   websiteSchema,
 } from "@/lib/seo";
 import {
   SITE_DESCRIPTION,
-  SITE_MARK_ALT,
   SITE_MARK_PATH,
   SITE_NAME,
   SITE_URL,
@@ -48,13 +46,11 @@ export const metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — Identities and digital experiences`,
     description: SITE_DESCRIPTION,
-    images: [{ url: SITE_SHARE_IMAGE, alt: SITE_MARK_ALT }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} — Identities and digital experiences`,
     description: SITE_DESCRIPTION,
-    images: [{ url: SITE_SHARE_IMAGE, alt: SITE_MARK_ALT }],
   },
 };
 

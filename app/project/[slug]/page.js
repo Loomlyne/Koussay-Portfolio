@@ -16,7 +16,6 @@ import {
   breadcrumbSchema,
   graph,
   projectSchema,
-  shareImages,
 } from "@/lib/seo";
 
 export async function generateStaticParams() {
@@ -45,7 +44,6 @@ export async function generateMetadata({ params }) {
 
   const description = project.detail?.summary || SITE_DESCRIPTION;
   const url = `${SITE_URL}${projectHref(project.slug)}`;
-  const images = shareImages(project);
 
   return {
     title: project.name,
@@ -58,13 +56,11 @@ export async function generateMetadata({ params }) {
       description,
       url,
       type: "article",
-      images,
     },
     twitter: {
       card: "summary_large_image",
       title: project.name,
       description,
-      images,
     },
   };
 }
