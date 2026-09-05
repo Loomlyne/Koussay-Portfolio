@@ -30,12 +30,12 @@ export const metadata = {
   creator: SITE_NAME,
   icons: {
     icon: [
-      { url: SITE_MARK_PATH, type: "image/png" },
-      { url: "/icon.png", type: "image/png", sizes: "192x192" },
-      { url: "/favicon.ico", sizes: "48x48" },
+      { url: `${SITE_MARK_PATH}?v=portrait`, type: "image/png", sizes: "512x512" },
     ],
-    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
-    shortcut: SITE_MARK_PATH,
+    apple: [
+      { url: `${SITE_MARK_PATH}?v=portrait`, sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: `${SITE_MARK_PATH}?v=portrait`,
   },
   robots: {
     index: true,
