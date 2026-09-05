@@ -977,48 +977,24 @@ export default function Carousel({
       return -1;
     };
 
-    // Screen-space bounds of a plane, for the shared-element handoff to the
-    // project hero. Same box the shader draws and planeAt tests against.
+    // The card as drawn, not its axis-aligned bounds. The flyer starts on
+    // this box and un-rotates into the hero so the photo never jumps.
     const rectForPlane = (i) => {
       const scale = uniforms.uScale.value[i];
       const pos = uniforms.uPos.value[i];
       const rot = uniforms.uRot.value[i];
-      const W = uniforms.uSize.value.x;
-      const H = uniforms.uSize.value.y;
-      const hw = W * scale.x * 0.5;
-      const hh = H * scale.y * 0.5;
-      const cr = Math.cos(rot);
-      const sr = Math.sin(rot);
+      const width = uniforms.uSize.value.x * scale.x;
+      const height = uniforms.uSize.value.y * scale.y;
       const bounds = container.getBoundingClientRect();
-      const ox = bounds.left + bounds.width * 0.5;
-      const oy = bounds.top + bounds.height * 0.5;
-
-      let minX = Infinity;
-      let minY = Infinity;
-      let maxX = -Infinity;
-      let maxY = -Infinity;
-
-      for (const [lx, ly] of [
-        [-hw, -hh],
-        [hw, -hh],
-        [hw, hh],
-        [-hw, hh],
-      ]) {
-        const wx = pos.x + lx * cr - ly * sr;
-        const wy = pos.y + lx * sr + ly * cr;
-        const sx = ox + wx;
-        const sy = oy - wy;
-        minX = Math.min(minX, sx);
-        minY = Math.min(minY, sy);
-        maxX = Math.max(maxX, sx);
-        maxY = Math.max(maxY, sy);
-      }
+      const cx = bounds.left + bounds.width * 0.5 + pos.x;
+      const cy = bounds.top + bounds.height * 0.5 - pos.y;
 
       return {
-        left: minX,
-        top: minY,
-        width: maxX - minX,
-        height: maxY - minY,
+        left: cx - width * 0.5,
+        top: cy - height * 0.5,
+        width,
+        height,
+        rotation: -rot * (180 / Math.PI),
         borderRadius: uniforms.uRadius.value,
       };
     };

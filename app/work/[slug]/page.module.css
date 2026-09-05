@@ -168,7 +168,7 @@ html[data-shared-transition="animating"] .heroInfo {
 html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaFrame,
 html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   opacity: 1;
-  transition: opacity 180ms ease;
+  transition: opacity 340ms ease;
 }
 
 @keyframes heroMetaReveal {

@@ -15,9 +15,28 @@ import gsap from "gsap";
 
 const SharedTransitionContext = createContext(null);
 
-const DURATION = 0.88;
-const EASE = "power3.inOut";
+const DURATION = 1.24;
+const EASE = "expo.inOut";
+const FADE = 0.34;
 const FAILSAFE = 4200;
+
+function flyerFrom(from) {
+  return {
+    left: from.left,
+    top: from.top,
+    width: from.width,
+    height: from.height,
+    borderRadius: from.borderRadius ?? 12,
+    x: 0,
+    y: 0,
+    rotation: from.rotation ?? 0,
+    scaleX: 1,
+    scaleY: 1,
+    transformOrigin: "50% 50%",
+    opacity: 1,
+    force3D: true,
+  };
+}
 
 function prefersReducedMotion() {
   if (typeof window === "undefined") return false;
@@ -82,13 +101,17 @@ export function SharedTransitionProvider({ children }) {
 
     return preloadImage(src)
       .catch(() => null)
-      .then(() => {
+      .then((image) => {
         if (gen !== startGenRef.current) return false;
+        const ratio =
+          image?.naturalWidth && image.naturalHeight
+            ? image.naturalWidth / image.naturalHeight
+            : null;
         return new Promise((resolve) => {
           paintReadyRef.current = resolve;
           landedRef.current = false;
           animatingRef.current = false;
-          setActive({ slug, src, from });
+          setActive({ slug, src, from, ratio });
           document.documentElement.classList.add("shared-transition");
           document.documentElement.dataset.sharedTransition = "holding";
         });
@@ -118,38 +141,31 @@ export function SharedTransitionProvider({ children }) {
       const to = targetEl.getBoundingClientRect();
       const toRadius =
         parseFloat(getComputedStyle(targetEl).borderRadius) || 12;
-      const scaleX = to.width / from.width;
-      const scaleY = to.height / from.height;
 
       gsap.killTweensOf(flyer);
       gsap.set(flyer, {
-        left: from.left,
-        top: from.top,
-        width: from.width,
-        height: from.height,
-        borderRadius: from.borderRadius ?? 12,
-        x: 0,
-        y: 0,
-        scaleX: 1,
-        scaleY: 1,
-        transformOrigin: "0 0",
-        opacity: 1,
-        willChange: "transform, border-radius",
+        ...flyerFrom(from),
+        willChange: "transform, width, height, border-radius",
       });
 
+      // Size the box itself instead of stretching it. The photo stays
+      // undistorted and the corner radius tracks the hero frame.
       gsap.to(flyer, {
         x: to.left - from.left,
         y: to.top - from.top,
-        scaleX,
-        scaleY,
+        width: to.width,
+        height: to.height,
+        rotation: 0,
         borderRadius: toRadius,
+        boxShadow: "0 8px 28px rgba(10, 10, 10, 0.06)",
         duration: DURATION,
         ease: EASE,
+        overwrite: true,
         onComplete: () => {
           document.documentElement.dataset.sharedTransition = "complete";
           gsap.to(flyer, {
             opacity: 0,
-            duration: 0.18,
+            duration: FADE,
             ease: "power2.out",
             onComplete: finish,
           });
@@ -181,17 +197,7 @@ export function SharedTransitionProvider({ children }) {
 
     gsap.killTweensOf(flyer);
     gsap.set(flyer, {
-      left: from.left,
-      top: from.top,
-      width: from.width,
-      height: from.height,
-      borderRadius: from.borderRadius ?? 12,
-      x: 0,
-      y: 0,
-      scaleX: 1,
-      scaleY: 1,
-      transformOrigin: "0 0",
-      opacity: 1,
+      ...flyerFrom(from),
       clearProps: "willChange",
     });
 
@@ -233,6 +239,7 @@ export function SharedTransitionProvider({ children }) {
                 width: active.from.width,
                 height: active.from.height,
                 borderRadius: active.from.borderRadius ?? 12,
+                transform: `rotate(${active.from.rotation ?? 0}deg)`,
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

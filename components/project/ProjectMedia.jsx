@@ -19,10 +19,15 @@ export default function ProjectMedia({ project, preload = false }) {
   useLayoutEffect(() => {
     if (!isTransitionTarget || !frameRef.current || !sharedTransition) return;
 
+    const ratio = sharedTransition.active?.ratio;
+    if (ratio) {
+      frameRef.current.style.setProperty("--media-ratio", String(ratio));
+    }
+
     let cancelled = false;
 
     const run = () => {
-      if (!cancelled) {
+      if (!cancelled && frameRef.current) {
         sharedTransition.land(frameRef.current, project.slug);
       }
     };
