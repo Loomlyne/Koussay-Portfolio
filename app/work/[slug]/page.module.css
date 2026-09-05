@@ -2,6 +2,8 @@
   --paper: #fafafa;
   --ink: #0a0a0a;
   --line: rgba(10, 10, 10, 0.18);
+  --media-col: min(100%, 70rem);
+  --media-width: 70%;
   position: relative;
   min-height: 100svh;
   background: var(--paper);
@@ -110,8 +112,9 @@
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: var(--media-col);
   min-height: 0;
+  margin-inline: auto;
 }
 
 .heroFoot {
@@ -183,7 +186,7 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: var(--media-width);
   max-width: 100%;
   min-height: 0;
   margin: 0;
@@ -298,7 +301,7 @@ html[data-project-pager] .mediaFigure,
 }
 
 .content {
-  width: min(100%, 70rem);
+  width: var(--media-col);
   margin: 0 auto;
   padding: clamp(3rem, 10vw, 10rem) 0 0;
 }
@@ -388,7 +391,7 @@ html[data-project-pager] .mediaFigure,
 }
 
 .galleryItem {
-  width: 70%;
+  width: var(--media-width);
   margin: 0;
 }
 
@@ -653,7 +656,7 @@ html[data-project-pager] .mediaFigure,
 }
 
 .loadingFrame {
-  width: min(100%, calc((100svh - 22rem) * 3 / 2));
+  width: min(var(--media-width, 70%), calc((100svh - 22rem) * 3 / 2));
   aspect-ratio: 3 / 2;
   max-height: calc(100svh - 22rem);
   border-radius: clamp(0.55rem, 1.1vw, 1rem);
@@ -690,6 +693,10 @@ html[data-project-pager] .mediaFigure,
 }
 
 @media (max-width: 1024px) {
+  .page {
+    --media-width: 100%;
+  }
+
   .article {
     padding-inline: clamp(24px, 5vw, 48px);
   }
@@ -702,10 +709,6 @@ html[data-project-pager] .mediaFigure,
 
   .heroTitle {
     font-size: clamp(3.1rem, 10vw, 6.25rem);
-  }
-
-  .galleryItem {
-    width: 100%;
   }
 
   .testimonialFigure {

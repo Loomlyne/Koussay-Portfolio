@@ -66,7 +66,7 @@ export default function ProjectMedia({ project, preload = false }) {
             alt={`${project.name} — placeholder artwork`}
             fill
             preload={preload}
-            sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) calc(100vw - 64px), min(1760px, calc(100vw - 144px))"
+            sizes="(max-width: 1024px) min(70rem, calc(100vw - 64px)), min(49rem, 70vw)"
             className={styles.mediaImage}
             onLoad={(event) => fitToImage(event.currentTarget)}
             onError={() => setFailedSrc(imageSrc)}
