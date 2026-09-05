@@ -13,6 +13,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useLenis } from "lenis/react";
 import gsap from "gsap";
 
+import { warmHref } from "@/lib/project/warm";
+
 const ProjectPagerContext = createContext(null);
 
 const DURATION = 1.2;
@@ -193,12 +195,7 @@ export function ProjectPagerProvider({ children }) {
     (href, direction, previewSrc) => {
       if (pendingRef.current) return;
 
-      router.prefetch(href);
-      if (previewSrc && typeof window !== "undefined") {
-        const image = new window.Image();
-        image.decoding = "async";
-        image.src = previewSrc;
-      }
+      warmHref(href, previewSrc, router);
 
       if (prefersReducedMotion()) {
         router.push(href, { scroll: false });

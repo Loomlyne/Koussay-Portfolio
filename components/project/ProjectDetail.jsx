@@ -4,6 +4,7 @@ import ProjectGallery from "./ProjectGallery";
 import ProjectHero from "./ProjectHero";
 import ProjectPager from "./ProjectPager";
 import ProjectPageShell from "./ProjectPagerTransition";
+import ProjectWarm from "./ProjectWarm";
 import ProjectSections from "./ProjectSections";
 import ProjectTestimonial from "./ProjectTestimonial";
 import ProjectTools from "./ProjectTools";
@@ -19,6 +20,7 @@ export default function ProjectDetail({
 
   return (
     <main className={styles.page}>
+      <ProjectWarm current={project} previous={previous} next={next} />
       <ScrollTop id={project.slug} />
       <ProjectPageShell id={project.slug}>
         <article className={styles.article}>

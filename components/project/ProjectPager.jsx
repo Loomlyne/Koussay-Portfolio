@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { getProjectDisplayIndex, projectImageSrc } from "@/lib/projects";
+import { warmProject } from "@/lib/project/warm";
 
 import styles from "@/app/work/[slug]/page.module.css";
 
@@ -20,13 +21,8 @@ function PagerLink({ project, direction }) {
   const imageSrc = projectImageSrc(project);
 
   useEffect(() => {
-    router.prefetch(href);
-    if (!imageSrc) return undefined;
-    const image = new window.Image();
-    image.decoding = "async";
-    image.src = imageSrc;
-    return undefined;
-  }, [href, imageSrc, router]);
+    warmProject(project, router);
+  }, [project, router]);
 
   return (
     <Link

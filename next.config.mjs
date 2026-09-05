@@ -2,6 +2,12 @@
 const nextConfig = {
   // output: "standalone" only for Docker; Vercel handles its own output
   ...(process.env.VERCEL !== "1" ? { output: "standalone" } : {}),
+  experimental: {
+    staleTimes: {
+      dynamic: 180,
+      static: 300,
+    },
+  },
   images: {
     localPatterns: [
       // Notion covers are versioned (`?v=`) so CMS edits bust the cache.

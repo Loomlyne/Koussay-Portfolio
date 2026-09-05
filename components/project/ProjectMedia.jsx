@@ -5,6 +5,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 
 import { useSharedTransition } from "@/components/SharedTransitionProvider";
 import { projectImageSrc } from "@/lib/projects";
+import { HERO_IMAGE_SIZES } from "@/lib/project/warm";
 import styles from "@/app/work/[slug]/page.module.css";
 
 export default function ProjectMedia({ project, preload = false }) {
@@ -66,7 +67,7 @@ export default function ProjectMedia({ project, preload = false }) {
             alt={`${project.name} — placeholder artwork`}
             fill
             preload={preload}
-            sizes="(max-width: 1024px) min(70rem, calc(100vw - 64px)), min(49rem, 70vw)"
+            sizes={HERO_IMAGE_SIZES}
             className={styles.mediaImage}
             onLoad={(event) => fitToImage(event.currentTarget)}
             onError={() => setFailedSrc(imageSrc)}

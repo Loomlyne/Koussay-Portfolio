@@ -3,6 +3,7 @@
 import Image from "next/image";
 
 import { projectImageSrc } from "@/lib/projects";
+import { GALLERY_IMAGE_SIZES } from "@/lib/project/warm";
 
 import styles from "@/app/work/[slug]/page.module.css";
 
@@ -34,7 +35,7 @@ export default function ProjectGallery({ project, gallery = [] }) {
                   alt={alt}
                   fill
                   loading="lazy"
-                  sizes="(max-width: 640px) 70vw, 70vw"
+                  sizes={GALLERY_IMAGE_SIZES}
                   className={styles.galleryImage}
                 />
               </div>
