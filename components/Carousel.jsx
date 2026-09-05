@@ -2104,21 +2104,20 @@ export default function Carousel({
 
       <div ref={liveRef} aria-live="polite" className="sr-only" />
 
-      <p className="ring-credit">
-        <span className="ring-credit-name">Koussay Zayani</span>
-        <span className="ring-credit-line">
-          Identities and digital experiences
-        </span>
-      </p>
-
-      <Link
-        href="/book"
-        prefetch={false}
-        className="glass-btn glass-btn--cta glass-btn--solid pointer-events-auto fixed bottom-[2.4vh] right-[4vw] z-20"
-      >
-        Start a project
-        <span aria-hidden="true">→</span>
-      </Link>
+      <div className="ring-dock">
+        <p className="ring-credit">
+          <span className="ring-credit-name">Koussay Zayani</span>
+          <span className="ring-credit-line">Brand and web</span>
+        </p>
+        <Link
+          href="/book"
+          prefetch={false}
+          className="glass-btn glass-btn--cta glass-btn--solid pointer-events-auto ring-dock-cta"
+        >
+          Start a project
+          <span aria-hidden="true">→</span>
+        </Link>
+      </div>
 
       {/* Alpha multiplied up hard and biased down, so a pixel is either fully
           opaque or gone. That is what fuses two blurred words into one
