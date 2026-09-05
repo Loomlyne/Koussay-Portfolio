@@ -473,17 +473,23 @@ export default function BookFlow() {
                   className={`${styles.input} ${
                     error && stepError ? styles.inputError : ""
                   }`}
-                  type="url"
-                  name="url"
+                  type="text"
+                  name="website"
                   inputMode="url"
                   enterKeyHint="next"
                   autoCapitalize="none"
                   autoCorrect="off"
-                  placeholder="https://yourcompany.com"
+                  spellCheck={false}
+                  placeholder="yourcompany.com"
                   value={form.website}
                   aria-invalid={Boolean(error && stepError)}
                   onChange={(event) => update({ website: event.target.value })}
-                  onKeyDown={onFieldEnter}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter") return;
+                    event.preventDefault();
+                    if (form.website.trim()) goNext();
+                    else skipWebsite();
+                  }}
                 />
               </label>
               <FieldError message={error && stepError ? error : ""} />
@@ -637,18 +643,26 @@ export default function BookFlow() {
                   Back
                 </button>
                 {step === 6 ? (
-                  <button
-                    type="button"
-                    className={
-                      form.website.trim()
-                        ? `${styles.continueButton} ${styles.continueButtonActive}`
-                        : styles.primaryButton
-                    }
-                    onClick={form.website.trim() ? goNext : skipWebsite}
-                    disabled={submitting}
-                  >
-                    {form.website.trim() ? "Continue" : "Skip for now"}
-                  </button>
+                  <div className={styles.websiteActions}>
+                    <button
+                      type="button"
+                      className={styles.primaryButton}
+                      onClick={skipWebsite}
+                      disabled={submitting}
+                    >
+                      Skip for now
+                    </button>
+                    {form.website.trim() ? (
+                      <button
+                        type="button"
+                        className={`${styles.continueButton} ${styles.continueButtonActive}`}
+                        onClick={goNext}
+                        disabled={submitting}
+                      >
+                        Continue
+                      </button>
+                    ) : null}
+                  </div>
                 ) : lastStep && !hasProjectNotes ? (
                   <button
                     type="button"

@@ -467,6 +467,14 @@
   gap: var(--space-4);
 }
 
+.websiteActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
 .introActions {
   display: flex;
   flex-wrap: wrap;
