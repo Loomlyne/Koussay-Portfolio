@@ -47,6 +47,7 @@ const blankTexture = () => {
 export default function Carousel({
   projects = FALLBACK_PROJECTS,
   active = true,
+  resumeSlug = null,
 }) {
   const ring = projects.length > 0 ? projects : FALLBACK_PROJECTS;
   const ringKey = ring.map((p) => `${p.slug ?? ""}:${p.file}`).join("|");
@@ -56,6 +57,7 @@ export default function Carousel({
   const routerRef = useRef(router);
   const startTransitionRef = useRef(startTransition);
   const pickProjectRef = useRef(null);
+  const resumeSlugRef = useRef(resumeSlug);
   const stageApiRef = useRef(null);
   const containerRef = useRef(null);
   const listRef = useRef(null);
@@ -75,11 +77,12 @@ export default function Carousel({
     activeRef.current = active;
     routerRef.current = router;
     startTransitionRef.current = startTransition;
-  }, [active, router, startTransition]);
+    resumeSlugRef.current = resumeSlug;
+  }, [active, router, startTransition, resumeSlug]);
 
   useEffect(() => {
-    stageApiRef.current?.(active);
-  }, [active]);
+    stageApiRef.current?.(active, resumeSlug);
+  }, [active, resumeSlug]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -1845,7 +1848,9 @@ export default function Carousel({
       renderer.setAnimationLoop(on ? tick : null);
     };
 
-    const applyStage = (on) => {
+    let lastResume = null;
+
+    const applyStage = (on, slug = resumeSlugRef.current) => {
       if (disposed) return;
       if (on) {
         document.documentElement.classList.add("ring-lock");
@@ -1859,6 +1864,12 @@ export default function Carousel({
         refit();
         applyQuality();
         renderer.setSize(viewW, viewH);
+        if (slug && slug !== lastResume) {
+          lastResume = slug;
+          const idx = ring.findIndex((project) => project.slug === slug);
+          params.imageOffset = idx >= 0 ? idx : 0;
+          if (tl) replay();
+        }
         setLoop(true);
         return;
       }
@@ -1868,6 +1879,7 @@ export default function Carousel({
         document.removeEventListener("touchmove", lockTouchScroll);
         docLocked = false;
       }
+      lastResume = null;
       openGen += 1;
       stopPick();
       // Keep ticking until the entry can finish; otherwise the counter never
@@ -1877,7 +1889,7 @@ export default function Carousel({
 
     stageApiRef.current = applyStage;
     setLoop(true);
-    applyStage(activeRef.current);
+    applyStage(activeRef.current, resumeSlugRef.current);
 
     return () => {
       disposed = true;

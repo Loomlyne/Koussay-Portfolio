@@ -28,6 +28,7 @@ export function HomeRingProvider({ children }) {
   const pager = useProjectPager();
   const [projects, setProjectsState] = useState(null);
   const [homePending, setHomePending] = useState(false);
+  const [resumeSlug, setResumeSlug] = useState(null);
   const projectsRef = useRef(null);
 
   const setProjects = useCallback((next) => {
@@ -49,6 +50,10 @@ export function HomeRingProvider({ children }) {
   const prepareHome = useCallback(() => {
     shared?.abort?.();
     pager?.clear?.();
+    const slug = pathname.startsWith("/work/")
+      ? decodeURIComponent(pathname.slice("/work/".length).split("/")[0])
+      : "";
+    setResumeSlug(slug || null);
     if (projectsRef.current) setHomePending(true);
     if (pathname !== "/") router.push("/");
   }, [shared, pager, pathname, router]);
@@ -65,7 +70,11 @@ export function HomeRingProvider({ children }) {
           className={showHome ? "home-ring" : "home-ring home-ring--parked"}
           aria-hidden={!showHome}
         >
-          <Carousel projects={projects} active={showHome} />
+          <Carousel
+            projects={projects}
+            active={showHome}
+            resumeSlug={resumeSlug}
+          />
         </div>
       ) : null}
       <div
