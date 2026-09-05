@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useLayoutEffect, useRef, useState } from "react";
 
 import { useSharedTransition } from "@/components/SharedTransitionProvider";
-import { projectImageSrc } from "@/lib/projects";
+import { projectImageSrc, shareImageAlt } from "@/lib/projects";
 import { HERO_IMAGE_SIZES } from "@/lib/project/warm";
 import styles from "@/app/project/[slug]/page.module.css";
 
@@ -69,11 +69,7 @@ export default function ProjectMedia({ project, preload = false }) {
         ) : (
           <Image
             src={imageSrc}
-            alt={
-              project.type
-                ? `${project.name} — ${project.type} cover`
-                : `${project.name} cover`
-            }
+            alt={shareImageAlt(project)}
             fill
             preload={preload}
             sizes={HERO_IMAGE_SIZES}

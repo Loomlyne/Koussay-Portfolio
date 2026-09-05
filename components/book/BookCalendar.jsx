@@ -7,7 +7,7 @@ import { TIMEZONES } from "@/lib/book/config";
 import { isDayOpen } from "@/lib/book/time";
 import { dateStamp } from "@/lib/book/validate";
 
-import styles from "@/app/book/page.module.css";
+import styles from "@/app/booking/page.module.css";
 
 const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 

@@ -4,7 +4,7 @@ import { TIME_SLOTS_12H, TIME_SLOTS_24H } from "@/lib/book/config";
 import { isSlotOpen } from "@/lib/book/time";
 import { dateStamp } from "@/lib/book/validate";
 
-import styles from "@/app/book/page.module.css";
+import styles from "@/app/booking/page.module.css";
 
 function formatSelectedDate(date) {
   if (!date) return "";

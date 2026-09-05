@@ -2116,7 +2116,7 @@ export default function Carousel({
           </span>
         </p>
         <Link
-          href="/book"
+          href="/booking"
           prefetch={false}
           className="glass-btn glass-btn--cta glass-btn--solid pointer-events-auto ring-dock-cta"
         >

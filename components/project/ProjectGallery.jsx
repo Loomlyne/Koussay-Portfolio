@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import { projectImageSrc } from "@/lib/projects";
+import { galleryImageAlt, projectImageSrc } from "@/lib/projects";
 import { GALLERY_IMAGE_SIZES } from "@/lib/project/warm";
 
 import styles from "@/app/project/[slug]/page.module.css";
@@ -22,8 +22,7 @@ export default function ProjectGallery({ project, gallery = [], index }) {
       <ul className={styles.galleryStack}>
         {items.map((item, itemIndex) => {
           const src = projectImageSrc(item.file ?? item);
-          const alt =
-            item.alt ?? `${project.name} — gallery image ${itemIndex + 1}`;
+          const alt = galleryImageAlt(project, item, itemIndex);
 
           return (
             <li key={`${src}-${itemIndex}`} className={styles.galleryItem}>

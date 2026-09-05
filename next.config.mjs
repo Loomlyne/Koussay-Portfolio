@@ -21,6 +21,16 @@ const nextConfig = {
         destination: "/project/:slug",
         permanent: true,
       },
+      {
+        source: "/book",
+        destination: "/booking",
+        permanent: true,
+      },
+      {
+        source: "/book/:path*",
+        destination: "/booking/:path*",
+        permanent: true,
+      },
     ];
   },
   images: {

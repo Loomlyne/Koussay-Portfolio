@@ -5,7 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { getProjectDisplayIndex, projectImageSrc } from "@/lib/projects";
+import {
+  getProjectDisplayIndex,
+  projectImageSrc,
+  shareImageAlt,
+} from "@/lib/projects";
 import { warmProject } from "@/lib/project/warm";
 
 import styles from "@/app/project/[slug]/page.module.css";
@@ -58,7 +62,7 @@ function PagerLink({ project, direction }) {
         <div className={styles.pagerThumb}>
           <Image
             src={imageSrc}
-            alt={`${project.name} cover`}
+            alt={shareImageAlt(project)}
             fill
             sizes="112px"
             className={styles.pagerThumbImage}
@@ -78,7 +82,7 @@ function PagerLink({ project, direction }) {
         <div className={styles.pagerThumb}>
           <Image
             src={imageSrc}
-            alt={`${project.name} cover`}
+            alt={shareImageAlt(project)}
             fill
             sizes="112px"
             className={styles.pagerThumbImage}

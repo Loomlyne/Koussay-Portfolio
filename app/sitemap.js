@@ -1,6 +1,6 @@
 import { getProjects } from "@/lib/cms/projects";
 import { projectHref } from "@/lib/projects";
-import { SITE_URL } from "@/lib/site";
+import { BOOKING_PATH, SITE_URL } from "@/lib/site";
 
 export default async function sitemap() {
   const now = new Date();
@@ -20,7 +20,7 @@ export default async function sitemap() {
       priority: 1,
     },
     {
-      url: `${SITE_URL}/book`,
+      url: `${SITE_URL}${BOOKING_PATH}`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,

@@ -1,6 +1,6 @@
 import { getProjects } from "@/lib/cms/projects";
 import { projectHref } from "@/lib/projects";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { BOOKING_PATH, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const revalidate = 60;
 
@@ -32,14 +32,14 @@ export async function GET() {
 > ${SITE_DESCRIPTION}
 
 - Site: ${SITE_URL}
-- Book a 1-hour call: ${SITE_URL}/book
+- Booking: ${SITE_URL}${BOOKING_PATH}
 - Sitemap: ${SITE_URL}/sitemap.xml
 - Robots: ${SITE_URL}/robots.txt
 
 ## Pages
 
 - [Home](${SITE_URL}): selected projects on a ring
-- [Start a project](${SITE_URL}/book): booking form
+- [Start a project](${SITE_URL}${BOOKING_PATH}): booking form
 - Project URLs follow ${SITE_URL}/project/[slug]
 
 ## Projects
@@ -48,7 +48,7 @@ ${work || "- Projects are listed on the home ring"}
 
 ## Contact
 
-Use ${SITE_URL}/book. Do not invent testimonials, live URLs, tools, addresses, or project facts that are not listed here.
+Use ${SITE_URL}${BOOKING_PATH}. Do not invent testimonials, live URLs, tools, addresses, or project facts that are not listed here.
 `;
 
   return new Response(body, {

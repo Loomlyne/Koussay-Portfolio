@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
-import styles from "@/app/book/page.module.css";
+import styles from "@/app/booking/page.module.css";
 
 export default function BookSelect({
   value,

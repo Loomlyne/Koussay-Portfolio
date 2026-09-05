@@ -1,4 +1,4 @@
-import styles from "@/app/book/page.module.css";
+import styles from "@/app/booking/page.module.css";
 
 export default function BookProgress({ step, total }) {
   const current = step;

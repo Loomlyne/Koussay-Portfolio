@@ -11,13 +11,12 @@ import {
   getProjectNavigation,
   getProjectStaticParams,
   projectHref,
-  projectShareImage,
 } from "@/lib/projects";
 import {
   breadcrumbSchema,
   graph,
   projectSchema,
-  SITE_SHARE_IMAGE,
+  shareImages,
 } from "@/lib/seo";
 
 export async function generateStaticParams() {
@@ -46,10 +45,7 @@ export async function generateMetadata({ params }) {
 
   const description = project.detail?.summary || SITE_DESCRIPTION;
   const url = `${SITE_URL}${projectHref(project.slug)}`;
-  const image = projectShareImage(project);
-  const shareImage = image
-    ? [{ url: image, alt: `${project.name} cover` }]
-    : [{ url: SITE_SHARE_IMAGE, alt: SITE_NAME }];
+  const images = shareImages(project);
 
   return {
     title: project.name,
@@ -62,13 +58,13 @@ export async function generateMetadata({ params }) {
       description,
       url,
       type: "article",
-      images: shareImage,
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title: project.name,
       description,
-      images: image ? [image] : [SITE_SHARE_IMAGE],
+      images,
     },
   };
 }

@@ -10,7 +10,13 @@ import {
   SITE_SHARE_IMAGE,
   websiteSchema,
 } from "@/lib/seo";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import {
+  SITE_DESCRIPTION,
+  SITE_MARK_ALT,
+  SITE_MARK_PATH,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/site";
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -23,8 +29,13 @@ export const metadata = {
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
   icons: {
-    icon: [{ url: "/icon.png", type: "image/png" }],
-    apple: [{ url: "/apple-icon.png" }],
+    icon: [
+      { url: SITE_MARK_PATH, type: "image/png" },
+      { url: "/icon.png", type: "image/png", sizes: "192x192" },
+      { url: "/favicon.ico", sizes: "48x48" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+    shortcut: SITE_MARK_PATH,
   },
   robots: {
     index: true,
@@ -37,13 +48,13 @@ export const metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — Identities and digital experiences`,
     description: SITE_DESCRIPTION,
-    images: [{ url: SITE_SHARE_IMAGE, alt: SITE_NAME }],
+    images: [{ url: SITE_SHARE_IMAGE, alt: SITE_MARK_ALT }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} — Identities and digital experiences`,
     description: SITE_DESCRIPTION,
-    images: [SITE_SHARE_IMAGE],
+    images: [{ url: SITE_SHARE_IMAGE, alt: SITE_MARK_ALT }],
   },
 };
 

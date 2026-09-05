@@ -58,7 +58,7 @@ export default function ProjectHero({ project, displayIndex }) {
             </a>
           ) : null}
           <Link
-            href="/book"
+            href="/booking"
             className="glass-btn glass-btn--cta glass-btn--solid"
           >
             Start a project

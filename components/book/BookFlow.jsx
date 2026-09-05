@@ -36,7 +36,7 @@ import {
 } from "@/lib/book/validate";
 import { busyFromResponse, isSlotOpen } from "@/lib/book/time";
 
-import styles from "@/app/book/page.module.css";
+import styles from "@/app/booking/page.module.css";
 
 function focusField(node) {
   if (!node) return;
@@ -238,7 +238,7 @@ export default function BookFlow() {
       }
       clearLocalDraft();
       setSubmitted(true);
-      router.replace("/book?step=done", { scroll: false });
+      router.replace("/booking?step=done", { scroll: false });
     } catch {
       setError("Could not send this booking. Check your connection.");
     } finally {
@@ -324,7 +324,7 @@ export default function BookFlow() {
             <Breadcrumbs
               items={[
                 { label: "Koussay Zayani", href: "/" },
-                { label: "Start a project", href: "/book" },
+                { label: "Start a project", href: "/booking" },
               ]}
             />
             <h1 className={styles.heading}>Thank you</h1>
@@ -349,7 +349,7 @@ export default function BookFlow() {
           <Breadcrumbs
             items={[
               { label: "Koussay Zayani", href: "/" },
-              { label: "Start a project", href: "/book" },
+              { label: "Start a project", href: "/booking" },
             ]}
           />
           {step === 0 ? (

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { SITE_MARK_ALT } from "@/lib/site";
 import { useHomeRing } from "./homeRingContext";
 
 export default function BrandMark({ className = "", size = 40 }) {
@@ -29,7 +30,7 @@ export default function BrandMark({ className = "", size = 40 }) {
     >
       <Image
         src="/logo.png"
-        alt="Koussay Zayani"
+        alt={SITE_MARK_ALT}
         width={size}
         height={size}
         priority
