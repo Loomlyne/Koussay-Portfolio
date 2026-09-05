@@ -590,40 +590,23 @@ html[data-project-pager] .mediaFigure,
 
 .notFoundState {
   display: grid;
-  grid-template-columns: minmax(8rem, 0.7fr) minmax(0, 1.3fr);
-  align-items: center;
-  gap: clamp(2rem, 8vw, 10rem);
-  width: min(100%, 70rem);
+  place-items: center;
+  width: 100%;
   min-height: 100svh;
-  margin: 0 auto;
-  padding: clamp(2rem, 5vw, 5rem) 0;
-}
-
-.notFoundNumber {
   margin: 0;
-  font-size: clamp(5rem, 14vw, 13rem);
-  letter-spacing: -0.09em;
-  line-height: 0.8;
+  padding: 0;
 }
 
-.notFoundCopy {
-  max-width: 29rem;
+.notFoundMark {
+  display: block;
+  width: min(42rem, 86vw);
+  line-height: 0;
 }
 
-.notFoundTitle {
-  margin: 1.2rem 0;
-  font-size: clamp(3rem, 7vw, 7rem);
-  font-weight: 500;
-  letter-spacing: -0.085em;
-  line-height: 0.85;
-}
-
-.notFoundDescription {
-  max-width: 24rem;
-  margin: 0 0 2rem;
-  color: rgba(10, 10, 10, 0.68);
-  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
-  line-height: 1.35;
+.notFoundMark img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .loadingState {
@@ -904,24 +887,6 @@ html[data-project-pager] .mediaFigure,
   .pagerDirection,
   .pagerIndex {
     font-size: 0.58rem;
-  }
-
-  .notFoundState {
-    display: flex;
-    min-height: 100svh;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 3rem;
-    padding: 2rem 16px;
-  }
-
-  .notFoundNumber {
-    font-size: clamp(6rem, 28vw, 11rem);
-  }
-
-  .notFoundTitle {
-    font-size: clamp(3.5rem, 16vw, 6rem);
   }
 
   .loadingState {
