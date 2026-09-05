@@ -742,18 +742,37 @@ html[data-project-pager] .mediaFigure,
 
   .hero {
     --hero-chrome: 18rem;
+    min-height: 0;
     gap: 1.15rem;
     padding: 1rem 0 2rem;
   }
 
   .heroMedia {
-    flex: 1 1 auto;
-    min-height: 16rem;
-    max-height: calc(100svh - var(--hero-chrome));
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .mediaFigure {
+    flex: 0 0 auto;
+    height: auto;
   }
 
   .mediaFrame {
-    min-height: 16rem;
+    flex: none;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 3 / 2;
+  }
+
+  .loadingHero {
+    flex: 0 0 auto;
+  }
+
+  .loadingFrame {
+    flex: none;
+    min-height: 0;
+    aspect-ratio: 3 / 2;
   }
 
   .heroInfo {
@@ -926,6 +945,44 @@ html[data-project-pager] .mediaFigure,
 
   .loadingFooter {
     gap: 0.75rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .hero {
+    --hero-chrome: 12.5rem;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .heroMedia {
+    flex: 1 1 auto;
+    min-height: 10rem;
+    max-height: calc(100svh - var(--hero-chrome));
+  }
+
+  .mediaFigure {
+    display: flex;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+  }
+
+  .mediaFrame {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 10rem;
+    aspect-ratio: auto;
+  }
+
+  .loadingHero {
+    flex: 1 1 auto;
+  }
+
+  .loadingFrame {
+    flex: 1 1 auto;
+    min-height: 10rem;
+    aspect-ratio: auto;
   }
 }
 
