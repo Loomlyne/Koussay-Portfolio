@@ -740,7 +740,7 @@ export default function Carousel({
       }
       if (plane < 0) return;
       const open = openForPlane(plane);
-      if (open) pick(plane, open);
+      if (open) open();
     };
 
     const onPointerUp = (e) => {
@@ -977,24 +977,48 @@ export default function Carousel({
       return -1;
     };
 
-    // The card as drawn, not its axis-aligned bounds. The flyer starts on
-    // this box and un-rotates into the hero so the photo never jumps.
+    // Screen-space box of a plane, for the shared-element handoff.
+    // Axis-aligned on purpose: the morph should travel in a straight line.
     const rectForPlane = (i) => {
       const scale = uniforms.uScale.value[i];
       const pos = uniforms.uPos.value[i];
       const rot = uniforms.uRot.value[i];
-      const width = uniforms.uSize.value.x * scale.x;
-      const height = uniforms.uSize.value.y * scale.y;
+      const W = uniforms.uSize.value.x;
+      const H = uniforms.uSize.value.y;
+      const hw = W * scale.x * 0.5;
+      const hh = H * scale.y * 0.5;
+      const cr = Math.cos(rot);
+      const sr = Math.sin(rot);
       const bounds = container.getBoundingClientRect();
-      const cx = bounds.left + bounds.width * 0.5 + pos.x;
-      const cy = bounds.top + bounds.height * 0.5 - pos.y;
+      const ox = bounds.left + bounds.width * 0.5;
+      const oy = bounds.top + bounds.height * 0.5;
+
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+
+      for (const [lx, ly] of [
+        [-hw, -hh],
+        [hw, -hh],
+        [hw, hh],
+        [-hw, hh],
+      ]) {
+        const wx = pos.x + lx * cr - ly * sr;
+        const wy = pos.y + lx * sr + ly * cr;
+        const sx = ox + wx;
+        const sy = oy - wy;
+        minX = Math.min(minX, sx);
+        minY = Math.min(minY, sy);
+        maxX = Math.max(maxX, sx);
+        maxY = Math.max(maxY, sy);
+      }
 
       return {
-        left: cx - width * 0.5,
-        top: cy - height * 0.5,
-        width,
-        height,
-        rotation: -rot * (180 / Math.PI),
+        left: minX,
+        top: minY,
+        width: maxX - minX,
+        height: maxY - minY,
         borderRadius: uniforms.uRadius.value,
       };
     };

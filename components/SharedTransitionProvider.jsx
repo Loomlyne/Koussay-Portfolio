@@ -29,10 +29,10 @@ function flyerFrom(from) {
     borderRadius: from.borderRadius ?? 12,
     x: 0,
     y: 0,
-    rotation: from.rotation ?? 0,
+    rotation: 0,
     scaleX: 1,
     scaleY: 1,
-    transformOrigin: "50% 50%",
+    transformOrigin: "0 0",
     opacity: 1,
     force3D: true,
   };
@@ -155,7 +155,6 @@ export function SharedTransitionProvider({ children }) {
         y: to.top - from.top,
         width: to.width,
         height: to.height,
-        rotation: 0,
         borderRadius: toRadius,
         boxShadow: "0 8px 28px rgba(10, 10, 10, 0.06)",
         duration: DURATION,
@@ -239,7 +238,6 @@ export function SharedTransitionProvider({ children }) {
                 width: active.from.width,
                 height: active.from.height,
                 borderRadius: active.from.borderRadius ?? 12,
-                transform: `rotate(${active.from.rotation ?? 0}deg)`,
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
