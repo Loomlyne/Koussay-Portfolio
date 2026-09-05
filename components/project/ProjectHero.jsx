@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import BrandMark from "@/components/BrandMark";
 import BackToWorks from "@/components/BackToWorks";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import styles from "@/app/project/[slug]/page.module.css";
 
 import ProjectMedia from "./ProjectMedia";
@@ -33,6 +34,13 @@ export default function ProjectHero({ project, displayIndex }) {
       ) : null}
 
       <div className={styles.heroFoot}>
+        <Breadcrumbs
+          items={[
+            { label: "Koussay Zayani", href: "/" },
+            { label: "Projects", href: "/" },
+            { label: project.name },
+          ]}
+        />
         <h1 id="project-title" className={styles.heroTitle}>
           {project.name}
         </h1>

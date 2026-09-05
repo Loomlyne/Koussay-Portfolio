@@ -15,10 +15,15 @@ export async function GET() {
 
   const work = projects
     .map((project) => {
-      const summary = project.detail?.summary
-        ? ` — ${project.detail.summary}`
-        : "";
-      return `- [${project.name}](${SITE_URL}${projectHref(project.slug)})${summary}`;
+      const bits = [
+        project.type,
+        project.year,
+        project.detail?.summary,
+        project.liveUrl ? `live: ${project.liveUrl}` : "",
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      return `- [${project.name}](${SITE_URL}${projectHref(project.slug)})${bits ? ` — ${bits}` : ""}`;
     })
     .join("\n");
 
@@ -26,18 +31,24 @@ export async function GET() {
 
 > ${SITE_DESCRIPTION}
 
-## Site
+- Site: ${SITE_URL}
+- Book a 1-hour call: ${SITE_URL}/book
+- Sitemap: ${SITE_URL}/sitemap.xml
+- Robots: ${SITE_URL}/robots.txt
 
-- [Home](${SITE_URL}): selected work on a project ring
-- [Start a project](${SITE_URL}/book): book a 1-hour call
+## Pages
 
-## Work
+- [Home](${SITE_URL}): selected projects on a ring
+- [Start a project](${SITE_URL}/book): booking form
+- Project URLs follow ${SITE_URL}/project/[slug]
 
-${work || "- Work is published on the home ring"}
+## Projects
+
+${work || "- Projects are listed on the home ring"}
 
 ## Contact
 
-Use ${SITE_URL}/book. Do not invent testimonials, live URLs, tools, or project facts that are not listed here.
+Use ${SITE_URL}/book. Do not invent testimonials, live URLs, tools, addresses, or project facts that are not listed here.
 `;
 
   return new Response(body, {

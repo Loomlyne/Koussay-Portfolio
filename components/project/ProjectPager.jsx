@@ -16,7 +16,7 @@ function PagerLink({ project, direction }) {
   const pager = useProjectPager();
   const router = useRouter();
   const previous = direction === "previous";
-  const label = previous ? "Previous work" : "Next work";
+  const label = previous ? "Previous project" : "Next project";
   const href = `/project/${project.slug}`;
   const imageSrc = projectImageSrc(project);
 
@@ -58,7 +58,7 @@ function PagerLink({ project, direction }) {
         <div className={styles.pagerThumb}>
           <Image
             src={imageSrc}
-            alt=""
+            alt={`${project.name} cover`}
             fill
             sizes="112px"
             className={styles.pagerThumbImage}
@@ -78,7 +78,7 @@ function PagerLink({ project, direction }) {
         <div className={styles.pagerThumb}>
           <Image
             src={imageSrc}
-            alt=""
+            alt={`${project.name} cover`}
             fill
             sizes="112px"
             className={styles.pagerThumbImage}
@@ -99,7 +99,7 @@ export default function ProjectPager({ previous, next }) {
   if (!previous || !next) return null;
 
   return (
-    <nav className={styles.pager} aria-label="Browse more work">
+    <nav className={styles.pager} aria-label="Browse more projects">
       <PagerLink project={previous} direction="previous" />
       <PagerLink project={next} direction="next" />
     </nav>

@@ -2,11 +2,17 @@
 const nextConfig = {
   // output: "standalone" only for Docker; Vercel handles its own output
   ...(process.env.VERCEL !== "1" ? { output: "standalone" } : {}),
+  productionBrowserSourceMaps: false,
+  compiler: {
+    removeConsole:
+      process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
+  },
   experimental: {
     staleTimes: {
       dynamic: 180,
       static: 300,
     },
+    optimizePackageImports: ["gsap", "three"],
   },
   async redirects() {
     return [

@@ -21,7 +21,11 @@ import { createSplitText } from "./ring/splitText";
 import { createTag, TAG_W, TAG_H } from "./ring/tag";
 import { defaultParams } from "./ring/params";
 import { PROJECTS as FALLBACK_PROJECTS } from "./ring/projects";
-import { getProjectNavigation, projectImageSrc } from "@/lib/projects";
+import {
+  getProjectNavigation,
+  projectHref,
+  projectImageSrc,
+} from "@/lib/projects";
 import { warmProject } from "@/lib/project/warm";
 import {
   TAU,
@@ -2012,7 +2016,7 @@ export default function Carousel({
           {ring.map((p, i) => (
             <li key={`accessible-${p.slug ?? p.file}`}>
               <a
-                href={`/project/${p.slug}`}
+                href={projectHref(p.slug)}
                 className="sr-only rounded-sm bg-[#fafafa] px-4 py-3 text-sm text-[#0a0a0a] outline-2 outline-offset-2 outline-[#0a0a0a] focus:pointer-events-auto focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"
               >
                 {String(i + 1).padStart(2, "0")} {p.name}, {p.type}, {p.year}

@@ -27,7 +27,13 @@ export default function BrandMark({ className = "", size = 40 }) {
         home?.prepareHome?.();
       }}
     >
-      <Image src="/logo.png" alt="" width={size} height={size} priority />
+      <Image
+        src="/logo.png"
+        alt="Koussay Zayani"
+        width={size}
+        height={size}
+        priority
+      />
     </Link>
   );
 }

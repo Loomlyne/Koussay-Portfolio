@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import BrandMark from "@/components/BrandMark";
 import BackToWorks from "@/components/BackToWorks";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import BookCalendar from "@/components/book/BookCalendar";
 import BookProgress from "@/components/book/BookProgress";
 import BookSelect from "@/components/book/BookSelect";
@@ -320,6 +321,12 @@ export default function BookFlow() {
         <BrandMark className={styles.brandMark} />
         <div className={styles.stage} data-lenis-prevent>
           <div className={styles.panel}>
+            <Breadcrumbs
+              items={[
+                { label: "Koussay Zayani", href: "/" },
+                { label: "Start a project", href: "/book" },
+              ]}
+            />
             <h1 className={styles.heading}>Thank you</h1>
             <p className={styles.lead}>
               Your booking is in. We emailed the details to {form.email}.
@@ -339,6 +346,12 @@ export default function BookFlow() {
       <BrandMark className={styles.brandMark} />
       <div className={styles.stage} data-lenis-prevent>
         <div className={styles.panel}>
+          <Breadcrumbs
+            items={[
+              { label: "Koussay Zayani", href: "/" },
+              { label: "Start a project", href: "/book" },
+            ]}
+          />
           {step === 0 ? (
             <>
               <h1 className={`${styles.heading} ${styles.headingFit}`}>

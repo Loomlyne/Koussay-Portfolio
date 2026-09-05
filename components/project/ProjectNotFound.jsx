@@ -1,5 +1,6 @@
 import BrandMark from "@/components/BrandMark";
 import BackToWorks from "@/components/BackToWorks";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { PagerAbort } from "@/components/project/ProjectPagerTransition";
 import styles from "@/app/project/[slug]/page.module.css";
 
@@ -14,6 +15,12 @@ export default function ProjectNotFound() {
       >
         <p className={styles.notFoundNumber}>404</p>
         <div className={styles.notFoundCopy}>
+          <Breadcrumbs
+            items={[
+              { label: "Koussay Zayani", href: "/" },
+              { label: "Project not found" },
+            ]}
+          />
           <p className={styles.eyebrow}>Koussay / Projects</p>
           <h1 id="project-not-found-title" className={styles.notFoundTitle}>
             Project not found

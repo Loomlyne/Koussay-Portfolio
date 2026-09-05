@@ -228,6 +228,48 @@ html.ring-lock body {
   }
 }
 
+.site-crumbs {
+  width: min(100%, 34rem);
+  margin: 0 0 0.85rem;
+  color: rgba(10, 10, 10, 0.46);
+  font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.site-crumbs-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-crumbs-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.site-crumbs-mark {
+  color: rgba(10, 10, 10, 0.28);
+}
+
+.site-crumbs-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-crumbs-link:hover,
+.site-crumbs-link:focus-visible {
+  color: #0a0a0a;
+}
+
 html.shared-transition,
 html.project-pager {
   overflow: hidden;

@@ -69,7 +69,11 @@ export default function ProjectMedia({ project, preload = false }) {
         ) : (
           <Image
             src={imageSrc}
-            alt={`${project.name} — placeholder artwork`}
+            alt={
+              project.type
+                ? `${project.name} — ${project.type} cover`
+                : `${project.name} cover`
+            }
             fill
             preload={preload}
             sizes={HERO_IMAGE_SIZES}

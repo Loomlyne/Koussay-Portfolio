@@ -28,7 +28,7 @@ export function HomeRingProvider({ children }) {
   const shared = useSharedTransition();
   const pager = useProjectPager();
   const [projects, setProjectsState] = useState(null);
-  const [homePending, setHomePending] = useState(false);
+  const [coverPath, setCoverPath] = useState(null);
   const [resumeSlug, setResumeSlug] = useState(null);
   const projectsRef = useRef(null);
 
@@ -42,18 +42,14 @@ export function HomeRingProvider({ children }) {
   }, []);
 
   const isHome = pathname === "/";
-  const showHome = isHome || homePending;
-
-  if (isHome && homePending) {
-    setHomePending(false);
-  }
+  const showHome = isHome || pathname === coverPath;
 
   const prepareHome = useCallback(() => {
     shared?.abort?.();
     pager?.clear?.();
     const slug = projectSlugFromPath(pathname);
     setResumeSlug(slug || null);
-    if (projectsRef.current) setHomePending(true);
+    if (projectsRef.current) setCoverPath(pathname);
     if (pathname !== "/") router.push("/");
   }, [shared, pager, pathname, router]);
 
