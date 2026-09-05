@@ -14,6 +14,7 @@ import {
   CURRENCIES,
   DEADLINE_OPTIONS,
   EMPTY_FORM,
+  FIT_CHECKS,
   SERVICES,
   budgetKeyFromLabel,
   budgetOptions,
@@ -130,7 +131,7 @@ export default function BookFlow() {
   const stepError = issueForStep(step, form, busy);
 
   const canContinue = useMemo(() => {
-    if (step === 0 || step === 10) return true;
+    if (step === 10) return true;
     if (step === 6) return !form.website.trim() || !stepError;
     return !stepError;
   }, [form.website, step, stepError]);
@@ -185,6 +186,7 @@ export default function BookFlow() {
     body.append(
       "payload",
       JSON.stringify({
+        fit: form.fit,
         name: form.name,
         email: form.email,
         date: dateStamp(form.date),
@@ -329,11 +331,39 @@ export default function BookFlow() {
         <div className={styles.panel}>
           {step === 0 ? (
             <>
-              <h1 className={styles.heading}>Let&apos;s talk</h1>
+              <h1 className={`${styles.heading} ${styles.headingFit}`}>
+                Let&apos;s make sure we&apos;re a good fit
+              </h1>
               <p className={styles.lead}>
-                Book a 1-hour call and let&apos;s figure out if we&apos;re the
-                right fit for your project.
+                Select all three before we book a 1-hour call.
               </p>
+              <div className={styles.fitList} role="group" aria-label="Fit">
+                {FIT_CHECKS.map((check) => {
+                  const active = form.fit.includes(check.key);
+                  return (
+                    <button
+                      key={check.key}
+                      type="button"
+                      className={`${styles.fitItem} ${
+                        active ? styles.pickerSolid : ""
+                      }`}
+                      aria-pressed={active}
+                      onClick={() =>
+                        update({ fit: toggleService(form.fit, check.key) })
+                      }
+                    >
+                      <span className={styles.fitMark} aria-hidden="true">
+                        {active ? "✓" : ""}
+                      </span>
+                      <span className={styles.fitCopy}>
+                        <span className={styles.fitTitle}>{check.title}</span>
+                        <span className={styles.fitBody}>{check.body}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <FieldError message={error && stepError ? error : ""} />
               <div className={styles.introActions}>
                 <BackToWorks
                   arrow={false}
@@ -341,7 +371,12 @@ export default function BookFlow() {
                 />
                 <button
                   type="button"
-                  className={`${styles.primaryButton} ${styles.primaryButtonActive} ${styles.soloButton}`}
+                  className={`${styles.primaryButton} ${
+                    canContinue
+                      ? styles.primaryButtonActive
+                      : styles.continueButtonDisabled
+                  } ${styles.soloButton}`}
+                  disabled={!canContinue}
                   onClick={goNext}
                 >
                   Start a project
