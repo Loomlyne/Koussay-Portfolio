@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { flushSync } from "react-dom";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import BrandMark from "@/components/BrandMark";
 import BackToWorks from "@/components/BackToWorks";
@@ -19,7 +19,19 @@ import {
   budgetOptions,
   formatBudget,
 } from "@/lib/book/config";
-import { dateStamp, EMAIL_PATTERN } from "@/lib/book/validate";
+import {
+  clearLocalDraft,
+  draftToForm,
+  readLocalDraft,
+  serializeDraft,
+  writeLocalDraft,
+} from "@/lib/book/draft";
+import { bookStepHref, stepFromSlug } from "@/lib/book/steps";
+import {
+  dateStamp,
+  firstInvalidStep,
+  issueForStep,
+} from "@/lib/book/validate";
 import { busyFromResponse, isSlotOpen } from "@/lib/book/time";
 
 import styles from "@/app/book/page.module.css";
@@ -35,18 +47,45 @@ function toggleService(list, service) {
     : [...list, service];
 }
 
+function FieldError({ message }) {
+  if (!message) return null;
+  return (
+    <p className={styles.formError} role="alert">
+      {message}
+    </p>
+  );
+}
+
 export default function BookFlow() {
-  const [step, setStep] = useState(0);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const step = stepFromSlug(searchParams.get("step"));
   const [form, setForm] = useState(EMPTY_FORM);
+  const [draftId, setDraftId] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [resumeSubmit, setResumeSubmit] = useState(false);
   const [busy, setBusy] = useState(() => []);
   const fieldRef = useRef(null);
+  const restoredRef = useRef(false);
 
   const update = (patch) => {
     setForm((current) => ({ ...current, ...patch }));
+    setError("");
   };
+
+  useEffect(() => {
+    if (restoredRef.current) return;
+    restoredRef.current = true;
+    const saved = readLocalDraft();
+    if (!saved) return;
+    /* Restore once from localStorage after mount so a refresh keeps the draft. */
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setForm((current) => draftToForm(saved, current));
+    if (saved.id) setDraftId(saved.id);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
 
   useEffect(() => {
     if (step !== 3 && step !== 4) return;
@@ -88,41 +127,58 @@ export default function BookFlow() {
     };
   }, [step]);
 
+  const stepError = issueForStep(step, form, busy);
+
   const canContinue = useMemo(() => {
-    switch (step) {
-      case 0:
-        return true;
-      case 1:
-        return form.name.trim().length > 1;
-      case 2:
-        return EMAIL_PATTERN.test(form.email.trim());
-      case 3:
-        return Boolean(form.date);
-      case 4:
-        return (
-          Boolean(form.time) &&
-          isSlotOpen(dateStamp(form.date), form.time, form.timezone, busy)
-        );
-      case 5:
-        return form.company.trim().length > 1;
-      case 6:
-        return true;
-      case 7:
-        return form.services.length > 0;
-      case 8:
-        return Boolean(form.budget);
-      case 9:
-        return Boolean(form.deadline);
-      case 10:
-        return true;
-      default:
-        return false;
-    }
-  }, [form, step, busy]);
+    if (step === 0 || step === 10) return true;
+    if (step === 6) return !form.website.trim() || !stepError;
+    return !stepError;
+  }, [form.website, step, stepError]);
+
+  const goToStep = (next) => {
+    router.push(bookStepHref(next), { scroll: false });
+    requestAnimationFrame(() => focusField(fieldRef.current));
+  };
+
+  const persistDraft = (nextStep, nextForm = form) => {
+    const payload = serializeDraft(nextForm, nextStep, draftId);
+    writeLocalDraft(payload);
+    if (!payload.name && !payload.email) return;
+
+    fetch("/api/book/draft", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json().catch(() => ({})))
+      .then((data) => {
+        if (typeof data?.id === "string" && data.id) {
+          setDraftId(data.id);
+          writeLocalDraft({ ...payload, id: data.id });
+        }
+      })
+      .catch(() => {
+        // Local draft is enough if Notion is down.
+      });
+  };
+
+  const returnToIssue = (issueStep, message) => {
+    setResumeSubmit(true);
+    setError(message);
+    goToStep(issueStep);
+  };
 
   const submit = async () => {
     if (submitting) return;
+
+    const invalid = firstInvalidStep(form, busy);
+    if (invalid != null) {
+      returnToIssue(invalid, issueForStep(invalid, form, busy));
+      return;
+    }
+
     setError("");
+    setResumeSubmit(false);
     setSubmitting(true);
 
     const body = new FormData();
@@ -140,6 +196,7 @@ export default function BookFlow() {
         budget: form.budget,
         deadline: form.deadline,
         details: form.details,
+        draftId,
       }),
     );
     if (form.attachment) body.append("attachment", form.attachment);
@@ -153,14 +210,22 @@ export default function BookFlow() {
       const nextBusy = busyFromResponse(data);
       if (nextBusy) setBusy(nextBusy);
       if (!response.ok) {
-        if (response.status === 409) {
-          setStep(4);
-          update({ time: null });
+        if (typeof data.step === "number") {
+          const nextForm =
+            response.status === 409 ? { ...form, time: null } : form;
+          if (response.status === 409) update({ time: null });
+          returnToIssue(
+            data.step,
+            data.error || issueForStep(data.step, nextForm, nextBusy || busy),
+          );
+          return;
         }
         setError(data.error || "Could not send this booking.");
         return;
       }
+      clearLocalDraft();
       setSubmitted(true);
+      router.replace("/book?step=done", { scroll: false });
     } catch {
       setError("Could not send this booking. Check your connection.");
     } finally {
@@ -168,18 +233,38 @@ export default function BookFlow() {
     }
   };
 
+  const advanceFrom = (current) => {
+    if (resumeSubmit) {
+      const invalid = firstInvalidStep(form, busy, current + 1);
+      if (invalid != null) {
+        goToStep(invalid);
+        setError(issueForStep(invalid, form, busy));
+        return;
+      }
+      setResumeSubmit(false);
+      goToStep(BOOK_STEP_COUNT - 1);
+      return;
+    }
+    goToStep(Math.min(current + 1, BOOK_STEP_COUNT - 1));
+  };
+
   const goNext = () => {
-    if (!canContinue || submitting) return;
+    if (submitting) return;
+    const issue = issueForStep(step, form, busy);
+    if (issue) {
+      setError(issue);
+      return;
+    }
+
+    persistDraft(Math.min(step + 1, BOOK_STEP_COUNT - 1));
+
     if (step === BOOK_STEP_COUNT - 1) {
       submit();
       return;
     }
-    // Flush before focusing so iOS still treats this as the tap that
-    // opened the field, and the keyboard comes up with it.
-    flushSync(() => {
-      setStep((current) => Math.min(current + 1, BOOK_STEP_COUNT - 1));
-    });
-    focusField(fieldRef.current);
+
+    setError("");
+    advanceFrom(step);
   };
 
   const hasProjectNotes =
@@ -188,10 +273,8 @@ export default function BookFlow() {
 
   const goBack = () => {
     if (step === 0 || submitting) return;
-    flushSync(() => {
-      setStep((current) => Math.max(current - 1, 0));
-    });
-    focusField(fieldRef.current);
+    persistDraft(step - 1);
+    goToStep(Math.max(step - 1, 0));
   };
 
   const onFieldEnter = (event) => {
@@ -201,8 +284,22 @@ export default function BookFlow() {
   };
 
   const skipWebsite = () => {
+    const nextForm = { ...form, website: "" };
     update({ website: "" });
-    setStep(7);
+    persistDraft(7, nextForm);
+    setError("");
+    if (resumeSubmit) {
+      const invalid = firstInvalidStep(nextForm, busy, 7);
+      if (invalid != null) {
+        goToStep(invalid);
+        setError(issueForStep(invalid, nextForm, busy));
+        return;
+      }
+      setResumeSubmit(false);
+      goToStep(BOOK_STEP_COUNT - 1);
+      return;
+    }
+    goToStep(7);
   };
 
   if (submitted) {
@@ -260,7 +357,9 @@ export default function BookFlow() {
                 <span className="sr-only">Your name</span>
                 <input
                   ref={fieldRef}
-                  className={styles.input}
+                  className={`${styles.input} ${
+                    error && stepError ? styles.inputError : ""
+                  }`}
                   type="text"
                   name="name"
                   autoComplete="name"
@@ -269,10 +368,12 @@ export default function BookFlow() {
                   enterKeyHint="next"
                   placeholder="Your name..."
                   value={form.name}
+                  aria-invalid={Boolean(error && stepError)}
                   onChange={(event) => update({ name: event.target.value })}
                   onKeyDown={onFieldEnter}
                 />
               </label>
+              <FieldError message={error && stepError ? error : ""} />
             </>
           ) : null}
 
@@ -283,7 +384,9 @@ export default function BookFlow() {
                 <span className="sr-only">Email</span>
                 <input
                   ref={fieldRef}
-                  className={styles.input}
+                  className={`${styles.input} ${
+                    error && stepError ? styles.inputError : ""
+                  }`}
                   type="email"
                   name="email"
                   autoComplete="email"
@@ -291,10 +394,12 @@ export default function BookFlow() {
                   inputMode="email"
                   placeholder="you@company.com"
                   value={form.email}
+                  aria-invalid={Boolean(error && stepError)}
                   onChange={(event) => update({ email: event.target.value })}
                   onKeyDown={onFieldEnter}
                 />
               </label>
+              <FieldError message={error && stepError ? error : ""} />
             </>
           ) : null}
 
@@ -339,7 +444,9 @@ export default function BookFlow() {
                 <span className="sr-only">Company name</span>
                 <input
                   ref={fieldRef}
-                  className={styles.input}
+                  className={`${styles.input} ${
+                    error && stepError ? styles.inputError : ""
+                  }`}
                   type="text"
                   name="organization"
                   autoComplete="organization"
@@ -347,10 +454,12 @@ export default function BookFlow() {
                   enterKeyHint="next"
                   placeholder="Your company name..."
                   value={form.company}
+                  aria-invalid={Boolean(error && stepError)}
                   onChange={(event) => update({ company: event.target.value })}
                   onKeyDown={onFieldEnter}
                 />
               </label>
+              <FieldError message={error && stepError ? error : ""} />
             </>
           ) : null}
 
@@ -361,7 +470,9 @@ export default function BookFlow() {
                 <span className="sr-only">Website URL</span>
                 <input
                   ref={fieldRef}
-                  className={styles.input}
+                  className={`${styles.input} ${
+                    error && stepError ? styles.inputError : ""
+                  }`}
                   type="url"
                   name="url"
                   inputMode="url"
@@ -370,10 +481,12 @@ export default function BookFlow() {
                   autoCorrect="off"
                   placeholder="https://yourcompany.com"
                   value={form.website}
+                  aria-invalid={Boolean(error && stepError)}
                   onChange={(event) => update({ website: event.target.value })}
                   onKeyDown={onFieldEnter}
                 />
               </label>
+              <FieldError message={error && stepError ? error : ""} />
             </>
           ) : null}
 
@@ -564,7 +677,13 @@ export default function BookFlow() {
                   </button>
                 )}
               </div>
-              {error ? <p className={styles.formError}>{error}</p> : null}
+              {step !== 1 &&
+              step !== 2 &&
+              step !== 5 &&
+              step !== 6 &&
+              error ? (
+                <p className={styles.formError}>{error}</p>
+              ) : null}
             </>
           ) : null}
         </div>

@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import BookFlow from "@/components/book/BookFlow";
 
 export const metadata = {
@@ -6,5 +8,9 @@ export const metadata = {
 };
 
 export default function BookPage() {
-  return <BookFlow />;
+  return (
+    <Suspense fallback={null}>
+      <BookFlow />
+    </Suspense>
+  );
 }

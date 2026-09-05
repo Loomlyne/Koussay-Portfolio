@@ -412,6 +412,11 @@
   color: var(--text-placeholder);
 }
 
+.inputError,
+.inputError:focus {
+  border-color: rgba(154, 47, 47, 0.45);
+}
+
 .textarea {
   min-height: 11rem;
   border-radius: var(--radius-input);

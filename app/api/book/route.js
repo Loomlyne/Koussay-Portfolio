@@ -72,8 +72,8 @@ export async function POST(request) {
     return json({ error: "Could not read the booking form." }, 400);
   }
 
-  const { booking, error } = validateBooking(payload);
-  if (error) return json({ error }, 400);
+  const { booking, error, step, field } = validateBooking(payload);
+  if (error) return json({ error, step, field }, 400);
 
   const record = {
     ...booking,
@@ -86,6 +86,8 @@ export async function POST(request) {
     return json(
       {
         error: "That time was just booked. Pick the next open slot.",
+        step: 4,
+        field: "time",
         busy,
         taken: busy.map((range) => range.start),
       },
@@ -100,6 +102,8 @@ export async function POST(request) {
       return json(
         {
           error: "That time is already booked. Pick the next open slot.",
+          step: 4,
+          field: "time",
           busy,
           taken: busy.map((range) => range.start),
         },
@@ -118,7 +122,11 @@ export async function POST(request) {
     let created = null;
 
     if (isNotionBookingsConfigured()) {
-      created = await createNotionBooking(record, attachment);
+      created = await createNotionBooking(
+        record,
+        attachment,
+        typeof payload.draftId === "string" ? payload.draftId : "",
+      );
       results.notion = true;
     }
     if (isResendConfigured()) {
