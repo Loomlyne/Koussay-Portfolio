@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { getProjectDisplayIndex, projectImageSrc } from "@/lib/projects";
 
@@ -11,14 +13,26 @@ import { useProjectPager } from "./ProjectPagerTransition";
 
 function PagerLink({ project, direction }) {
   const pager = useProjectPager();
+  const router = useRouter();
   const previous = direction === "previous";
   const label = previous ? "Previous work" : "Next work";
+  const href = `/work/${project.slug}`;
   const imageSrc = projectImageSrc(project);
+
+  useEffect(() => {
+    router.prefetch(href);
+    if (!imageSrc) return undefined;
+    const image = new window.Image();
+    image.decoding = "async";
+    image.src = imageSrc;
+    return undefined;
+  }, [href, imageSrc, router]);
 
   return (
     <Link
-      href={`/work/${project.slug}`}
+      href={href}
       scroll={false}
+      prefetch
       className={`${styles.pagerCard} ${
         previous ? styles.pagerCardPrevious : styles.pagerCardNext
       }`}
@@ -35,7 +49,7 @@ function PagerLink({ project, direction }) {
         }
         if (!pager?.go) return;
         event.preventDefault();
-        pager.go(`/work/${project.slug}`, direction);
+        pager.go(href, direction, imageSrc);
       }}
     >
       {previous ? (

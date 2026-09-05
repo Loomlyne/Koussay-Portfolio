@@ -15,9 +15,9 @@ import gsap from "gsap";
 
 const ProjectPagerContext = createContext(null);
 
-const DURATION = 1.05;
-const EASE = "power3.inOut";
+const DURATION = 1.2;
 const FAILSAFE = 5000;
+const LENIS_EASE = (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t));
 
 function prefersReducedMotion() {
   if (typeof window === "undefined") return false;
@@ -147,23 +147,26 @@ export function ProjectPagerProvider({ children }) {
 
     const done = () => {
       if (gen !== genRef.current) return;
+      if (incomingEl) incomingEl.removeAttribute("inert");
+      // Drop the pager CSS offset while GSAP still holds y:0, then clear the
+      // inline transform so the page does not snap back to 100svh.
+      clear();
       if (incomingEl) {
-        incomingEl.removeAttribute("inert");
         gsap.set(incomingEl, { clearProps: "transform" });
         document.getElementById("project-title")?.focus({ preventScroll: true });
       }
-      clear();
     };
 
     if (flyer) {
       gsap.killTweensOf(flyer);
       gsap.fromTo(
         flyer,
-        { y: 0 },
+        { y: 0, force3D: true },
         {
           y: outY,
           duration: DURATION,
-          ease: EASE,
+          ease: LENIS_EASE,
+          overwrite: true,
           onComplete: () => {
             flyer.remove();
             if (!incomingEl) done();
@@ -178,11 +181,12 @@ export function ProjectPagerProvider({ children }) {
       gsap.killTweensOf(incomingEl);
       gsap.fromTo(
         incomingEl,
-        { y: inY },
+        { y: inY, force3D: true },
         {
           y: 0,
           duration: DURATION,
-          ease: EASE,
+          ease: LENIS_EASE,
+          overwrite: true,
           onComplete: done,
         },
       );
@@ -194,8 +198,15 @@ export function ProjectPagerProvider({ children }) {
   }, [clear]);
 
   const go = useCallback(
-    (href, direction) => {
+    (href, direction, previewSrc) => {
       if (pendingRef.current) return;
+
+      router.prefetch(href);
+      if (previewSrc && typeof window !== "undefined") {
+        const image = new window.Image();
+        image.decoding = "async";
+        image.src = previewSrc;
+      }
 
       if (prefersReducedMotion()) {
         router.push(href, { scroll: false });
