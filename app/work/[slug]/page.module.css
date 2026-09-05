@@ -18,28 +18,24 @@
 }
 
 .hero {
-  --hero-media-max: min(45rem, calc((100svh - 22rem) * 1.2));
-  display: grid;
-  grid-template-columns: minmax(9rem, 1fr) minmax(16rem, var(--hero-media-max))
-    minmax(9rem, 1fr);
-  grid-template-rows: auto auto auto auto;
-  align-items: start;
-  gap: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1.5rem, 3.5vw, 5rem);
+  --hero-chrome: 22rem;
+  display: flex;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: clamp(1.5rem, 3vw, 3rem) 0 clamp(2rem, 4vw, 4rem);
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(0.85rem, 1.6vw, 1.35rem);
+  padding: clamp(1.25rem, 2.4vw, 2rem) 0 clamp(2rem, 4vw, 3.25rem);
 }
 
 .heroMeta {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: row;
   align-items: center;
-  align-self: stretch;
   justify-content: space-between;
   width: 100%;
-  grid-column: 1 / -1;
-  grid-row: 1;
-  padding: 0.15rem 0 0.4rem;
+  padding: 0.15rem 0 0.2rem;
 }
 
 .brandRow {
@@ -110,19 +106,18 @@
 }
 
 .heroMedia {
-  grid-column: 2;
-  grid-row: 2;
-  justify-self: center;
+  display: flex;
+  flex: 1 1 auto;
   width: 100%;
-  max-width: var(--hero-media-max);
+  min-height: 20rem;
+  max-height: calc(100svh - var(--hero-chrome));
 }
 
 .heroFoot {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
-  gap: clamp(1.25rem, 2.4vw, 2rem);
-  grid-column: 2;
-  grid-row: 4;
+  gap: clamp(1.1rem, 2vw, 1.75rem);
   width: 100%;
 }
 
@@ -184,6 +179,10 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 }
 
 .mediaFigure {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
   margin: 0;
   animation: heroReveal 950ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
 }
@@ -195,8 +194,10 @@ html[data-project-pager] .mediaFigure,
 
 .mediaFrame {
   position: relative;
+  flex: 1 1 auto;
   width: 100%;
-  aspect-ratio: 3 / 2;
+  height: 100%;
+  min-height: 20rem;
   overflow: hidden;
   border-radius: clamp(0.55rem, 1.1vw, 1rem);
   background: #e7e7e2;
@@ -204,6 +205,7 @@ html[data-project-pager] .mediaFigure,
 
 .mediaImage {
   object-fit: cover;
+  object-position: center;
   transition: transform 700ms cubic-bezier(0.2, 0.75, 0.25, 1);
 }
 
@@ -251,16 +253,14 @@ html[data-project-pager] .mediaFigure,
 
 .heroInfo {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: row;
   flex-wrap: wrap;
-  grid-column: 2;
-  grid-row: 3;
   align-items: baseline;
-  align-self: start;
   justify-content: space-between;
   width: 100%;
   gap: 0.35rem 0.65rem;
-  padding-bottom: clamp(0.25rem, 0.8vw, 0.75rem);
+  padding-top: 0.15rem;
 }
 
 .heroType,
@@ -274,11 +274,10 @@ html[data-project-pager] .mediaFigure,
 }
 
 .heroTitle {
-  justify-self: start;
   width: 100%;
   max-width: none;
   margin: 0;
-  font-size: clamp(3.25rem, 6vw, 7.5rem);
+  font-size: clamp(3.4rem, 8vw, 8rem);
   font-weight: 500;
   letter-spacing: -0.085em;
   line-height: 0.84;
@@ -603,8 +602,8 @@ html[data-project-pager] .mediaFigure,
 }
 
 .loadingState {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   width: min(100%, 1760px);
   min-height: 100svh;
   margin: 0 auto;
@@ -641,14 +640,16 @@ html[data-project-pager] .mediaFigure,
 }
 
 .loadingHero {
-  display: grid;
-  place-items: center;
-  padding: clamp(2rem, 8vw, 8rem) 0;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  padding: clamp(1rem, 3vw, 2rem) 0;
 }
 
 .loadingFrame {
-  width: min(70vw, var(--hero-media-max, 45rem));
-  aspect-ratio: 3 / 2;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 20rem;
   border-radius: clamp(0.55rem, 1.1vw, 1rem);
   background: #e7e7e2;
   animation: loadingPulse 1.7s ease-in-out infinite;
@@ -688,54 +689,13 @@ html[data-project-pager] .mediaFigure,
   }
 
   .hero {
-    --hero-media-max: min(29rem, 69vw, calc((100svh - 24rem) * 1.2));
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto;
-    gap: clamp(1.15rem, 2.8vw, 1.75rem);
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: clamp(1.5rem, 4vw, 3rem) 0 clamp(2rem, 5vw, 3.5rem);
-  }
-
-  .heroMeta {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .heroMedia {
-    grid-column: 1;
-    grid-row: 2;
-    width: var(--hero-media-max);
-  }
-
-  .heroFoot {
-    grid-column: 1;
-    grid-row: 4;
-    width: 100%;
-    gap: clamp(2.25rem, 6vw, 3.5rem);
+    --hero-chrome: 20rem;
+    gap: clamp(0.9rem, 2vw, 1.35rem);
+    padding: clamp(1.15rem, 3vw, 2rem) 0 clamp(1.75rem, 4vw, 2.75rem);
   }
 
   .heroTitle {
-    font-size: clamp(3rem, 9vw, 6.5rem);
-  }
-
-  .heroInfo {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.35rem 0.65rem;
-    grid-column: 1;
-    grid-row: 3;
-    width: 100%;
-    padding-bottom: 0;
-  }
-
-  .heroType {
-    color: rgba(10, 10, 10, 0.58);
+    font-size: clamp(3.1rem, 10vw, 6.25rem);
   }
 
   .galleryItem {
@@ -767,7 +727,7 @@ html[data-project-pager] .mediaFigure,
   }
 
   .loadingFrame {
-    width: var(--hero-media-max, min(69vw, 29rem));
+    width: 100%;
   }
 }
 
@@ -781,53 +741,35 @@ html[data-project-pager] .mediaFigure,
   }
 
   .hero {
-    display: flex;
-    min-height: 100vh;
-    min-height: 100dvh;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1.5rem;
+    --hero-chrome: 18rem;
+    gap: 1.15rem;
     padding: 1rem 0 2rem;
   }
 
-  .heroMeta {
-    flex: 0 0 auto;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
+  .heroMedia {
+    flex: 1 1 auto;
+    min-height: 16rem;
+    max-height: calc(100svh - var(--hero-chrome));
   }
 
-  .heroMedia {
-    width: 100%;
-    max-width: none;
-    flex: 0 0 auto;
+  .mediaFrame {
+    min-height: 16rem;
   }
 
   .heroInfo {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.35rem 0.65rem;
-    width: 100%;
-    flex: 0 0 auto;
-    margin-top: -0.25rem;
+    margin-top: 0;
   }
 
   .heroFoot {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    justify-content: center;
-    gap: clamp(2.5rem, 8vw, 3.75rem);
-    padding-bottom: clamp(1.5rem, 5vh, 3rem);
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    gap: 1.35rem;
+    padding-bottom: 0;
   }
 
   .heroTitle {
-    max-width: none;
-    margin: 0;
-    font-size: clamp(3.6rem, 17vw, 7rem);
-    line-height: 0.83;
+    font-size: clamp(3.2rem, 14vw, 5.5rem);
+    line-height: 0.86;
   }
 
   .heroActions {
@@ -975,7 +917,7 @@ html[data-project-pager] .mediaFigure,
   }
 
   .loadingHero {
-    padding: 3rem 0;
+    padding: 1rem 0;
   }
 
   .loadingFrame {
