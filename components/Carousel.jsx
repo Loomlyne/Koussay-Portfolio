@@ -830,9 +830,10 @@ export default function Carousel({
     const updatePointer = (dt) => {
       // Held off until the entry finishes, so the cursor cannot soften the
       // ring while the timeline is still drawing it.
-      // Melt on a phone is the smear under the thumb. Tablet and desktop keep it.
+      // Phone uses the same hover as desktop. A finger still has to sit still
+      // long enough to count (see engaged); a swipe stays a swipe.
       const live =
-        params.hover && !tightNow && engaged() && pointer.seeded && interactive;
+        params.hover && engaged() && pointer.seeded && interactive;
       cursor.amt += ((live ? 1 : 0) - cursor.amt) * chase(dt, 0.12);
 
       const k = chase(dt, params.lag);
@@ -1328,15 +1329,22 @@ export default function Carousel({
       // Goo, threads and the glass lip smear the ring into a blur while it
       // turns. Drop them for the throw and ease them back — a boolean swap
       // is the flash on every phone flick.
-      // On a phone the goo blooming back when a card seats is the same
-      // flash as the name melt. Stay cheap there. Tablet and desktop ease it.
+      // On a phone the resting ring stays crisp. Honey only comes up while a
+      // pointer is actually on a card; a flick or a seated card does not
+      // bloom it back on its own.
+      const spinning =
+        dragging || picking || settling || Math.abs(spinVel) > params.cheapIn;
       if (tightNow) {
-        cheapOn = true;
-        cheapAmt = 1;
+        const wantHoney = cursor.amt > 0.04 && !spinning;
+        cheapOn = !wantHoney;
+        if (wantHoney) {
+          cheapAmt += (0 - cheapAmt) * chase(dt, params.cheapChase);
+          if (cheapAmt < 0.001) cheapAmt = 0;
+        } else {
+          cheapAmt = 1;
+        }
       } else {
-        const wantCheap =
-          dragging || picking || settling || Math.abs(spinVel) > params.cheapIn;
-        if (wantCheap) cheapOn = true;
+        if (spinning) cheapOn = true;
         else if (
           !dragging &&
           !picking &&
