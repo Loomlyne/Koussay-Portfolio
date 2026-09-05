@@ -57,6 +57,16 @@ function FieldError({ message }) {
   );
 }
 
+function FitMark({ on }) {
+  return (
+    <span className={styles.fitMark} data-on={on || undefined} aria-hidden="true">
+      <svg className={styles.fitCheck} viewBox="0 0 16 16">
+        <path d="M3.6 8.2 6.6 11.1 12.4 4.9" />
+      </svg>
+    </span>
+  );
+}
+
 export default function BookFlow() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -335,30 +345,31 @@ export default function BookFlow() {
                 Let&apos;s make sure we&apos;re a good fit
               </h1>
               <p className={styles.lead}>
-                Select all three before we book a 1-hour call.
+                Select both before we book a 1-hour call.
               </p>
               <div className={styles.fitList} role="group" aria-label="Fit">
-                {FIT_CHECKS.map((check) => {
+                {FIT_CHECKS.map((check, index) => {
                   const active = form.fit.includes(check.key);
                   return (
                     <button
                       key={check.key}
                       type="button"
                       className={`${styles.fitItem} ${
-                        active ? styles.pickerSolid : ""
+                        active ? styles.fitItemOn : ""
                       }`}
                       aria-pressed={active}
                       onClick={() =>
                         update({ fit: toggleService(form.fit, check.key) })
                       }
                     >
-                      <span className={styles.fitMark} aria-hidden="true">
-                        {active ? "✓" : ""}
+                      <span className={styles.fitIndex} aria-hidden="true">
+                        {String(index + 1).padStart(2, "0")}
                       </span>
                       <span className={styles.fitCopy}>
                         <span className={styles.fitTitle}>{check.title}</span>
                         <span className={styles.fitBody}>{check.body}</span>
                       </span>
+                      <FitMark on={active} />
                     </button>
                   );
                 })}
