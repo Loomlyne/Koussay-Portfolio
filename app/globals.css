@@ -169,7 +169,7 @@ html.ring-lock body {
 
 .ring-credit {
   display: flex;
-  max-width: 14rem;
+  max-width: 16rem;
   flex-direction: column;
   align-items: flex-end;
   gap: 0.22rem;

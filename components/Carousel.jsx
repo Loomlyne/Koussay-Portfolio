@@ -2107,7 +2107,9 @@ export default function Carousel({
       <div className="ring-dock">
         <p className="ring-credit">
           <span className="ring-credit-name">Koussay Zayani</span>
-          <span className="ring-credit-line">Brand and web</span>
+          <span className="ring-credit-line">
+            Identities and digital experiences
+          </span>
         </p>
         <Link
           href="/book"
