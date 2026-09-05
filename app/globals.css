@@ -221,13 +221,10 @@ html.project-pager [data-project-page] {
 }
 
 html[data-project-pager="next"]
-  [data-project-page]:not([data-project-outgoing]) {
-  transform: translate3d(0, 100svh, 0);
-}
-
+  [data-project-page]:not([data-project-outgoing]),
 html[data-project-pager="previous"]
   [data-project-page]:not([data-project-outgoing]) {
-  transform: translate3d(0, -100svh, 0);
+  transform: translate3d(0, 100svh, 0);
 }
 
 [data-project-outgoing] {

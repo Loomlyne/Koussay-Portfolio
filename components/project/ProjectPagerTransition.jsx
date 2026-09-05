@@ -146,10 +146,10 @@ export function ProjectPagerProvider({ children }) {
 
       window.clearTimeout(failsafeRef.current);
       const gen = ++genRef.current;
-      const { direction, flyer } = pending;
+      const { flyer } = pending;
       const distance = slideDistance();
-      const outY = direction === "next" ? -distance : distance;
-      const inY = direction === "next" ? distance : -distance;
+      const outY = -distance;
+      const inY = distance;
       const currentLenis = lenisRef.current;
 
       currentLenis?.scrollTo(0, { immediate: true, force: true });
