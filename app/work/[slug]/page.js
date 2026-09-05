@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { RegisterHome } from "@/components/HomeRing";
 import ProjectDetail from "@/components/project/ProjectDetail";
 import { getProjects } from "@/lib/cms/projects";
+import { SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
 import {
   getProjectBySlug,
   getProjectDisplayIndex,
@@ -34,11 +35,24 @@ export async function generateMetadata({ params }) {
     };
   }
 
+  const description = project.detail?.summary || SITE_DESCRIPTION;
+
   return {
-    title: { absolute: project.name },
-    description:
-      project.detail?.summary ??
-      "Prototype / speculative material for this project.",
+    title: project.name,
+    description,
+    alternates: {
+      canonical: `${SITE_URL}/work/${project.slug}`,
+    },
+    openGraph: {
+      title: project.name,
+      description,
+      url: `${SITE_URL}/work/${project.slug}`,
+      type: "article",
+    },
+    twitter: {
+      title: project.name,
+      description,
+    },
   };
 }
 

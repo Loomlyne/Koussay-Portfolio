@@ -1,7 +1,15 @@
 import styles from "@/app/work/[slug]/page.module.css";
 
+function isPublishedQuote(quote) {
+  const text = String(quote || "").trim();
+  if (!text) return false;
+  return !/placeholder client feedback|replace with a verified quote/i.test(
+    text,
+  );
+}
+
 export default function ProjectTestimonial({ testimonial }) {
-  if (!testimonial?.quote) return null;
+  if (!isPublishedQuote(testimonial?.quote)) return null;
 
   return (
     <section className={styles.testimonialSection} aria-label="Testimonial">

@@ -2104,6 +2104,13 @@ export default function Carousel({
 
       <div ref={liveRef} aria-live="polite" className="sr-only" />
 
+      <p className="ring-credit">
+        <span className="ring-credit-name">Koussay Zayani</span>
+        <span className="ring-credit-line">
+          Identities and digital experiences
+        </span>
+      </p>
+
       <Link
         href="/book"
         prefetch={false}

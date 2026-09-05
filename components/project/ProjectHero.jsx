@@ -46,12 +46,7 @@ export default function ProjectHero({ project, displayIndex }) {
               View live project
               <span aria-hidden="true">↗</span>
             </a>
-          ) : (
-            <span className="glass-btn glass-btn--cta glass-btn--muted">
-              View live project
-              <span aria-hidden="true">↗</span>
-            </span>
-          )}
+          ) : null}
           <Link
             href="/book"
             className="glass-btn glass-btn--cta glass-btn--solid"

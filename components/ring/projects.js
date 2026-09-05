@@ -18,12 +18,11 @@ const prototypeDetail = (summary, sections) => ({
   outcome: sections[2]?.body ?? "",
   gallery: [],
   testimonial: {
-    quote:
-      "Placeholder client feedback for this speculative case study. Replace with a verified quote before publishing.",
-    author: "Client name",
-    role: "Role · Company",
+    quote: "",
+    author: "",
+    role: "",
   },
-  tools: ["Figma", "After Effects", "Cinema 4D"],
+  tools: ["Figma"],
 });
 
 const PROJECTS_DATA = [

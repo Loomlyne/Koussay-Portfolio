@@ -156,6 +156,40 @@ html.ring-lock body {
   letter-spacing: 0.08em;
 }
 
+.ring-credit {
+  position: fixed;
+  left: 4vw;
+  bottom: 2.6vh;
+  z-index: 20;
+  display: flex;
+  max-width: min(42vw, 16rem);
+  flex-direction: column;
+  gap: 0.28rem;
+  color: rgba(10, 10, 10, 0.52);
+  font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  pointer-events: none;
+}
+
+.ring-credit-name {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.ring-credit-line {
+  font-size: 0.72rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+@media (max-width: 640px) {
+  .ring-credit {
+    max-width: min(46vw, 11.5rem);
+  }
+}
+
 html.shared-transition,
 html.project-pager {
   overflow: hidden;
