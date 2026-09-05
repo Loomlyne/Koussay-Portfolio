@@ -505,10 +505,13 @@
   gap: 0.85rem 1rem;
   padding: 1rem 1.15rem;
   overflow: hidden;
-  border: 1px solid var(--control-border);
+  isolation: isolate;
+  border: 1px solid var(--glass-border);
   border-radius: 1.25rem;
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 22px rgba(10, 10, 10, 0.03);
+  background: var(--glass-sheen-light), var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   color: var(--ink);
   cursor: pointer;
   font: inherit;
@@ -520,25 +523,25 @@
 }
 
 .fitItem:hover {
-  border-color: var(--control-border-focus);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 12px 28px rgba(10, 10, 10, 0.05);
+  border-color: var(--glass-border);
+  background: var(--glass-sheen-light), var(--glass-bg-strong);
+  box-shadow: var(--glass-shadow);
 }
 
 .fitItem:focus-visible {
   outline: none;
-  box-shadow: var(--focus-ring);
+  box-shadow: var(--glass-shadow), var(--focus-ring);
 }
 
 .fitItemOn {
-  border-color: rgba(10, 10, 10, 0.22);
-  background: #fff;
-  box-shadow: 0 14px 34px rgba(10, 10, 10, 0.07);
+  border-color: var(--glass-border);
+  background: var(--glass-sheen-light), var(--glass-bg-strong);
+  box-shadow: var(--glass-shadow);
 }
 
 .fitItemOn:hover {
-  border-color: rgba(10, 10, 10, 0.28);
-  background: #fff;
+  border-color: var(--glass-border);
+  background: var(--glass-sheen-light), var(--glass-bg-strong);
 }
 
 .fitIndex {
