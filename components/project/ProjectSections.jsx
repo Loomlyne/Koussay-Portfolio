@@ -9,7 +9,7 @@ const NARRATIVE = [
 export default function ProjectSections({ detail }) {
   const blocks = NARRATIVE.map(({ key, title }) => ({
     title,
-    body: detail?.[key],
+    body: String(detail?.[key] || "").trim(),
   })).filter((block) => block.body);
 
   if (blocks.length === 0) return null;

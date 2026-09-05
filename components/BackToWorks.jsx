@@ -6,7 +6,7 @@ import { useHomeRing } from "./homeRingContext";
 
 export default function BackToWorks({
   className,
-  children = "Back to works",
+  children = "Back to projects",
   arrow = true,
 }) {
   const home = useHomeRing();

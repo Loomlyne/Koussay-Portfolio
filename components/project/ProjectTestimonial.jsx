@@ -8,14 +8,17 @@ function isPublishedQuote(quote) {
   );
 }
 
-export default function ProjectTestimonial({ testimonial }) {
+export default function ProjectTestimonial({ testimonial, index }) {
   if (!isPublishedQuote(testimonial?.quote)) return null;
+
+  const author = String(testimonial.author || "").trim();
+  const role = String(testimonial.role || "").trim();
 
   return (
     <section className={styles.testimonialSection} aria-label="Testimonial">
       <div className={styles.testimonialHeader}>
         <p className={styles.sectionNumber} aria-hidden="true">
-          05
+          {String(index).padStart(2, "0")}
         </p>
         <h2 className={styles.sectionTitle}>Testimonial</h2>
       </div>
@@ -24,17 +27,13 @@ export default function ProjectTestimonial({ testimonial }) {
           <blockquote className={styles.testimonialQuote}>
             <p>{`“${testimonial.quote}”`}</p>
           </blockquote>
-          {(testimonial.author || testimonial.role) && (
+          {(author || role) && (
             <figcaption className={styles.testimonialAttribution}>
-              {testimonial.author ? (
-                <span className={styles.testimonialAuthor}>
-                  {testimonial.author}
-                </span>
+              {author ? (
+                <span className={styles.testimonialAuthor}>{author}</span>
               ) : null}
-              {testimonial.role ? (
-                <span className={styles.testimonialRole}>
-                  {testimonial.role}
-                </span>
+              {role ? (
+                <span className={styles.testimonialRole}>{role}</span>
               ) : null}
             </figcaption>
           )}

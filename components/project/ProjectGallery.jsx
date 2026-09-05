@@ -7,28 +7,26 @@ import { GALLERY_IMAGE_SIZES } from "@/lib/project/warm";
 
 import styles from "@/app/project/[slug]/page.module.css";
 
-export default function ProjectGallery({ project, gallery = [] }) {
-  const items =
-    gallery.length > 0
-      ? gallery
-      : [{ file: project.file, alt: `${project.name} — gallery` }];
+export default function ProjectGallery({ project, gallery = [], index }) {
+  const items = gallery.filter((item) => projectImageSrc(item.file ?? item));
+  if (items.length === 0) return null;
 
   return (
     <section className={styles.gallerySection} aria-label="Gallery">
       <div className={styles.galleryHeader}>
         <p className={styles.sectionNumber} aria-hidden="true">
-          04
+          {String(index).padStart(2, "0")}
         </p>
         <h2 className={styles.sectionTitle}>Gallery</h2>
       </div>
       <ul className={styles.galleryStack}>
-        {items.map((item, index) => {
+        {items.map((item, itemIndex) => {
           const src = projectImageSrc(item.file ?? item);
           const alt =
-            item.alt ?? `${project.name} — gallery image ${index + 1}`;
+            item.alt ?? `${project.name} — gallery image ${itemIndex + 1}`;
 
           return (
-            <li key={`${src}-${index}`} className={styles.galleryItem}>
+            <li key={`${src}-${itemIndex}`} className={styles.galleryItem}>
               <div className={styles.galleryFrame}>
                 <Image
                   src={src}

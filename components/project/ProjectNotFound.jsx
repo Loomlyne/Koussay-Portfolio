@@ -10,16 +10,16 @@ export default function ProjectNotFound() {
       <BrandMark className={styles.pageBrandMark} />
       <section
         className={styles.notFoundState}
-        aria-labelledby="work-not-found-title"
+        aria-labelledby="project-not-found-title"
       >
         <p className={styles.notFoundNumber}>404</p>
         <div className={styles.notFoundCopy}>
-          <p className={styles.eyebrow}>Koussay / Works</p>
-          <h1 id="work-not-found-title" className={styles.notFoundTitle}>
-            Work not found
+          <p className={styles.eyebrow}>Koussay / Projects</p>
+          <h1 id="project-not-found-title" className={styles.notFoundTitle}>
+            Project not found
           </h1>
           <p className={styles.notFoundDescription}>
-            This address does not match a project in the current work index.
+            This address does not match a project in the current index.
           </p>
           <BackToWorks className={styles.backLink} />
         </div>

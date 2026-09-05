@@ -10,6 +10,7 @@ import {
   getProjectNavigation,
   getProjectStaticParams,
   projectHref,
+  projectShareImage,
 } from "@/lib/projects";
 
 export async function generateStaticParams() {
@@ -31,13 +32,17 @@ export async function generateMetadata({ params }) {
 
   if (!project) {
     return {
-      title: { absolute: "Work not found" },
-      description: "This address does not match a project in the work index.",
+      title: { absolute: "Project not found" },
+      description: "This address does not match a project in the current index.",
     };
   }
 
   const description = project.detail?.summary || SITE_DESCRIPTION;
   const url = `${SITE_URL}${projectHref(project.slug)}`;
+  const image = projectShareImage(project);
+  const shareImage = image
+    ? [{ url: image, alt: `${project.name} — project cover` }]
+    : undefined;
 
   return {
     title: project.name,
@@ -50,10 +55,13 @@ export async function generateMetadata({ params }) {
       description,
       url,
       type: "article",
+      images: shareImage,
     },
     twitter: {
+      card: "summary_large_image",
       title: project.name,
       description,
+      images: image ? [image] : undefined,
     },
   };
 }

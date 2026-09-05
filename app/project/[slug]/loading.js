@@ -41,7 +41,7 @@ export default function Loading() {
         </div>
 
         <div className={styles.loadingFooter} aria-hidden="true">
-          <span className={styles.loadingLabel}>Loading work</span>
+          <span className={styles.loadingLabel}>Loading project</span>
           <span className={styles.loadingRule} />
         </div>
       </div>

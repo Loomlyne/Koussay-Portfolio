@@ -1,5 +1,7 @@
 import styles from "@/app/project/[slug]/page.module.css";
 
+import { projectImageSrc } from "@/lib/projects";
+
 import ProjectGallery from "./ProjectGallery";
 import ProjectHero from "./ProjectHero";
 import ProjectPager from "./ProjectPager";
@@ -10,6 +12,18 @@ import ProjectTestimonial from "./ProjectTestimonial";
 import ProjectTools from "./ProjectTools";
 import ScrollTop from "./ScrollTop";
 
+function filled(value) {
+  return Boolean(String(value || "").trim());
+}
+
+function hasPublishedQuote(quote) {
+  const text = String(quote || "").trim();
+  if (!text) return false;
+  return !/placeholder client feedback|replace with a verified quote/i.test(
+    text,
+  );
+}
+
 export default function ProjectDetail({
   project,
   displayIndex,
@@ -17,6 +31,23 @@ export default function ProjectDetail({
   next,
 }) {
   const detail = project.detail ?? {};
+  const summary = String(detail.summary || "").trim();
+  const gallery = (detail.gallery ?? []).filter((item) =>
+    projectImageSrc(item.file ?? item),
+  );
+  const tools = (detail.tools ?? [])
+    .map((tool) => String(tool || "").trim())
+    .filter(Boolean);
+  const testimonial = hasPublishedQuote(detail.testimonial?.quote)
+    ? detail.testimonial
+    : null;
+
+  const narrativeCount = ["overview", "challenge", "outcome"].filter((key) =>
+    filled(detail[key]),
+  ).length;
+
+  let section = narrativeCount + 1;
+  const take = () => section++;
 
   return (
     <main className={styles.page}>
@@ -27,16 +58,26 @@ export default function ProjectDetail({
           <ProjectHero project={project} displayIndex={displayIndex} />
 
           <div className={`${styles.content} project-transition-content`}>
-            {detail.summary ? (
+            {summary ? (
               <header className={styles.intro}>
-                <p className={styles.summary}>{detail.summary}</p>
+                <p className={styles.summary}>{summary}</p>
               </header>
             ) : null}
 
             <ProjectSections detail={detail} />
-            <ProjectGallery project={project} gallery={detail.gallery} />
-            <ProjectTestimonial testimonial={detail.testimonial} />
-            <ProjectTools tools={detail.tools} />
+            {gallery.length > 0 ? (
+              <ProjectGallery
+                project={project}
+                gallery={gallery}
+                index={take()}
+              />
+            ) : null}
+            {testimonial ? (
+              <ProjectTestimonial testimonial={testimonial} index={take()} />
+            ) : null}
+            {tools.length > 0 ? (
+              <ProjectTools tools={tools} index={take()} />
+            ) : null}
           </div>
 
           <div className="project-transition-content">

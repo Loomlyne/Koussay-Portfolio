@@ -25,10 +25,12 @@ export default function ProjectHero({ project, displayIndex }) {
         <ProjectMedia project={project} preload />
       </div>
 
-      <div className={styles.heroInfo}>
-        <p className={styles.heroType}>{project.type}</p>
-        <p className={styles.heroYear}>{project.year}</p>
-      </div>
+      {project.type || project.year ? (
+        <div className={styles.heroInfo}>
+          {project.type ? <p className={styles.heroType}>{project.type}</p> : null}
+          {project.year ? <p className={styles.heroYear}>{project.year}</p> : null}
+        </div>
+      ) : null}
 
       <div className={styles.heroFoot}>
         <h1 id="project-title" className={styles.heroTitle}>
