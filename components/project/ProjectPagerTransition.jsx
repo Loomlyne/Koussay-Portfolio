@@ -29,6 +29,10 @@ function currentScroll(lenis) {
   return window.scrollY || document.documentElement.scrollTop || 0;
 }
 
+function slideDistance() {
+  return window.innerHeight;
+}
+
 function captureFlyer(lenis) {
   const page = document.querySelector("[data-project-page]");
   if (!page) return null;
@@ -115,7 +119,10 @@ export function ProjectPagerProvider({ children }) {
       lockPager(direction);
       lenisRef.current?.stop();
 
-      const flyer = prefersReducedMotion() ? null : captureFlyer(lenisRef.current);
+      const flyer = prefersReducedMotion()
+        ? null
+        : captureFlyer(lenisRef.current);
+
       pendingRef.current = {
         direction,
         flyer,
@@ -130,72 +137,57 @@ export function ProjectPagerProvider({ children }) {
 
   const peek = useCallback(() => pendingRef.current?.direction ?? null, []);
 
-  const play = useCallback((incomingEl) => {
-    const pending = pendingRef.current;
-    if (!pending) return false;
+  const play = useCallback(
+    (incomingEl) => {
+      const pending = pendingRef.current;
+      if (!pending) return false;
 
-    window.clearTimeout(failsafeRef.current);
-    const gen = ++genRef.current;
-    const { direction, flyer } = pending;
-    const distance = window.innerHeight;
-    const outY = direction === "next" ? -distance : distance;
-    const inY = direction === "next" ? distance : -distance;
-    const currentLenis = lenisRef.current;
+      window.clearTimeout(failsafeRef.current);
+      const gen = ++genRef.current;
+      const { direction, flyer } = pending;
+      const distance = slideDistance();
+      const outY = direction === "next" ? -distance : distance;
+      const inY = direction === "next" ? distance : -distance;
+      const currentLenis = lenisRef.current;
 
-    currentLenis?.scrollTo(0, { immediate: true, force: true });
-    window.scrollTo(0, 0);
+      currentLenis?.scrollTo(0, { immediate: true, force: true });
+      window.scrollTo(0, 0);
 
-    const done = () => {
-      if (gen !== genRef.current) return;
-      if (incomingEl) incomingEl.removeAttribute("inert");
-      // Drop the pager CSS offset while GSAP still holds y:0, then clear the
-      // inline transform so the page does not snap back to 100svh.
-      clear();
-      if (incomingEl) {
-        gsap.set(incomingEl, { clearProps: "transform" });
-        document.getElementById("project-title")?.focus({ preventScroll: true });
+      const done = () => {
+        if (gen !== genRef.current) return;
+        if (incomingEl) incomingEl.removeAttribute("inert");
+        clear();
+        if (incomingEl) {
+          gsap.set(incomingEl, { clearProps: "transform" });
+          document
+            .getElementById("project-title")
+            ?.focus({ preventScroll: true });
+        }
+      };
+
+      const timeline = gsap.timeline({
+        defaults: { duration: DURATION, ease: LENIS_EASE, overwrite: true },
+        onComplete: done,
+      });
+
+      if (flyer) {
+        gsap.killTweensOf(flyer);
+        timeline.fromTo(flyer, { y: 0, force3D: true }, { y: outY }, 0);
       }
-    };
 
-    if (flyer) {
-      gsap.killTweensOf(flyer);
-      gsap.fromTo(
-        flyer,
-        { y: 0, force3D: true },
-        {
-          y: outY,
-          duration: DURATION,
-          ease: LENIS_EASE,
-          overwrite: true,
-          onComplete: () => {
-            flyer.remove();
-            if (!incomingEl) done();
-          },
-        },
-      );
-    }
+      if (incomingEl) {
+        incomingEl.setAttribute("inert", "");
+        incomingEl.setAttribute("data-pager-landed", "");
+        gsap.killTweensOf(incomingEl);
+        timeline.fromTo(incomingEl, { y: inY, force3D: true }, { y: 0 }, 0);
+      } else if (!flyer) {
+        done();
+      }
 
-    if (incomingEl) {
-      incomingEl.setAttribute("inert", "");
-      incomingEl.setAttribute("data-pager-landed", "");
-      gsap.killTweensOf(incomingEl);
-      gsap.fromTo(
-        incomingEl,
-        { y: inY, force3D: true },
-        {
-          y: 0,
-          duration: DURATION,
-          ease: LENIS_EASE,
-          overwrite: true,
-          onComplete: done,
-        },
-      );
-    } else if (!flyer) {
-      done();
-    }
-
-    return true;
-  }, [clear]);
+      return true;
+    },
+    [clear],
+  );
 
   const go = useCallback(
     (href, direction, previewSrc) => {

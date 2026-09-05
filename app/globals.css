@@ -193,6 +193,15 @@ html.project-pager body {
   object-fit: cover;
 }
 
+html.project-pager body::before {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: #fafafa;
+  content: "";
+  pointer-events: none;
+}
+
 .project-pager-flyer {
   position: fixed;
   inset: 0;
@@ -204,6 +213,8 @@ html.project-pager body {
 }
 
 html.project-pager [data-project-page] {
+  position: relative;
+  z-index: 41;
   min-height: 100svh;
   pointer-events: none;
   will-change: transform;
