@@ -209,7 +209,7 @@ export default function BookFlow() {
     return (
       <main className={styles.page}>
         <BrandMark className={styles.brandMark} />
-        <div className={styles.stage}>
+        <div className={styles.stage} data-lenis-prevent>
           <div className={styles.panel}>
             <h1 className={styles.heading}>Thank you</h1>
             <p className={styles.lead}>
@@ -228,7 +228,7 @@ export default function BookFlow() {
   return (
     <main className={styles.page}>
       <BrandMark className={styles.brandMark} />
-      <div className={styles.stage}>
+      <div className={styles.stage} data-lenis-prevent>
         <div className={styles.panel}>
           {step === 0 ? (
             <>

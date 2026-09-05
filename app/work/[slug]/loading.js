@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
+import { isProjectPagerActive } from "@/components/project/ProjectPagerTransition";
 import { isSharedTransitionActive } from "@/components/SharedTransitionProvider";
 
 import styles from "./page.module.css";
@@ -12,7 +13,7 @@ function subscribe(onStoreChange) {
   const observer = new MutationObserver(onStoreChange);
   observer.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ["class", "data-shared-transition"],
+    attributeFilter: ["class", "data-shared-transition", "data-project-pager"],
   });
 
   return () => observer.disconnect();
@@ -21,7 +22,7 @@ function subscribe(onStoreChange) {
 export default function Loading() {
   const transitioning = useSyncExternalStore(
     subscribe,
-    isSharedTransitionActive,
+    () => isSharedTransitionActive() || isProjectPagerActive(),
     () => false,
   );
 

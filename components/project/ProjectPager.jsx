@@ -7,7 +7,10 @@ import { getProjectDisplayIndex, projectImageSrc } from "@/lib/projects";
 
 import styles from "@/app/work/[slug]/page.module.css";
 
+import { useProjectPager } from "./ProjectPagerTransition";
+
 function PagerLink({ project, direction }) {
+  const pager = useProjectPager();
   const previous = direction === "previous";
   const label = previous ? "Previous work" : "Next work";
   const imageSrc = projectImageSrc(project);
@@ -20,6 +23,20 @@ function PagerLink({ project, direction }) {
         previous ? styles.pagerCardPrevious : styles.pagerCardNext
       }`}
       aria-label={`${label}: ${project.name}`}
+      onClick={(event) => {
+        if (
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey ||
+          event.button !== 0
+        ) {
+          return;
+        }
+        if (!pager?.go) return;
+        event.preventDefault();
+        pager.go(`/work/${project.slug}`, direction);
+      }}
     >
       {previous ? (
         <span className={styles.pagerArrow} aria-hidden="true">

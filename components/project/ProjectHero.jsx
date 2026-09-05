@@ -31,7 +31,7 @@ export default function ProjectHero({ project, displayIndex }) {
       </div>
 
       <div className={styles.heroFoot}>
-        <h1 id="project-title" className={styles.heroTitle}>
+        <h1 id="project-title" className={styles.heroTitle} tabIndex={-1}>
           {project.name}
         </h1>
 

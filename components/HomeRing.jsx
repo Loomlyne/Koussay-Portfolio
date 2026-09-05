@@ -3,6 +3,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
+import { useProjectPager } from "./project/ProjectPagerTransition";
 import Carousel from "./Carousel";
 import { HomeRingContext, useHomeRing } from "./homeRingContext";
 import { useSharedTransition } from "./SharedTransitionProvider";
@@ -24,6 +25,7 @@ export function HomeRingProvider({ children }) {
   const pathname = usePathname();
   const router = useRouter();
   const shared = useSharedTransition();
+  const pager = useProjectPager();
   const [projects, setProjectsState] = useState(null);
   const [homePending, setHomePending] = useState(false);
   const projectsRef = useRef(null);
@@ -46,9 +48,10 @@ export function HomeRingProvider({ children }) {
 
   const prepareHome = useCallback(() => {
     shared?.abort?.();
+    pager?.clear?.();
     if (projectsRef.current) setHomePending(true);
     if (pathname !== "/") router.push("/");
-  }, [shared, pathname, router]);
+  }, [shared, pager, pathname, router]);
 
   const value = useMemo(
     () => ({ setProjects, prepareHome, ready: Boolean(projects) }),

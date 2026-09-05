@@ -1,10 +1,12 @@
 import BrandMark from "@/components/BrandMark";
 import BackToWorks from "@/components/BackToWorks";
+import { PagerAbort } from "@/components/project/ProjectPagerTransition";
 import styles from "@/app/work/[slug]/page.module.css";
 
 export default function ProjectNotFound() {
   return (
     <main className={styles.page}>
+      <PagerAbort />
       <BrandMark className={styles.pageBrandMark} />
       <section
         className={styles.notFoundState}

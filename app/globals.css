@@ -156,11 +156,13 @@ html.ring-lock body {
   letter-spacing: 0.08em;
 }
 
-html.shared-transition {
+html.shared-transition,
+html.project-pager {
   overflow: hidden;
 }
 
-html.shared-transition body {
+html.shared-transition body,
+html.project-pager body {
   overflow: hidden;
 }
 
@@ -189,6 +191,26 @@ html.shared-transition body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.project-pager-flyer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: hidden;
+  background: #fafafa;
+  pointer-events: none;
+  will-change: transform;
+}
+
+html.project-pager [data-project-page] {
+  min-height: 100svh;
+  pointer-events: none;
+  will-change: transform;
+}
+
+[data-project-outgoing] {
+  visibility: hidden;
 }
 
 html[data-shared-transition="complete"] .project-transition-content {

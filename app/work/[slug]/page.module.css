@@ -188,6 +188,11 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   animation: heroReveal 950ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
 }
 
+html[data-project-pager] .mediaFigure,
+[data-project-page][data-pager-landed] .mediaFigure {
+  animation: none;
+}
+
 .mediaFrame {
   position: relative;
   width: 100%;
@@ -278,6 +283,10 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
   letter-spacing: -0.085em;
   line-height: 0.84;
   text-wrap: balance;
+}
+
+.heroTitle:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .heroYear {
