@@ -23,6 +23,7 @@
   --hero-chrome: 22rem;
   display: flex;
   min-height: 100vh;
+  min-height: 100svh;
   min-height: 100dvh;
   flex-direction: column;
   align-items: stretch;
@@ -747,7 +748,6 @@ html[data-project-pager] .mediaFigure,
 
   .hero {
     --hero-chrome: 18rem;
-    min-height: 0;
     gap: 1.15rem;
     padding: 1rem 0 2rem;
   }
