@@ -108,9 +108,10 @@
 .heroMedia {
   display: flex;
   flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  min-height: 20rem;
-  max-height: calc(100svh - var(--hero-chrome));
+  min-height: 0;
 }
 
 .heroFoot {
@@ -180,8 +181,10 @@ html[data-shared-transition="complete"] .mediaFigureTransitioning .mediaImage {
 
 .mediaFigure {
   display: flex;
-  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
   width: 100%;
+  max-width: 100%;
   min-height: 0;
   margin: 0;
   animation: heroReveal 950ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
@@ -193,18 +196,20 @@ html[data-project-pager] .mediaFigure,
 }
 
 .mediaFrame {
+  --media-ratio: 3 / 2;
+  --media-fit-h: calc(100svh - var(--hero-chrome));
   position: relative;
-  flex: 1 1 auto;
-  width: 100%;
-  height: 100%;
-  min-height: 20rem;
+  width: min(100%, calc(var(--media-fit-h) * var(--media-ratio)));
+  max-width: 100%;
+  aspect-ratio: var(--media-ratio);
+  max-height: var(--media-fit-h);
   overflow: hidden;
   border-radius: clamp(0.55rem, 1.1vw, 1rem);
   background: #e7e7e2;
 }
 
 .mediaImage {
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   transition: transform 700ms cubic-bezier(0.2, 0.75, 0.25, 1);
 }
@@ -642,14 +647,15 @@ html[data-project-pager] .mediaFigure,
 .loadingHero {
   display: flex;
   flex: 1 1 auto;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center;
   padding: clamp(1rem, 3vw, 2rem) 0;
 }
 
 .loadingFrame {
-  flex: 1 1 auto;
-  width: 100%;
-  min-height: 20rem;
+  width: min(100%, calc((100svh - 22rem) * 3 / 2));
+  aspect-ratio: 3 / 2;
+  max-height: calc(100svh - 22rem);
   border-radius: clamp(0.55rem, 1.1vw, 1rem);
   background: #e7e7e2;
   animation: loadingPulse 1.7s ease-in-out infinite;
@@ -725,10 +731,6 @@ html[data-project-pager] .mediaFigure,
   .pager {
     width: 100%;
   }
-
-  .loadingFrame {
-    width: 100%;
-  }
 }
 
 @media (max-width: 640px) {
@@ -745,34 +747,6 @@ html[data-project-pager] .mediaFigure,
     min-height: 0;
     gap: 1.15rem;
     padding: 1rem 0 2rem;
-  }
-
-  .heroMedia {
-    flex: 0 0 auto;
-    min-height: 0;
-    max-height: none;
-  }
-
-  .mediaFigure {
-    flex: 0 0 auto;
-    height: auto;
-  }
-
-  .mediaFrame {
-    flex: none;
-    height: auto;
-    min-height: 0;
-    aspect-ratio: 3 / 2;
-  }
-
-  .loadingHero {
-    flex: 0 0 auto;
-  }
-
-  .loadingFrame {
-    flex: none;
-    min-height: 0;
-    aspect-ratio: 3 / 2;
   }
 
   .heroInfo {
@@ -939,10 +913,6 @@ html[data-project-pager] .mediaFigure,
     padding: 1rem 0;
   }
 
-  .loadingFrame {
-    width: 100%;
-  }
-
   .loadingFooter {
     gap: 0.75rem;
   }
@@ -951,38 +921,6 @@ html[data-project-pager] .mediaFigure,
 @media (orientation: landscape) and (max-height: 540px) {
   .hero {
     --hero-chrome: 12.5rem;
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-
-  .heroMedia {
-    flex: 1 1 auto;
-    min-height: 10rem;
-    max-height: calc(100svh - var(--hero-chrome));
-  }
-
-  .mediaFigure {
-    display: flex;
-    flex: 1 1 auto;
-    height: auto;
-    min-height: 0;
-  }
-
-  .mediaFrame {
-    flex: 1 1 auto;
-    height: 100%;
-    min-height: 10rem;
-    aspect-ratio: auto;
-  }
-
-  .loadingHero {
-    flex: 1 1 auto;
-  }
-
-  .loadingFrame {
-    flex: 1 1 auto;
-    min-height: 10rem;
-    aspect-ratio: auto;
   }
 }
 
