@@ -21,7 +21,8 @@ import { createSplitText } from "./ring/splitText";
 import { createTag, TAG_W, TAG_H } from "./ring/tag";
 import { defaultParams } from "./ring/params";
 import { PROJECTS as FALLBACK_PROJECTS } from "./ring/projects";
-import { projectImageSrc } from "@/lib/projects";
+import { getProjectNavigation, projectImageSrc } from "@/lib/projects";
+import { warmProject } from "@/lib/project/warm";
 import {
   TAU,
   HALF_PI,
@@ -778,6 +779,10 @@ export default function Carousel({
         const gen = ++openGen;
 
         const imageSrc = projectImageSrc(project);
+        const { previous, next } = getProjectNavigation(project, ring);
+        warmProject(project, routerRef.current);
+        warmProject(previous, routerRef.current);
+        warmProject(next, routerRef.current);
         const from = rectForPlane(plane);
         const push = () => routerRef.current.push(`/work/${project.slug}`);
         const start = startTransitionRef.current;

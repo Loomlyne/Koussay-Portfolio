@@ -18,12 +18,7 @@ const OPTIONS = {
 };
 
 function isScrollLocked() {
-  const html = document.documentElement;
-  return (
-    html.classList.contains("ring-lock") ||
-    html.classList.contains("shared-transition") ||
-    html.classList.contains("project-pager")
-  );
+  return document.documentElement.classList.contains("ring-lock");
 }
 
 function syncLenis(lenis) {

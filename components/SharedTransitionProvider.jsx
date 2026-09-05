@@ -15,10 +15,10 @@ import gsap from "gsap";
 
 const SharedTransitionContext = createContext(null);
 
-const DURATION = 1.24;
-const EASE = "expo.inOut";
-const FADE = 0.34;
+const DURATION = 0.88;
+const FADE = 0.18;
 const FAILSAFE = 4200;
+const LENIS_EASE = (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t));
 
 function flyerFrom(from) {
   return {
@@ -142,23 +142,23 @@ export function SharedTransitionProvider({ children }) {
       const toRadius =
         parseFloat(getComputedStyle(targetEl).borderRadius) || 12;
 
+      const scaleX = to.width / Math.max(1, from.width);
+      const scaleY = to.height / Math.max(1, from.height);
+
       gsap.killTweensOf(flyer);
       gsap.set(flyer, {
         ...flyerFrom(from),
-        willChange: "transform, width, height, border-radius",
+        willChange: "transform, border-radius",
       });
 
-      // Size the box itself instead of stretching it. The photo stays
-      // undistorted and the corner radius tracks the hero frame.
       gsap.to(flyer, {
         x: to.left - from.left,
         y: to.top - from.top,
-        width: to.width,
-        height: to.height,
+        scaleX,
+        scaleY,
         borderRadius: toRadius,
-        boxShadow: "0 8px 28px rgba(10, 10, 10, 0.06)",
         duration: DURATION,
-        ease: EASE,
+        ease: LENIS_EASE,
         overwrite: true,
         onComplete: () => {
           document.documentElement.dataset.sharedTransition = "complete";

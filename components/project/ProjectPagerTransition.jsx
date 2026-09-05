@@ -119,7 +119,6 @@ export function ProjectPagerProvider({ children }) {
       if (pendingRef.current) return false;
 
       lockPager(direction);
-      lenisRef.current?.stop();
 
       const flyer = prefersReducedMotion()
         ? null
@@ -161,9 +160,6 @@ export function ProjectPagerProvider({ children }) {
         clear();
         if (incomingEl) {
           gsap.set(incomingEl, { clearProps: "transform" });
-          document
-            .getElementById("project-title")
-            ?.focus({ preventScroll: true });
         }
       };
 

@@ -19,6 +19,21 @@
   padding: 0 clamp(24px, 4vw, 72px);
 }
 
+.warmCache {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.warmSlot {
+  position: absolute;
+  width: min(70rem, 100vw);
+  height: 70vh;
+}
+
 .hero {
   --hero-chrome: 22rem;
   display: flex;
@@ -293,7 +308,8 @@ html[data-project-pager] .mediaFigure,
   text-wrap: balance;
 }
 
-.heroTitle:focus:not(:focus-visible) {
+.heroTitle:focus,
+.heroTitle:focus-visible {
   outline: none;
 }
 
