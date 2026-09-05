@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { getProjectDisplayIndex, projectImageSrc } from "@/lib/projects";
 import { warmProject } from "@/lib/project/warm";
 
-import styles from "@/app/work/[slug]/page.module.css";
+import styles from "@/app/project/[slug]/page.module.css";
 
 import { useProjectPager } from "./ProjectPagerTransition";
 
@@ -17,7 +17,7 @@ function PagerLink({ project, direction }) {
   const router = useRouter();
   const previous = direction === "previous";
   const label = previous ? "Previous work" : "Next work";
-  const href = `/work/${project.slug}`;
+  const href = `/project/${project.slug}`;
   const imageSrc = projectImageSrc(project);
 
   useEffect(() => {

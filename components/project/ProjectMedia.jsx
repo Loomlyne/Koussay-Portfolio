@@ -6,7 +6,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { useSharedTransition } from "@/components/SharedTransitionProvider";
 import { projectImageSrc } from "@/lib/projects";
 import { HERO_IMAGE_SIZES } from "@/lib/project/warm";
-import styles from "@/app/work/[slug]/page.module.css";
+import styles from "@/app/project/[slug]/page.module.css";
 
 export default function ProjectMedia({ project, preload = false }) {
   const imageSrc = projectImageSrc(project);

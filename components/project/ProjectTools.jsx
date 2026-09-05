@@ -1,4 +1,4 @@
-import styles from "@/app/work/[slug]/page.module.css";
+import styles from "@/app/project/[slug]/page.module.css";
 
 export default function ProjectTools({ tools = [] }) {
   if (tools.length === 0) return null;

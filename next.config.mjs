@@ -8,6 +8,15 @@ const nextConfig = {
       static: 300,
     },
   },
+  async redirects() {
+    return [
+      {
+        source: "/work/:slug",
+        destination: "/project/:slug",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     localPatterns: [
       // Notion covers are versioned (`?v=`) so CMS edits bust the cache.

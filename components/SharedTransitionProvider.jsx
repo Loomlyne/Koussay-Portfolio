@@ -177,7 +177,7 @@ export function SharedTransitionProvider({ children }) {
   useEffect(() => {
     const current = activeRef.current;
     if (!current) return;
-    if (pathname === `/work/${current.slug}`) return;
+    if (pathname === `/project/${current.slug}`) return;
     abort();
   }, [pathname, abort]);
 

@@ -1,4 +1,4 @@
-import styles from "@/app/work/[slug]/page.module.css";
+import styles from "@/app/project/[slug]/page.module.css";
 
 function isPublishedQuote(quote) {
   const text = String(quote || "").trim();

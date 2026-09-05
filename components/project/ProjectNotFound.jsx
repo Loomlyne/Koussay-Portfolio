@@ -1,7 +1,7 @@
 import BrandMark from "@/components/BrandMark";
 import BackToWorks from "@/components/BackToWorks";
 import { PagerAbort } from "@/components/project/ProjectPagerTransition";
-import styles from "@/app/work/[slug]/page.module.css";
+import styles from "@/app/project/[slug]/page.module.css";
 
 export default function ProjectNotFound() {
   return (

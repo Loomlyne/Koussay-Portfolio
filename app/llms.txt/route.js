@@ -1,4 +1,5 @@
 import { getProjects } from "@/lib/cms/projects";
+import { projectHref } from "@/lib/projects";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const revalidate = 60;
@@ -17,7 +18,7 @@ export async function GET() {
       const summary = project.detail?.summary
         ? ` — ${project.detail.summary}`
         : "";
-      return `- [${project.name}](${SITE_URL}/work/${project.slug})${summary}`;
+      return `- [${project.name}](${SITE_URL}${projectHref(project.slug)})${summary}`;
     })
     .join("\n");
 

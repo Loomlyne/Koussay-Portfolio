@@ -7,6 +7,7 @@ import { useProjectPager } from "./project/ProjectPagerTransition";
 import Carousel from "./Carousel";
 import { HomeRingContext, useHomeRing } from "./homeRingContext";
 import { useSharedTransition } from "./SharedTransitionProvider";
+import { projectSlugFromPath } from "@/lib/projects";
 
 function ringKey(list) {
   if (!list?.length) return "";
@@ -50,9 +51,7 @@ export function HomeRingProvider({ children }) {
   const prepareHome = useCallback(() => {
     shared?.abort?.();
     pager?.clear?.();
-    const slug = pathname.startsWith("/work/")
-      ? decodeURIComponent(pathname.slice("/work/".length).split("/")[0])
-      : "";
+    const slug = projectSlugFromPath(pathname);
     setResumeSlug(slug || null);
     if (projectsRef.current) setHomePending(true);
     if (pathname !== "/") router.push("/");

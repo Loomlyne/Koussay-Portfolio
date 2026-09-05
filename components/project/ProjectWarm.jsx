@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { projectImageSrc } from "@/lib/projects";
 import { HERO_IMAGE_SIZES, rememberProject, warmProject } from "@/lib/project/warm";
-import styles from "@/app/work/[slug]/page.module.css";
+import styles from "@/app/project/[slug]/page.module.css";
 
 export default function ProjectWarm({ current, previous, next }) {
   const router = useRouter();

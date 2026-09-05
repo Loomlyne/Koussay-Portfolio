@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import BrandMark from "@/components/BrandMark";
 import BackToWorks from "@/components/BackToWorks";
-import styles from "@/app/work/[slug]/page.module.css";
+import styles from "@/app/project/[slug]/page.module.css";
 
 import ProjectMedia from "./ProjectMedia";
 

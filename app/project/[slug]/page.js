@@ -9,6 +9,7 @@ import {
   getProjectDisplayIndex,
   getProjectNavigation,
   getProjectStaticParams,
+  projectHref,
 } from "@/lib/projects";
 
 export async function generateStaticParams() {
@@ -36,17 +37,18 @@ export async function generateMetadata({ params }) {
   }
 
   const description = project.detail?.summary || SITE_DESCRIPTION;
+  const url = `${SITE_URL}${projectHref(project.slug)}`;
 
   return {
     title: project.name,
     description,
     alternates: {
-      canonical: `${SITE_URL}/work/${project.slug}`,
+      canonical: url,
     },
     openGraph: {
       title: project.name,
       description,
-      url: `${SITE_URL}/work/${project.slug}`,
+      url,
       type: "article",
     },
     twitter: {

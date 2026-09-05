@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 function bust() {
   revalidateTag("projects", { expire: 0 });
   revalidatePath("/");
-  revalidatePath("/work", "layout");
+  revalidatePath("/project", "layout");
   revalidatePath("/api/media", "layout");
 }
 

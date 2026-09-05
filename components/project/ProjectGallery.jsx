@@ -5,7 +5,7 @@ import Image from "next/image";
 import { projectImageSrc } from "@/lib/projects";
 import { GALLERY_IMAGE_SIZES } from "@/lib/project/warm";
 
-import styles from "@/app/work/[slug]/page.module.css";
+import styles from "@/app/project/[slug]/page.module.css";
 
 export default function ProjectGallery({ project, gallery = [] }) {
   const items =
