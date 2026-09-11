@@ -1,9 +1,14 @@
-import { cachedNotionMediaUrl } from "@/lib/notion/projects";
+import sharp from "sharp";
+
+import { cachedNotionMediaUrl, notionMediaUrl } from "@/lib/notion/projects";
 
 export const runtime = "nodejs";
 
 function notFound() {
-  return new Response("Not found", { status: 404 });
+  return new Response("Not found", {
+    status: 404,
+    headers: { "Cache-Control": "no-store" },
+  });
 }
 
 function extensionFor(type) {
@@ -12,6 +17,27 @@ function extensionFor(type) {
   if (type.includes("gif")) return "gif";
   if (type.includes("avif")) return "avif";
   return "png";
+}
+
+async function fetchFile(fileUrl) {
+  return fetch(fileUrl, {
+    signal: AbortSignal.timeout(12000),
+    cache: "no-store",
+  });
+}
+
+async function optimize(bytes, type) {
+  if (type.includes("gif")) return { bytes, type };
+  try {
+    const out = await sharp(bytes)
+      .rotate()
+      .resize(1600, 1600, { fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toBuffer();
+    return { bytes: out, type: "image/webp" };
+  } catch {
+    return { bytes, type };
+  }
 }
 
 export async function GET(request, { params }) {
@@ -37,18 +63,24 @@ export async function GET(request, { params }) {
 
   let upstream;
   try {
-    upstream = await fetch(fileUrl, {
-      signal: AbortSignal.timeout(8000),
-      next: { revalidate: 3600 },
-    });
+    // Signed Notion URLs expire in about an hour. Never cache that fetch:
+    // a cached 403 is what left the ring on black cells. The versioned
+    // Cache-Control on the response is what stops the function running again.
+    upstream = await fetchFile(fileUrl);
+    if (upstream.status === 403 || upstream.status === 404) {
+      fileUrl = await notionMediaUrl(dashed, slot);
+      if (!fileUrl) return notFound();
+      upstream = await fetchFile(fileUrl);
+    }
   } catch (error) {
     console.warn("[media] upstream", error);
     return notFound();
   }
   if (!upstream.ok) return notFound();
 
-  const bytes = Buffer.from(await upstream.arrayBuffer());
-  const type = upstream.headers.get("content-type") || "image/png";
+  const raw = Buffer.from(await upstream.arrayBuffer());
+  const rawType = upstream.headers.get("content-type") || "image/png";
+  const { bytes, type } = await optimize(raw, rawType);
   const versioned = request.nextUrl.searchParams.has("v");
   const headers = new Headers();
   headers.set("Content-Type", type);

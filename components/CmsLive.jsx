@@ -3,19 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-function isLiveHost() {
-  const host = window.location.hostname;
-  return host !== "localhost" && host !== "127.0.0.1";
-}
-
 export default function CmsLive() {
   const router = useRouter();
   const stampRef = useRef(null);
   const refreshingRef = useRef(false);
 
   useEffect(() => {
-    if (!isLiveHost()) return undefined;
-
     let cancelled = false;
 
     const tick = async () => {

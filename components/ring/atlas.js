@@ -3,11 +3,12 @@ import { IMAGE_FILES } from "./projects";
 import { projectImageSrc } from "@/lib/projects";
 import { signedOffset } from "./utils";
 
-const load = (src, priority, ms = 8000) =>
+const load = (src, priority, ms = 12000) =>
   new Promise((resolve, reject) => {
     const img = new Image();
     // Must be set before src or the request is already away.
     if (priority) img.fetchPriority = priority;
+    img.decoding = "async";
     let done = false;
     let timer;
     const finish = (err) => {
@@ -37,13 +38,9 @@ const load = (src, priority, ms = 8000) =>
  * while the rest are still coming.
  *
  * Images are fetched in fan order (the facing card, then either side) so the
- * visible arc is painted first. The GPU sees the sheet twice only: once when
- * cell 0 lands, and once when the set the counter is waiting on is painted.
- * Marking dirty per image re-sends the whole sheet for cells nobody is
- * looking at, which is what froze the tab after the ring had already landed.
- *
- * If `launchAt` is below the full set, remaining cells wait until `setPaused`
- * is false (no press, drag, or snap) and flush in one upload when they finish.
+ * visible arc is painted first. GPU uploads are coalesced to one per frame
+ * and skipped while the ring is being thrown — marking dirty per image used
+ * to re-send the whole sheet and freeze the tab.
  *
  * `first` settles once cell 0 is on the texture, `ready` once all of them are.
  * Neither rejects — a missing file leaves its cell blank and still counts as
@@ -101,26 +98,41 @@ export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
 
   let settled = 0;
   let paused = false;
-  const resumeWaiters = [];
+  let disposed = false;
+  let raf = 0;
+  let pendingFlush = false;
+
+  const flush = () => {
+    raf = 0;
+    pendingFlush = false;
+    if (disposed || paused) return;
+    texture.needsUpdate = true;
+  };
+
+  const markDirty = () => {
+    if (disposed) return;
+    if (paused) {
+      pendingFlush = true;
+      return;
+    }
+    if (raf) return;
+    raf = window.requestAnimationFrame(flush);
+  };
 
   const setPaused = (next) => {
     paused = next;
-    if (!paused && resumeWaiters.length) {
-      const waiting = resumeWaiters.splice(0);
-      for (const resume of waiting) resume();
-    }
-  };
-
-  const whenFree = () => {
-    if (!paused) return Promise.resolve();
-    return new Promise((resolve) => resumeWaiters.push(resolve));
+    if (!paused && pendingFlush) markDirty();
   };
 
   const tick = () => onProgress?.(Math.min(1, settled / launchAt));
 
   const fetchInto = (i, priority) =>
     load(projectImageSrc(files[i]), priority)
-      .then((img) => paint(img, i))
+      .then((img) => {
+        if (disposed) return;
+        paint(img, i);
+        markDirty();
+      })
       .catch((err) => console.warn("[atlas]", err.message))
       .finally(() => {
         settled++;
@@ -136,21 +148,13 @@ export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
   }
 
   const seed = fan[0];
-  const gate = fan.slice(1, launchAt);
-  const tail = fan.slice(launchAt);
+  const rest = fan.slice(1);
 
-  const first = fetchInto(seed, "high").then(() => {
-    texture.needsUpdate = true;
-  });
+  const first = fetchInto(seed, "high");
 
   const ready = (async () => {
-    await Promise.all([first, ...gate.map((i) => fetchInto(i, "low"))]);
-    if (tail.length) texture.needsUpdate = true;
-    for (const i of tail) {
-      await whenFree();
-      await fetchInto(i, "low");
-    }
-    texture.needsUpdate = true;
+    await Promise.all([first, ...rest.map((i) => fetchInto(i, "low"))]);
+    markDirty();
   })();
 
   tick();
@@ -161,5 +165,10 @@ export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
     first,
     ready,
     setPaused,
+    dispose: () => {
+      disposed = true;
+      if (raf) window.cancelAnimationFrame(raf);
+      raf = 0;
+    },
   };
 }

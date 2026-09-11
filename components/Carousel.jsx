@@ -1937,6 +1937,7 @@ export default function Carousel({
       gsap.killTweensOf(splitText.chars);
       gsap.killTweensOf(splitText.fades);
       gsap.killTweensOf(listEl);
+      atlas.dispose?.();
       meta.dispose();
       tag.dispose();
       splitText.dispose();

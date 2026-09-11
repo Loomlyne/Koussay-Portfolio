@@ -1,17 +1,10 @@
 import { verifyWebhookSignature } from "@notionhq/client";
-import { revalidatePath, revalidateTag } from "next/cache";
 
+import { bustProjectsCache } from "@/lib/cms/bust";
 import { notionWebhookSecret } from "@/lib/env";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-function bust() {
-  revalidateTag("projects", { expire: 0 });
-  revalidatePath("/");
-  revalidatePath("/project", "layout");
-  revalidatePath("/api/media", "layout");
-}
 
 export async function POST(request) {
   const raw = await request.text();
@@ -51,7 +44,7 @@ export async function POST(request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  bust();
+  bustProjectsCache();
   return Response.json({ ok: true, revalidated: true });
 }
 
@@ -61,6 +54,6 @@ export async function GET(request) {
   if (!secret || query !== secret) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
-  bust();
+  bustProjectsCache();
   return Response.json({ ok: true, revalidated: true });
 }

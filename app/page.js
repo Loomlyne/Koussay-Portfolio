@@ -31,18 +31,22 @@ export async function generateMetadata() {
 
 export default async function Page() {
   const projects = await getProjects();
-  const seed = projects[0]?.file;
+  const preload = projects
+    .slice(0, 3)
+    .map((project) => project.file)
+    .filter(Boolean);
 
   return (
     <>
-      {seed ? (
+      {preload.map((file, index) => (
         <link
+          key={file}
           rel="preload"
-          href={projectImageSrc(seed)}
+          href={projectImageSrc(file)}
           as="image"
-          fetchPriority="high"
+          fetchPriority={index === 0 ? "high" : "low"}
         />
-      ) : null}
+      ))}
       <h1 className="sr-only">{SITE_NAME}</h1>
       <JsonLd data={graph([projectListSchema(projects)])} />
       <RegisterHome projects={projects} />
