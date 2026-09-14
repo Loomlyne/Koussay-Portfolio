@@ -47,6 +47,26 @@ const nextConfig = {
     ],
   },
   serverExternalPackages: ["unpdf", "pdfjs-dist", "@napi-rs/canvas"],
+  outputFileTracingIncludes: {
+    "/api/media/**": [
+      "./node_modules/@napi-rs/canvas/**",
+      "./node_modules/@napi-rs/canvas-linux-x64-gnu/**",
+      "./node_modules/@napi-rs/canvas-linux-x64-musl/**",
+      "./node_modules/@napi-rs/canvas-linux-arm64-gnu/**",
+      "./node_modules/@napi-rs/canvas-linux-arm64-musl/**",
+      "./node_modules/pdfjs-dist/**",
+      "./node_modules/unpdf/**",
+    ],
+    "/project/**": [
+      "./node_modules/@napi-rs/canvas/**",
+      "./node_modules/@napi-rs/canvas-linux-x64-gnu/**",
+      "./node_modules/@napi-rs/canvas-linux-x64-musl/**",
+      "./node_modules/@napi-rs/canvas-linux-arm64-gnu/**",
+      "./node_modules/@napi-rs/canvas-linux-arm64-musl/**",
+      "./node_modules/pdfjs-dist/**",
+      "./node_modules/unpdf/**",
+    ],
+  },
 };
 
 export default nextConfig;

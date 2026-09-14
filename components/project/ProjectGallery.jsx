@@ -43,7 +43,7 @@ function PdfStack({ project, item, src, itemIndex }) {
   const [pages, setPages] = useState(known || 1);
 
   useEffect(() => {
-    if (known) return undefined;
+    if (known > 1) return undefined;
     const meta = `${src}${src.includes("?") ? "&" : "?"}pages=1`;
     let cancelled = false;
     fetch(meta)
@@ -95,7 +95,7 @@ export default function ProjectGallery({ project, gallery = [], index }) {
           const alt = galleryImageAlt(project, item, itemIndex);
           const paper = isPaperItem(item, src);
 
-          if (paper && !item.page) {
+          if (paper && Number(item.pages || 0) <= 1) {
             return (
               <PdfStack
                 key={`${src}-${itemIndex}`}

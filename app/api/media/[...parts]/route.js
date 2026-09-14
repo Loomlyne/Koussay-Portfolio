@@ -64,7 +64,7 @@ export async function GET(request, { params }) {
   try {
     fileUrl = await cachedNotionMediaUrl(dashed, slot, version);
   } catch (error) {
-    console.warn("[media]", error);
+    console.error("[media]", error);
     return notFound();
   }
 
@@ -88,11 +88,14 @@ export async function GET(request, { params }) {
         if (!raw) upstream = await fetchFile(fileUrl);
       }
     } catch (error) {
-      console.warn("[media] upstream", error);
+      console.error("[media] upstream", error);
       return notFound();
     }
     if (!raw) {
-      if (!upstream?.ok) return notFound();
+      if (!upstream?.ok) {
+        console.error("[media] upstream status", upstream?.status);
+        return notFound();
+      }
       raw = Buffer.from(await upstream.arrayBuffer());
       rawType = upstream.headers.get("content-type") || "image/png";
     }
@@ -115,7 +118,7 @@ export async function GET(request, { params }) {
           },
         );
       } catch (error) {
-        console.warn("[media] pdf pages", error);
+        console.error("[media] pdf pages", error);
         return notFound();
       }
     }
@@ -123,12 +126,13 @@ export async function GET(request, { params }) {
       raw = await renderPdfPage(raw, parseMediaSlot(slot).page);
       rawType = "image/png";
     } catch (error) {
-      console.warn("[media] pdf", error);
+      console.error("[media] pdf", error);
       return notFound();
     }
   }
   const { bytes, type } = await optimize(raw, rawType);
   if (isPdfBytes(bytes, type) || String(type).toLowerCase().includes("pdf")) {
+    console.error("[media] refused pdf", type);
     return notFound();
   }
   const versioned = request.nextUrl.searchParams.has("v");
