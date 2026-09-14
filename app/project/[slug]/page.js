@@ -4,6 +4,7 @@ import { RegisterHome } from "@/components/HomeRing";
 import JsonLd from "@/components/JsonLd";
 import ProjectDetail from "@/components/project/ProjectDetail";
 import { getProjects } from "@/lib/cms/projects";
+import { withExpandedPdfGallery } from "@/lib/notion/gallery-pdf";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import {
   getProjectBySlug,
@@ -12,11 +13,7 @@ import {
   getProjectStaticParams,
   projectHref,
 } from "@/lib/projects";
-import {
-  breadcrumbSchema,
-  graph,
-  projectSchema,
-} from "@/lib/seo";
+import { breadcrumbSchema, graph, projectSchema } from "@/lib/seo";
 
 export async function generateStaticParams() {
   try {
@@ -38,7 +35,8 @@ export async function generateMetadata({ params }) {
   if (!project) {
     return {
       title: { absolute: "Project not found" },
-      description: "This address does not match a project in the current index.",
+      description:
+        "This address does not match a project in the current index.",
     };
   }
 
@@ -72,7 +70,8 @@ export default async function ProjectPage({ params }) {
 
   if (!project) notFound();
 
-  const { previous, next } = getProjectNavigation(project, projects);
+  const detailed = await withExpandedPdfGallery(project);
+  const { previous, next } = getProjectNavigation(detailed, projects);
 
   const crumbs = [
     { label: SITE_NAME, href: "/" },
@@ -82,11 +81,13 @@ export default async function ProjectPage({ params }) {
 
   return (
     <>
-      <JsonLd data={graph([projectSchema(project), breadcrumbSchema(crumbs)])} />
+      <JsonLd
+        data={graph([projectSchema(project), breadcrumbSchema(crumbs)])}
+      />
       <RegisterHome projects={projects} />
       <ProjectDetail
-        project={project}
-        displayIndex={getProjectDisplayIndex(project, projects)}
+        project={detailed}
+        displayIndex={getProjectDisplayIndex(detailed, projects)}
         previous={previous}
         next={next}
       />

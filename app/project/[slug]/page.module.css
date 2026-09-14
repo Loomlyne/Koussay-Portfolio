@@ -424,6 +424,22 @@ html[data-project-pager] .mediaFigure,
   object-fit: cover;
 }
 
+.galleryFramePaper {
+  aspect-ratio: auto;
+  height: auto;
+  min-height: 12rem;
+  background: #f3f3ee;
+}
+
+.galleryImagePaper {
+  position: static;
+  inset: auto;
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
 .testimonialFigure {
   display: grid;
   grid-template-columns: minmax(10rem, 0.65fr) minmax(0, 1.85fr);

@@ -46,6 +46,7 @@ const nextConfig = {
       },
     ],
   },
+  serverExternalPackages: ["unpdf", "pdfjs-dist", "@napi-rs/canvas"],
 };
 
 export default nextConfig;

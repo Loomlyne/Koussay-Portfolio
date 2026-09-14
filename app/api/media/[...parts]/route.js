@@ -1,8 +1,17 @@
 import sharp from "sharp";
 
+import { parseMediaSlot } from "@/lib/media";
 import { cachedNotionMediaUrl, notionMediaUrl } from "@/lib/notion/projects";
+import {
+  isPdfBytes,
+  pdfPageCount,
+  peekPdfBytes,
+  rememberPdfBytes,
+  renderPdfPage,
+} from "@/lib/pdf";
 
 export const runtime = "nodejs";
+export const maxDuration = 30;
 
 function notFound() {
   return new Response("Not found", {
@@ -21,7 +30,7 @@ function extensionFor(type) {
 
 async function fetchFile(fileUrl) {
   return fetch(fileUrl, {
-    signal: AbortSignal.timeout(12000),
+    signal: AbortSignal.timeout(20000),
     cache: "no-store",
   });
 }
@@ -61,29 +70,71 @@ export async function GET(request, { params }) {
 
   if (!fileUrl) return notFound();
 
-  let upstream;
-  try {
-    // Signed Notion URLs expire in about an hour. Never cache that fetch:
-    // a cached 403 is what left the ring on black cells. The versioned
-    // Cache-Control on the response is what stops the function running again.
-    upstream = await fetchFile(fileUrl);
-    if (upstream.status === 403 || upstream.status === 404) {
-      fileUrl = await notionMediaUrl(dashed, slot);
-      if (!fileUrl) return notFound();
+  let raw = peekPdfBytes(fileUrl);
+  let rawType = raw ? "application/pdf" : "";
+
+  if (!raw) {
+    let upstream;
+    try {
+      // Signed Notion URLs expire in about an hour. Never cache that fetch:
+      // a cached 403 is what left the ring on black cells. The versioned
+      // Cache-Control on the response is what stops the function running again.
       upstream = await fetchFile(fileUrl);
+      if (upstream.status === 403 || upstream.status === 404) {
+        fileUrl = await notionMediaUrl(dashed, slot);
+        if (!fileUrl) return notFound();
+        raw = peekPdfBytes(fileUrl);
+        rawType = raw ? "application/pdf" : "";
+        if (!raw) upstream = await fetchFile(fileUrl);
+      }
+    } catch (error) {
+      console.warn("[media] upstream", error);
+      return notFound();
     }
-  } catch (error) {
-    console.warn("[media] upstream", error);
+    if (!raw) {
+      if (!upstream?.ok) return notFound();
+      raw = Buffer.from(await upstream.arrayBuffer());
+      rawType = upstream.headers.get("content-type") || "image/png";
+    }
+  }
+  if (isPdfBytes(raw, rawType)) {
+    rememberPdfBytes(fileUrl, raw);
+    if (request.nextUrl.searchParams.get("pages") === "1") {
+      try {
+        const pages = await pdfPageCount(raw);
+        const versioned = request.nextUrl.searchParams.has("v");
+        return Response.json(
+          { pages },
+          {
+            headers: {
+              "Cache-Control": versioned
+                ? "public, max-age=31536000, immutable"
+                : "no-store",
+              "X-Content-Type-Options": "nosniff",
+            },
+          },
+        );
+      } catch (error) {
+        console.warn("[media] pdf pages", error);
+        return notFound();
+      }
+    }
+    try {
+      raw = await renderPdfPage(raw, parseMediaSlot(slot).page);
+      rawType = "image/png";
+    } catch (error) {
+      console.warn("[media] pdf", error);
+      return notFound();
+    }
+  }
+  const { bytes, type } = await optimize(raw, rawType);
+  if (isPdfBytes(bytes, type) || String(type).toLowerCase().includes("pdf")) {
     return notFound();
   }
-  if (!upstream.ok) return notFound();
-
-  const raw = Buffer.from(await upstream.arrayBuffer());
-  const rawType = upstream.headers.get("content-type") || "image/png";
-  const { bytes, type } = await optimize(raw, rawType);
   const versioned = request.nextUrl.searchParams.has("v");
   const headers = new Headers();
   headers.set("Content-Type", type);
+  headers.set("X-Content-Type-Options", "nosniff");
   headers.set("Content-Length", String(bytes.length));
   headers.set(
     "Content-Disposition",
