@@ -8,6 +8,7 @@
  * The manifest is the gate: anything already recorded there is skipped unless
  * --force is passed. Credits are money, so the default is never to repeat work.
  *
+ *   node scripts/generate-project-media.mjs --probe
  *   node scripts/generate-project-media.mjs --check
  *   node scripts/generate-project-media.mjs --dry-run
  *   node scripts/generate-project-media.mjs --only=volt
@@ -15,7 +16,7 @@
  *   node scripts/generate-project-media.mjs --video --only=volt
  */
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -166,6 +167,63 @@ async function uploadVideo(slug, bytes) {
 
 if (flag("check")) {
   await check();
+  process.exit(0);
+}
+/**
+ * One image, straight to disk, no R2. This is the cheapest way to prove the key
+ * pair works and to look at the art direction before any of the R2 plumbing
+ * exists. 720p because a probe should not cost what a final frame costs.
+ */
+async function probe() {
+  if (!hasCredentials(env)) {
+    console.error(
+      "No Higgsfield credentials. Put HF_CREDENTIALS=id:secret in .env.local.",
+    );
+    console.error("Create a key pair at https://console.higgsfield.ai");
+    process.exit(1);
+  }
+  const { PROJECTS: list } = await import(
+    pathToFileURL(join(root, "components/ring/projects.js")).href
+  );
+  const slug = only[0] || list[0].slug;
+  const index = list.findIndex((item) => item.slug === slug);
+  if (index === -1) {
+    console.error(`no project with slug "${slug}"`);
+    process.exit(1);
+  }
+  const project = list[index];
+  const prompt = buildImagePrompt(project, index, direction);
+
+  console.log(`probe ${project.name} (${direction})`);
+  console.log(prompt);
+  console.log("\ngenerating, this takes a minute...");
+
+  const { requestId, urls } = await generate(
+    imageEndpoint,
+    imageInput(prompt, { quality: "720p", ...imageParams }),
+    env,
+  );
+  const bytes = await download(urls[0]);
+
+  const dir = join(root, ".media-probe");
+  mkdirSync(dir, { recursive: true });
+  const raw = join(dir, `${slug}-${direction}.png`);
+  const cell = join(dir, `${slug}-${direction}-cell.webp`);
+  writeFileSync(raw, bytes);
+  await sharp(bytes)
+    .resize(CELL.width, CELL.height, { fit: "cover", position: "centre" })
+    .webp({ quality: 82 })
+    .toFile(cell);
+
+  console.log(`\nrequest  ${requestId}`);
+  console.log(`source   ${urls[0]}`);
+  console.log(`full     ${raw}`);
+  console.log(`as cell  ${cell}  (what the ring actually shows)`);
+  console.log("\nNothing was uploaded and the manifest was not touched.");
+}
+
+if (flag("probe")) {
+  await probe();
   process.exit(0);
 }
 

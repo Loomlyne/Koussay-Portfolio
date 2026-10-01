@@ -43,3 +43,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local output from scripts/generate-project-media.mjs --probe
+.media-probe/
