@@ -26,8 +26,16 @@ import {
   buildVideoPrompt,
   DIRECTION_KEYS,
 } from "./lib/art-direction.mjs";
-import { download, generate } from "./lib/higgsfield.mjs";
-import { loadEnv, requireEnv, root, sleep } from "./lib/load-env.mjs";
+import {
+  download,
+  generate,
+  hasCredentials,
+  imageInput,
+  IMAGE_ENDPOINT,
+  videoInput,
+  VIDEO_ENDPOINT,
+} from "./lib/higgsfield.mjs";
+import { loadEnv, root, sleep } from "./lib/load-env.mjs";
 import {
   headObject,
   isR2Configured,
@@ -163,16 +171,15 @@ if (flag("check")) {
 
 const imageEndpoint = value(
   "image-endpoint",
-  env.HIGGSFIELD_IMAGE_ENDPOINT || "higgsfield-ai/soul/v2/standard",
+  env.HIGGSFIELD_IMAGE_ENDPOINT || IMAGE_ENDPOINT,
 );
 const videoEndpoint = value(
   "video-endpoint",
-  env.HIGGSFIELD_VIDEO_ENDPOINT || "",
+  env.HIGGSFIELD_VIDEO_ENDPOINT || VIDEO_ENDPOINT,
 );
 
-// Model-specific fields (aspect ratio, quality, resolution) differ per endpoint
-// and are documented per model in the Higgsfield console, not in the shared
-// docs. Keep them in env so a new model needs no code change.
+// Overrides for the typed defaults (size, quality, DoP model, motions). Kept in
+// env so trying another model needs no code change.
 function extraParams(name) {
   const raw = String(env[name] || "").trim();
   if (!raw) return {};
@@ -187,23 +194,19 @@ const imageParams = extraParams("HIGGSFIELD_IMAGE_PARAMS");
 const videoParams = extraParams("HIGGSFIELD_VIDEO_PARAMS");
 
 if (!dryRun) {
-  requireEnv(
-    env,
-    ["HIGGSFIELD_API_KEY_ID", "HIGGSFIELD_API_KEY_SECRET"],
-    "Create a key pair at https://console.higgsfield.ai and put both halves in .env.local",
-  );
+  if (!hasCredentials(env)) {
+    console.error(
+      "No Higgsfield credentials. Set HF_CREDENTIALS=id:secret (or the two halves) in .env.local.",
+    );
+    console.error("Create a key pair at https://console.higgsfield.ai");
+    process.exit(1);
+  }
   if (!isR2Configured(r2)) {
     console.error(
       "Missing R2 config. Run with --dry-run to preview, or --check once R2 is set.",
     );
     process.exit(1);
   }
-}
-if (wantVideo && !videoEndpoint && !dryRun) {
-  console.error(
-    "Set HIGGSFIELD_VIDEO_ENDPOINT to the image-to-video model path from your console.",
-  );
-  process.exit(1);
 }
 
 const { PROJECTS } = await import(
@@ -239,7 +242,7 @@ for (const [index, project] of PROJECTS.entries()) {
         console.log(`${label} generating image...`);
         const { requestId, urls } = await generate(
           imageEndpoint,
-          { prompt, ...imageParams },
+          imageInput(prompt, imageParams),
           env,
         );
         const bytes = await download(urls[0]);
@@ -273,9 +276,8 @@ for (const [index, project] of PROJECTS.entries()) {
         console.log(`${label} generating video...`);
         const { requestId, urls } = await generate(
           videoEndpoint,
-          { prompt, image_url: start, ...videoParams },
+          videoInput(prompt, start, videoParams),
           env,
-          { timeoutMs: 1800000 },
         );
         const bytes = await download(urls[0]);
         const uploaded = await uploadVideo(project.slug, bytes);

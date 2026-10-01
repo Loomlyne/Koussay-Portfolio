@@ -1,99 +1,49 @@
-import { sleep } from "./load-env.mjs";
+import { config, higgsfield } from "@higgsfield/client/v2";
 
-export const API_BASE = "https://api.higgsfield.ai";
+/**
+ * Thin wrapper over the official SDK. `subscribe` with `withPolling` already
+ * handles submit-and-poll, so this only adds credential plumbing, output
+ * normalisation and a download.
+ */
 
-// Terminal states per the Higgsfield request lifecycle. Anything else is
-// still working, including states this script has never seen.
-const DONE = new Set(["completed", "failed", "nsfw", "canceled", "cancelled"]);
+// Exactly 3:2, and the largest Soul size at that ratio. atlas.js packs cells at
+// cellW / 1.5, so this crops essentially nothing on the way into the ring.
+export const SOUL_SIZE_3_2 = "2016x1344";
 
-export function authHeader(env) {
+export const IMAGE_ENDPOINT = "/v1/text2image/soul";
+export const VIDEO_ENDPOINT = "/v1/image2video/dop";
+
+let configured = false;
+
+/**
+ * Accepts either HF_CREDENTIALS ("id:secret", the SDK's own convention) or the
+ * two halves separately, because the console hands them over as a pair.
+ */
+export function configure(env) {
+  if (configured) return;
+  const joined = String(env.HF_CREDENTIALS || "").trim();
   const id = String(env.HIGGSFIELD_API_KEY_ID || "").trim();
   const secret = String(env.HIGGSFIELD_API_KEY_SECRET || "").trim();
-  return `Key ${id}:${secret}`;
+
+  if (joined) config({ credentials: joined });
+  else if (id && secret) config({ apiKey: id, apiSecret: secret });
+  else throw new Error("no Higgsfield credentials");
+
+  configured = true;
 }
 
-function endpointUrl(endpoint) {
-  if (/^https?:\/\//.test(endpoint)) return endpoint;
-  return `${API_BASE}/${String(endpoint).replace(/^\/+/, "")}`;
-}
-
-async function readBody(response) {
-  const text = await response.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    return { raw: text };
-  }
-}
-
-export async function submit(endpoint, body, env) {
-  const response = await fetch(endpointUrl(endpoint), {
-    method: "POST",
-    headers: {
-      Authorization: authHeader(env),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(60000),
-  });
-  const payload = await readBody(response);
-  if (!response.ok) {
-    throw new Error(
-      `submit ${response.status}: ${payload.detail || payload.message || payload.raw || "unknown"}`,
-    );
-  }
-  const requestId = payload.request_id || payload.id;
-  if (!requestId) throw new Error(`submit returned no request_id`);
-  return {
-    requestId,
-    statusUrl: payload.status_url || `${API_BASE}/requests/${requestId}/status`,
-  };
+export function hasCredentials(env) {
+  if (String(env.HF_CREDENTIALS || "").trim()) return true;
+  return Boolean(
+    String(env.HIGGSFIELD_API_KEY_ID || "").trim() &&
+    String(env.HIGGSFIELD_API_KEY_SECRET || "").trim(),
+  );
 }
 
 /**
- * Polls until terminal. Generation is minutes, not seconds, so this backs off
- * to a steady 5s rather than hammering, and surfaces `nsfw` as its own failure
- * because the fix for it is a prompt edit, not a retry.
+ * V2Response returns `images` as an array but `video` as a single object, so a
+ * naive "look for the plural" read silently finds nothing on every video.
  */
-export async function poll(statusUrl, env, { timeoutMs = 900000 } = {}) {
-  const deadline = Date.now() + timeoutMs;
-  let wait = 2000;
-  for (;;) {
-    if (Date.now() > deadline) throw new Error(`poll timed out`);
-    await sleep(wait);
-    wait = Math.min(5000, Math.round(wait * 1.3));
-
-    let payload;
-    try {
-      const response = await fetch(statusUrl, {
-        headers: { Authorization: authHeader(env) },
-        signal: AbortSignal.timeout(30000),
-      });
-      payload = await readBody(response);
-      // A transient 5xx on the status endpoint is not a failed generation.
-      if (!response.ok && response.status < 500) {
-        throw new Error(
-          `status ${response.status}: ${payload.detail || payload.raw || ""}`,
-        );
-      }
-      if (!response.ok) continue;
-    } catch (error) {
-      if (error.name === "TimeoutError") continue;
-      throw error;
-    }
-
-    const status = String(payload.status || "").toLowerCase();
-    if (!DONE.has(status)) continue;
-    if (status !== "completed") {
-      throw new Error(
-        `generation ${status}${payload.detail ? `: ${payload.detail}` : ""}`,
-      );
-    }
-    return payload;
-  }
-}
-
-/** Flattens whichever array this model returns into plain URLs. */
 export function outputUrls(payload) {
   const urls = [];
   const push = (value) => {
@@ -101,25 +51,51 @@ export function outputUrls(payload) {
     if (typeof value === "string") urls.push(value);
     else if (typeof value.url === "string") urls.push(value.url);
   };
-  for (const key of ["images", "videos", "results", "outputs", "files"]) {
-    const list = payload?.[key];
-    if (Array.isArray(list)) list.forEach(push);
-  }
-  push(payload?.url);
-  push(payload?.result);
+  if (Array.isArray(payload?.images)) payload.images.forEach(push);
+  push(payload?.video);
+  if (Array.isArray(payload?.videos)) payload.videos.forEach(push);
   return [...new Set(urls)];
 }
 
-export async function generate(endpoint, body, env, options) {
-  const { requestId, statusUrl } = await submit(endpoint, body, env);
-  const payload = await poll(statusUrl, env, options);
-  const urls = outputUrls(payload);
-  if (!urls.length) throw new Error(`completed with no output url`);
-  return { requestId, urls, payload };
+export async function generate(endpoint, input, env) {
+  configure(env);
+  const result = await higgsfield.subscribe(endpoint, {
+    input,
+    withPolling: true,
+  });
+
+  const status = String(result?.status || "").toLowerCase();
+  if (status !== "completed") {
+    // nsfw is its own outcome: the fix is a prompt edit, not a retry.
+    throw new Error(`generation ${status || "returned no status"}`);
+  }
+
+  const urls = outputUrls(result);
+  if (!urls.length) throw new Error("completed with no output url");
+  return { requestId: result.request_id, urls, payload: result };
+}
+
+export function imageInput(prompt, extra = {}) {
+  return {
+    prompt,
+    width_and_height: SOUL_SIZE_3_2,
+    quality: "1080p",
+    batch_size: 1,
+    ...extra,
+  };
+}
+
+export function videoInput(prompt, startImageUrl, extra = {}) {
+  return {
+    model: "dop-standard",
+    prompt,
+    input_images: [{ type: "image_url", image_url: startImageUrl }],
+    ...extra,
+  };
 }
 
 export async function download(url) {
-  const response = await fetch(url, { signal: AbortSignal.timeout(120000) });
+  const response = await fetch(url, { signal: AbortSignal.timeout(180000) });
   if (!response.ok) throw new Error(`download ${response.status}`);
   return Buffer.from(await response.arrayBuffer());
 }
