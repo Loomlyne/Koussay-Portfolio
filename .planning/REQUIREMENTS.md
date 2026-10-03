@@ -77,7 +77,7 @@ Requirements for this milestone. Each maps to a roadmap phase.
 - [ ] **HYG-02**: Every font-family string in `params.js`, `gui.js` and `globals.css` matches a `@font-face` block; the heading, card names, index and meta morph are re-checked for metric shifts
 - [ ] **HYG-03**: LICENSE keeps the upstream MIT notice (Yousuf Soomro) and the simplex-noise notice word for word; README gains an upstream attribution line and states that removed assets remain in git history
 - [ ] **HYG-04**: README, LICENSE and AGENTS.md no longer claim Satoshi or PP Neue Montreal are bundled; README Quick start documents the env vars that remain
-- [ ] **HYG-05**: One formatting-only Prettier commit lands before any functional change; the tree then passes `prettier --check`, `npm run lint` and `npm run build` at every phase end
+- [x] **HYG-05**: One formatting-only Prettier commit lands before any functional change; the tree then passes `prettier --check`, `npm run lint` and `npm run build` at every phase end
 - [ ] **HYG-06**: `components/TwoPlaneMorph.jsx`, the root `shader` file, `scripts/seed-notion-projects.mjs` and the dead `lib/env.js` accessors are removed; `.agents/skills/` is gitignored with `skills-lock.json` kept
 - [ ] **HYG-07**: AGENTS.md matches the tree: layout, line counts, known gaps, the content and media model, and the smoke test
 - [ ] **HYG-08**: Vercel Deployment Protection is set so retired deployment URLs no longer serve removed files; Koussay checks it in one numbered step
@@ -179,7 +179,7 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | HYG-02 | Phase 1 | Pending |
 | HYG-03 | Phase 1 | Pending |
 | HYG-04 | Phase 1 | Pending |
-| HYG-05 | Phase 1 | Pending |
+| HYG-05 | Phase 1 | Complete |
 | HYG-06 | Phase 1 | Pending |
 | HYG-07 | Phase 8 | Pending |
 | HYG-08 | Phase 2 | Pending |
