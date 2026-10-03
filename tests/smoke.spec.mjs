@@ -7,7 +7,7 @@ const SPEED_INSIGHTS = "/_vercel/speed-insights/script.js";
 const GEIST = "/fonts/Geist-Variable.woff2";
 const GEIST_MONO = "/fonts/GeistMono-Variable.woff2";
 
-function watch(page) {
+async function watch(page) {
   const errors = [];
   page.on("console", (msg) => {
     if (msg.type() !== "error") return;
@@ -21,7 +21,7 @@ function watch(page) {
     errors.push(`${msg.text()} @ ${url}`);
   });
   page.on("pageerror", (err) => errors.push(`pageerror: ${err.message}`));
-  const bookingCalls = guardBooking(page);
+  const bookingCalls = await guardBooking(page);
   // Old font binaries must never be requested; the two woff2 statuses are
   // recorded so the home test can assert 200.
   const oldFonts = [];
@@ -37,7 +37,7 @@ function watch(page) {
 }
 
 test("home renders the ring", async ({ page }) => {
-  const { errors, bookingCalls, oldFonts, woff2 } = watch(page);
+  const { errors, bookingCalls, oldFonts, woff2 } = await watch(page);
   await page.goto("/");
   const canvas = page.locator(".ring-stage canvas");
   await expect(canvas).toHaveCount(1);
@@ -89,7 +89,7 @@ test("every project page renders", async ({ page, request }) => {
   // One real page load per slug; the count differs between the live Notion
   // set and the 18 placeholders, so the budget follows it.
   test.setTimeout(60_000 + paths.length * 30_000);
-  const { errors, bookingCalls, oldFonts } = watch(page);
+  const { errors, bookingCalls, oldFonts } = await watch(page);
   for (const path of paths) {
     await test.step(path, async () => {
       // One shared page; clear the lists so errors belong to this slug.
@@ -110,7 +110,7 @@ test("every project page renders", async ({ page, request }) => {
 });
 
 test("booking first step renders without a request", async ({ page }) => {
-  const { errors, bookingCalls, oldFonts } = watch(page);
+  const { errors, bookingCalls, oldFonts } = await watch(page);
   await page.goto("/booking");
   await expect(page.locator("main h1").first()).toBeVisible();
   await page.waitForTimeout(500);

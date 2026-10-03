@@ -5,19 +5,22 @@ export function isBookingUrl(url) {
   return url.pathname === "/api/book" || url.pathname.startsWith("/api/book/");
 }
 
-// Aborts and records every booking request. Returns the live list of URLs.
-export function guardBooking(page) {
+// Aborts and records every booking request in the whole browser context
+// (popups, extra pages), and waits until interception is live. Returns the
+// live list of URLs; every request is recorded, repeats included.
+export async function guardBooking(page) {
   const calls = [];
-  page.route(isBookingUrl, (route) => {
-    const url = route.request().url();
-    if (!calls.includes(url)) calls.push(url);
-    return route.abort();
-  });
+  const context = page.context();
+  await context.route(
+    (url) => isBookingUrl(url),
+    (route) => {
+      calls.push(route.request().url());
+      return route.abort();
+    },
+  );
   // Second net: records anything the route handler did not see.
-  page.on("request", (req) => {
-    if (isBookingUrl(new URL(req.url())) && !calls.includes(req.url())) {
-      calls.push(req.url());
-    }
+  context.on("request", (req) => {
+    if (isBookingUrl(new URL(req.url()))) calls.push(`seen:${req.url()}`);
   });
   return calls;
 }

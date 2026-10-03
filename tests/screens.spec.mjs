@@ -86,7 +86,7 @@ async function projectPath(request) {
 test.beforeAll(() => mkdirSync(DIR, { recursive: true }));
 
 test("loader", async ({ page }) => {
-  const calls = guardBooking(page);
+  const calls = await guardBooking(page);
   await page.goto("/");
   await expect(page.locator("[data-loader-count]")).toBeVisible();
   await shot(page, "loader");
@@ -94,7 +94,7 @@ test("loader", async ({ page }) => {
 });
 
 test("heading", async ({ page }) => {
-  const calls = guardBooking(page);
+  const calls = await guardBooking(page);
   await settledHome(page);
   await columnLanded(page);
   const fonts = await page.evaluate(() =>
@@ -115,7 +115,7 @@ test("heading", async ({ page }) => {
 });
 
 test("meta-rest", async ({ page }) => {
-  const calls = guardBooking(page);
+  const calls = await guardBooking(page);
   await settledHome(page);
   await entryDone(page);
   await page.waitForTimeout(REST_AFTER_ENTRY);
@@ -124,7 +124,7 @@ test("meta-rest", async ({ page }) => {
 });
 
 test("meta-morph", async ({ page }) => {
-  const calls = guardBooking(page);
+  const calls = await guardBooking(page);
   await settledHome(page);
   await entryDone(page);
   await page.waitForTimeout(REST_AFTER_ENTRY);
@@ -137,7 +137,7 @@ test("meta-morph", async ({ page }) => {
 });
 
 test("booking", async ({ page }) => {
-  const calls = guardBooking(page);
+  const calls = await guardBooking(page);
   await page.goto("/booking");
   await expect(page.locator("main h1").first()).toBeVisible();
   await page.waitForLoadState("networkidle");
@@ -149,7 +149,7 @@ test("booking", async ({ page }) => {
 // Last: the full-page capture leaves the browser unable to screenshot the next
 // page in the same run.
 test("project", async ({ page, request }) => {
-  const calls = guardBooking(page);
+  const calls = await guardBooking(page);
   await page.goto(await projectPath(request));
   await expect(page.locator("#project-title")).toBeVisible({ timeout: 30_000 });
   await page.waitForTimeout(800);
