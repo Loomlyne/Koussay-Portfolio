@@ -88,7 +88,7 @@ Requirements for this milestone. Each maps to a roadmap phase.
 
 ### Tests (TEST)
 
-- [ ] **TEST-01**: `npm test` runs a Playwright smoke test against `next build` output that loads `/` and one `/project/<slug>`, fails on any console error except the Speed Insights 404, and fails when the canvas is missing
+- [x] **TEST-01**: `npm test` runs a Playwright smoke test against `next build` output that loads `/` and one `/project/<slug>`, fails on any console error except the Speed Insights 404, and fails when the canvas is missing
 - [ ] **TEST-02**: The smoke test is proven to fail when `crossOrigin` is removed from the atlas and when a shader typo is introduced, then restored green
 
 ## v2 Requirements
@@ -183,7 +183,7 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | HYG-06 | Phase 1 | Pending |
 | HYG-07 | Phase 8 | Pending |
 | HYG-08 | Phase 2 | Pending |
-| TEST-01 | Phase 1 | Pending |
+| TEST-01 | Phase 1 | Complete |
 | TEST-02 | Phase 4 | Pending |
 | PLAT-01 | Phase 3.1 | Pending |
 

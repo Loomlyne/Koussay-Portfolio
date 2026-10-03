@@ -70,7 +70,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Playwright smoke test on port 3100, green before the swap, plus "before" screenshots
+- [x] 01-02-PLAN.md — Playwright smoke test on port 3100, green before the swap, plus "before" screenshots
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -281,7 +281,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Baseline and licence hygiene | 1/6 | In Progress|  |
+| 1. Baseline and licence hygiene | 2/6 | In Progress|  |
 | 2. Projects served from the repo | 0/TBD | Not started | - |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |

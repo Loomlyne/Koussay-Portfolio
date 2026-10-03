@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 1 context gathered
-last_updated: "2026-10-03T16:28:41.011Z"
+last_updated: "2026-10-03T17:39:49.040Z"
 last_activity: 2026-10-03
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 6
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 1 (Baseline and licence hygiene) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-10-03
 
-Progress: [██░░░░░░░░] 17%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [██░░░░░░░░] 17%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01 P02 | 3h | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,7 @@ Recent decisions affecting current work:
 - Roadmap: proxy and PDF removal (Phase 3) ships one deploy after the content cut-over (Phase 2).
 - Roadmap: OG images become static pre-rendered files in Phase 3 so runtime `sharp` leaves early.
 - Research recommends Geist for every face (Satoshi licence bars public-repo distribution); awaiting Koussay's confirmation in Phase 1.
+- [Phase 01]: Phase 1 Plan 02: screenshot moments timed from DOM signals, not wall clock
 
 ### Pending Todos
 
@@ -84,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-03T16:28:41.001Z
+Last session: 2026-10-03T17:39:45.692Z
 Stopped at: Phase 1 context gathered
 Resume file: None
