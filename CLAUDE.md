@@ -32,7 +32,7 @@ The ring is the hook. The case studies and the booking form are the close.
 - JavaScript (ES modules, no TypeScript) - the whole app: `app/**/*.js`, `components/**/*.{js,jsx}`, `lib/**/*.js`. Path alias `@/*` -> repo root via `jsconfig.json`.
 - GLSL ES (WebGL) - the ring renderer, compiled at runtime in the browser, not at build: `components/shaders/planeShaders.js`, `components/shaders/textShaders.js`. See `AGENTS.md`.
 - CSS - Tailwind v4 via `@import "tailwindcss"` in `app/globals.css`, plus CSS Modules (`app/booking/page.module.css`, `app/project/[slug]/page.module.css`).
-- Node `.mjs` scripts - authoring-time tooling only: `scripts/generate-project-media.mjs`, `scripts/seed-notion-projects.mjs`, `scripts/lib/*.mjs`.
+- Node `.mjs` scripts - authoring-time tooling only: `scripts/generate-project-media.mjs`, `scripts/lib/*.mjs`.
 ## Runtime
 - Node.js. Next 16.3.0 requires `>=20.9.0` (`node_modules/next/package.json`); README states Node 20+. Docker image pins `node:22-alpine` (`Dockerfile`). Local machine runs Node 26.
 - Route handlers declare `export const runtime = "nodejs"` (`app/api/revalidate/route.js`, `app/api/cms-stamp/route.js`, `app/api/media/[...parts]/route.js`, `app/api/book/**`). Nothing runs on the Edge runtime.
@@ -45,7 +45,7 @@ The ring is the hook. The case studies and the booking form are the close.
 - lenis 1.3 - smooth scroll (`components/SmoothScroll.jsx`).
 - lil-gui 0.21 - dev tuning panel, dynamically imported and `NODE_ENV === "development"` only (`components/ring/gui.js`).
 - Tailwind CSS 4 + `@tailwindcss/postcss` (`postcss.config.mjs`).
-- None. No test runner, no test files. `npm run build` + `npm run lint` is the safety net (per `AGENTS.md`).
+- Playwright smoke test via `npm test` (`tests/smoke.spec.mjs`, port 3100, desktop 1512 and phone 390). A control-session gate with `format:check`, `lint` and `build` before every ship. No git hook, no CI (per `AGENTS.md`).
 - ESLint 9 with `eslint-config-next/core-web-vitals` (`eslint.config.mjs`, flat config).
 - Prettier defaults, no config file, not in `package.json` (run via `npx prettier`).
 ## Key Dependencies
@@ -64,7 +64,7 @@ The ring is the hook. The case studies and the booking form are the close.
 ## Configuration
 - All app env var accessors live in `lib/env.js` (each trims and returns a string or default; `isXConfigured()` helpers gate features). Read env through these functions, never `process.env` directly in app code.
 - `.env.example` documents every key. There is no `.env.local` in git (`.gitignore` ignores `.env*` except `.env.example`). A local `.env.local` exists on developer machines only; never read or quote it.
-- Scripts do not use `lib/env.js`. They use `loadEnv()` in `scripts/lib/load-env.mjs` (hand-rolled `.env.local` then `.env` parser, real env wins) and a duplicate parser inline in `scripts/seed-notion-projects.mjs`.
+- Scripts do not use `lib/env.js`. They use `loadEnv()` in `scripts/lib/load-env.mjs` (hand-rolled `.env.local` then `.env` parser, real env wins).
 - Degradation: with no Notion keys the app serves the 18 local placeholder projects from `components/ring/projects.js` (`lib/cms/projects.js`). With no booking keys `/api/book` returns 503.
 - Mismatch to know: `lib/env.js` exposes `higgsfieldKeyId()` / `higgsfieldKeySecret()` reading `HIGGSFIELD_API_KEY_ID` / `HIGGSFIELD_API_KEY_SECRET`, but `.env.example` documents `HF_CREDENTIALS` (the script-side convention in `scripts/lib/higgsfield.mjs`, which accepts either form). The `lib/env.js` Higgsfield and R2 accessors (`isHiggsfieldConfigured`, `r2PublicBase`, `isR2Configured`) are not called anywhere in `app/`, `lib/` or `components/` yet.
 - `next.config.mjs` - `output: "standalone"` only when `VERCEL !== "1"` (Docker path); `removeConsole` in production except `error`; `experimental.staleTimes` (dynamic 180s, static 300s); `optimizePackageImports: ["gsap","three"]`; permanent redirects `/work/:slug` -> `/project/:slug`, `/book` -> `/booking`; `images.localPatterns` allows `/api/media/**` with query strings (Next 16 blocks query strings on local images otherwise) and `/**` without; no `remotePatterns`.
@@ -88,7 +88,7 @@ The ring is the hook. The case studies and the booking form are the close.
 - Non-component modules: camelCase `.js` (`components/ring/splitText.js`, `components/homeRingContext.js`, `lib/og-image.js` is the one kebab-case exception, as are `lib/notion/gallery-pdf.js` and `scripts/lib/load-env.mjs`).
 - Next.js route files use framework names: `page.js`, `route.js`, `loading.js`, `not-found.js`, `opengraph-image.js` under `app/`. Note `app/` pages and `route.js` use `.js`, not `.jsx`, even when they return JSX.
 - CSS Modules sit beside the route and are named `page.module.css` (`app/booking/page.module.css`, `app/project/[slug]/page.module.css`) and are imported by components via `@/app/...`.
-- Scripts: `.mjs`, kebab-case (`scripts/seed-notion-projects.mjs`, `scripts/generate-project-media.mjs`); shared helpers in `scripts/lib/*.mjs`.
+- Scripts: `.mjs`, kebab-case (`scripts/generate-project-media.mjs`); shared helpers in `scripts/lib/*.mjs`.
 - camelCase. Predicates start `is`/`has` (`isNotionProjectsConfigured`, `isSlotOpen`, `hasAllFitChecks`, `hasCredentials`).
 - Env accessors in `lib/env.js` are one tiny named function per variable, each trimming through the local `trim()` helper (`notionToken()`, `resendFrom()`). Read env through these, never `process.env` inline in `lib/` or `app/` code.
 - Factories that own DOM/GL state are `createX` (`createMeta`, `createTag`, `createSplitText`) and return an object with `build`/`dispose`-style methods. The dev panel is `mountGui`.
@@ -102,7 +102,7 @@ The ring is the hook. The case studies and the booking form are the close.
 - Prettier with defaults and **no config file** (no `.prettierrc*`, no `prettier` entry in `package.json`). Prettier is not a dependency; run it through `npx`:
 - Defaults in effect: double quotes, semicolons, 2-space indent, trailing commas, 80 columns.
 - Opt-out marker used where a long call must stay on one line: `// prettier-ignore` at end of line (`components/ring/gui.js`, e.g. the `textWeight`, `nameWeight` and `nameEdge` lines).
-- Current drift: `npx prettier --check` reports 17 files not formatted (`components/Carousel.jsx`, `components/book/BookFlow.jsx`, `components/SmoothScroll.jsx`, `app/layout.js`, `lib/book/validate.js`, `lib/book/time.js`, `lib/notion/bookings.js`, and others). New and edited files must be formatted; do not reformat unrelated files in a feature commit.
+- The tree is Prettier-clean since the baseline commit (SHA in `.git-blame-ignore-revs`) and `npm run format:check` is a gate. New and edited files must be formatted.
 - ESLint 9 flat config in `eslint.config.mjs`: `eslint-config-next/core-web-vitals` only, with `.next/**`, `out/**`, `build/**`, `next-env.d.ts` ignored. `npm run lint` currently exits clean.
 - Rule suppressions are rare and always local and justified in an adjacent comment:
 - Next.js 16 and React 19 are not the versions most training data covers. `AGENTS.md` instructs reading `node_modules/next/dist/docs/` before writing Next-specific code.
@@ -149,15 +149,14 @@ The ring is the hook. The case studies and the booking form are the close.
 - Booking and project pages use CSS Modules with design tokens as custom properties on `.page` in `app/booking/page.module.css` (`--space-*`, `--radius-*`, `--text-*`). Use the tokens instead of literals there.
 - `touch-action: none` on the canvas is load-bearing; keep it set in `components/Carousel.jsx`.
 ## Scripts (`scripts/`)
-- **Env loading:** `loadEnv()` reads `.env.local` then `.env`, a real process env var wins over the file, comment and blank lines skipped. The older `scripts/seed-notion-projects.mjs` has its own inline copy of `loadEnv`, `rich`, `textOf`, `sleep` and `withRetry`; newer scripts import the shared `loadEnv`, `root`, `sleep`, `requireEnv` from `scripts/lib/load-env.mjs`. Prefer the shared module for new scripts.
-- **Retry idiom** (`scripts/seed-notion-projects.mjs`): `withRetry(label, fn)`, up to 6 attempts, retries only status 429/409/502, exponential backoff `Math.min(8000, 600 * 2 ** attempt)`, rethrows as `` `${label}: ${error.message}` ``.
+- **Env loading:** `loadEnv()` reads `.env.local` then `.env`, a real process env var wins over the file, comment and blank lines skipped. Scripts import the shared `loadEnv`, `root`, `sleep`, `requireEnv` from `scripts/lib/load-env.mjs`.
 - **CLI flags:** hand-parsed from `process.argv.slice(2)` with `flag(name)` / `value(name, fallback)` helpers (`--only=a,b`, `--limit=3`, `--dry-run`, `--force`, `--probe`, `--check`); no argument library. Usage lines are in the file's header doc block.
 - **Idempotence:** `scripts/generate-project-media.mjs` skips anything already in `scripts/media-manifest.json` unless `--force`, because generations cost credits. Keep paid or destructive operations gated behind a manifest or an explicit flag.
 - **Importing app code:** scripts load app data via `await import(pathToFileURL(join(root, "components/ring/projects.js")).href)`; they do not use the `@/` alias.
 - **R2 access:** hand-rolled SigV4 in `scripts/lib/r2.mjs` using `node:crypto`, no AWS SDK. Config is read through `r2Config(env)` and checked with `isR2Configured(config)`.
 - **Output paths:** probe output goes to `.media-probe/` (gitignored).
 ## Public-repo obligations
-- `public/ppneuemontreal-book.otf` is a commercial face kept for development only; keep the README and LICENSE notices, and delete the file if the heading moves to a free face.
+- Every face is Geist or Geist Mono under OFL 1.1. Add no face without a licence that allows redistribution in a public repo. Earlier fonts were removed in Phase 1 and remain only in git history.
 - Sample project art is third-party Behance work and is flagged as such; do not present it as the author's.
 - `.env*` is gitignored except `.env.example`. Never commit or quote env values.
 <!-- GSD:conventions-end -->
@@ -202,7 +201,7 @@ The ring is the hook. The case studies and the booking form are the close.
 - Server pages are thin: they call `getProjects()` and pass data down. `RegisterHome` is the bridge that lets a server page feed the persistent client ring (`setProjects`, deduped by `ringKey`).
 - All Notion access is time-boxed and rate-limit-aware (4s timeout, `retry: false`, cached data source id, cached stamp).
 - Placeholder content is a permanent safety net, never a cache entry.
-- Plain JavaScript (JSX), no TypeScript, no test suite. Import alias `@/*` -> repo root (`jsconfig.json`).
+- Plain JavaScript (JSX), no TypeScript, one Playwright smoke test. Import alias `@/*` -> repo root (`jsconfig.json`).
 ## Layers
 - Purpose: Persistent ring, transitions, smooth scroll, CMS polling.
 - Location: `app/providers.js`, `components/HomeRing.jsx`, `components/SharedTransitionProvider.jsx`, `components/project/ProjectPagerTransition.jsx`, `components/SmoothScroll.jsx`, `components/CmsLive.jsx`, `components/homeRingContext.js`

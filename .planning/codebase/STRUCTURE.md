@@ -55,7 +55,6 @@ Koussay-Portfolio/
 │   ├── seo.js, site.js, og-image.js
 ├── scripts/                      # Authoring-time CLIs (never imported by app/)
 │   ├── generate-project-media.mjs    # Higgsfield -> sharp -> R2, manifest-gated
-│   ├── seed-notion-projects.mjs      # Seed Notion DB from placeholders
 │   └── lib/ (art-direction.mjs, higgsfield.mjs, load-env.mjs, r2.mjs)
 ├── public/                       # 1-18.webp placeholder art, 404.webp, fonts, logo.png, favicon.ico, svg
 ├── docs/                         # Screenshots (carousel/entry/hover.png), NEXT-SESSION-PROMPT.md (historical)
@@ -95,7 +94,7 @@ Koussay-Portfolio/
 - Generated at runtime: `scripts/media-manifest.json` (not yet present, not gitignored; commit it once created because it is the skip-gate) and `.media-probe/` (gitignored).
 
 **`public/`:**
-- Purpose: Static assets. `1.webp` to `18.webp` are the placeholder ring art (third-party, flagged in README/LICENSE); fonts including the dev-only PP Neue Montreal (see licence notes in `AGENTS.md`).
+- Purpose: Static assets. `1.webp` to `18.webp` are the placeholder ring art (third-party, flagged in README/LICENSE); fonts are Geist woff2 under `public/fonts` with `OFL.txt`.
 
 ## Key File Locations
 
@@ -121,7 +120,7 @@ Koussay-Portfolio/
 - `components/ring/projects.js`: 18 placeholder projects in ring order.
 
 **Testing:**
-- Not applicable. No test files or runner. Verification is `npm run build` and `npm run lint` (see `AGENTS.md`).
+- `tests/smoke.spec.mjs` and `tests/screens.spec.mjs` (Playwright, `npm test`, port 3100). Gate: `format:check`, `lint`, `build`, `test` (see `AGENTS.md`).
 
 ## Naming Conventions
 

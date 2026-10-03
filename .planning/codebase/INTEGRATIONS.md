@@ -13,7 +13,6 @@ All env var names below are read through accessors in `lib/env.js` (app) or `scr
   - DB: `NOTION_PROJECTS_DATABASE_ID`. `cachedDataSourceId()` resolves database -> data source id (cached 1h, tag `projects`), then `notion().dataSources.query` in `lib/notion/projects.js`.
   - Column names are matched case-insensitively by `findProp` (`lib/notion/props.js`): Name/title, Cover|Image|Thumbnail (files), Gallery (files), Published|Live on site (checkbox; unchecked hides), Slug, Type|Discipline, Year, Live|Live URL|URL, Order|Ring, Summary, Overview, Challenge, Outcome, Quote|Testimonial, Author, Role, Tools (multi-select). Rows without a title or cover are dropped; capped at `MAX_PLANES` (from `components/shaders/planeShaders.js`).
   - Read path: `lib/cms/projects.js` `getProjects()` (React `cache`) -> `getCachedProjectBundle()` (`unstable_cache`, key `cms-projects-v2`, `revalidate: 60`, tag `projects`) in `lib/notion/projects.js`. Returns `{ projects, media, stamp }`. Falls back to per-instance `lastGood`, then to the 18 placeholders in `components/ring/projects.js`. Never cache the fallback inside `unstable_cache`.
-  - Seeding: `scripts/seed-notion-projects.mjs` writes the placeholder projects into the database.
 - Staleness signal: `app/api/cms-stamp/route.js` (GET, `force-dynamic`, `no-store`). Returns newest `last_edited_time` via `cachedProjectsStamp` (`unstable_cache`, 20s). If the stamp is newer than the bundle's, it calls `bustProjectsCache()`. Polled every 20s by `components/CmsLive.jsx`, which calls `router.refresh()` on change.
 
 **Media delivery (Notion-backed, current):**
@@ -58,7 +57,7 @@ All env var names below are read through accessors in `lib/env.js` (app) or `scr
 **File Storage:**
 - Notion file properties (current media source, signed expiring URLs) proxied through `/api/media`.
 - Cloudflare R2 (planned media host; scripts write, app does not yet read).
-- Local `public/` for fonts, logo, placeholder art. Fonts are committed, including unlicensed PP Neue Montreal for development (see `AGENTS.md`).
+- Local `public/` for fonts, logo, placeholder art. Fonts are Geist and Geist Mono woff2 under `public/fonts/` with `OFL.txt`.
 
 **Caching:**
 - Next data cache via `unstable_cache` with tag `projects` (`lib/notion/projects.js`, `lib/notion/client.js`); ISR `revalidate = 60` on pages; HTTP immutable caching on versioned media URLs.

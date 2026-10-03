@@ -10,7 +10,7 @@
 
 **Secondary:**
 - CSS - Tailwind v4 via `@import "tailwindcss"` in `app/globals.css`, plus CSS Modules (`app/booking/page.module.css`, `app/project/[slug]/page.module.css`).
-- Node `.mjs` scripts - authoring-time tooling only: `scripts/generate-project-media.mjs`, `scripts/seed-notion-projects.mjs`, `scripts/lib/*.mjs`.
+- Node `.mjs` scripts - authoring-time tooling only: `scripts/generate-project-media.mjs`, `scripts/lib/*.mjs`.
 
 ## Runtime
 
@@ -33,7 +33,7 @@
 - Tailwind CSS 4 + `@tailwindcss/postcss` (`postcss.config.mjs`).
 
 **Testing:**
-- None. No test runner, no test files. `npm run build` + `npm run lint` is the safety net (per `AGENTS.md`).
+- Playwright smoke test via `npm test` (`tests/smoke.spec.mjs`, port 3100, desktop 1512 and phone 390). A control-session gate with `format:check`, `lint` and `build` before every ship. No git hook, no CI (per `AGENTS.md`).
 
 **Build/Dev:**
 - ESLint 9 with `eslint-config-next/core-web-vitals` (`eslint.config.mjs`, flat config).
@@ -66,7 +66,7 @@ These four are load-bearing for any hosting decision. They need a real Node runt
 **Environment:**
 - All app env var accessors live in `lib/env.js` (each trims and returns a string or default; `isXConfigured()` helpers gate features). Read env through these functions, never `process.env` directly in app code.
 - `.env.example` documents every key. There is no `.env.local` in git (`.gitignore` ignores `.env*` except `.env.example`). A local `.env.local` exists on developer machines only; never read or quote it.
-- Scripts do not use `lib/env.js`. They use `loadEnv()` in `scripts/lib/load-env.mjs` (hand-rolled `.env.local` then `.env` parser, real env wins) and a duplicate parser inline in `scripts/seed-notion-projects.mjs`.
+- Scripts do not use `lib/env.js`. They use `loadEnv()` in `scripts/lib/load-env.mjs` (hand-rolled `.env.local` then `.env` parser, real env wins).
 - Degradation: with no Notion keys the app serves the 18 local placeholder projects from `components/ring/projects.js` (`lib/cms/projects.js`). With no booking keys `/api/book` returns 503.
 - Mismatch to know: `lib/env.js` exposes `higgsfieldKeyId()` / `higgsfieldKeySecret()` reading `HIGGSFIELD_API_KEY_ID` / `HIGGSFIELD_API_KEY_SECRET`, but `.env.example` documents `HF_CREDENTIALS` (the script-side convention in `scripts/lib/higgsfield.mjs`, which accepts either form). The `lib/env.js` Higgsfield and R2 accessors (`isHiggsfieldConfigured`, `r2PublicBase`, `isR2Configured`) are not called anywhere in `app/`, `lib/` or `components/` yet.
 

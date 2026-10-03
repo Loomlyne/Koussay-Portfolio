@@ -15,10 +15,7 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 - Fix approach: Replace the images with owned work, or with generated media once the Higgsfield to R2 pipeline works (`scripts/generate-project-media.mjs`). Remove `public/*.webp` from the tree and, if takedown risk matters, rewrite history. Make the production fallback an owned neutral set, or fail closed (empty ring and error state) instead of showing the placeholders. Keep the `README.md` and `LICENSE` notices until the files are gone, per `AGENTS.md`.
 
 **Commercial font bundled and served in production:**
-- Issue: `public/ppneuemontreal-book.otf` (115,788 bytes) is a commercial Pangram Pangram face. `README.md` and `LICENSE` say "development only, not for commercial use". `app/globals.css` declares it with `@font-face` (`font-family: "PP Neue Montreal"`, line ~36), so it is delivered to every visitor of the live site. The site has a booking flow, so this is commercial use.
-- Files: `public/ppneuemontreal-book.otf`, `app/globals.css`, `components/ring/params.js` (font family strings), `README.md`, `LICENSE`
-- Impact: Licence violation on production, not just a dev-only risk.
-- Fix approach: Buy a web licence, or switch the heading to Satoshi or Geist (both free) and delete the `.otf` in the same change. The font-family strings in `params.js` (`nameFont`, `idxFont`, `textFont`), the `textFont` dropdown in `components/ring/gui.js`, and the `@font-face` blocks in `app/globals.css` must all change together. A missing match falls back to system sans silently.
+- Resolved in Phase 1: every face is now Geist or Geist Mono under OFL 1.1. The commercial face and the Satoshi files were removed, and removed files remain in git history.
 
 **Invented project metadata:**
 - Issue: Every `type` and `year` in `components/ring/projects.js` is invented. Names marked `// *` are guesses. `detail` copy is built by `prototypeDetail(...)` and is "placeholder copy only". `TODO` at `components/ring/projects.js:6` records this.
@@ -87,10 +84,10 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 - Fix approach: Run `--probe` and one real upload against a scratch bucket, and read the object back (`headObject` then a public GET). Prefer `@aws-sdk/client-s3` or Cloudflare's S3 client rather than maintaining signing code. Add a known-answer test against AWS's published SigV4 vectors.
 
 **Higgsfield generation pipeline:**
-- Issue: `scripts/generate-project-media.mjs` (376 lines), `scripts/lib/higgsfield.mjs` and `scripts/lib/art-direction.mjs` were added in the latest commits (`b427f41`, `3449e2f`, `e385e65`). The free Higgsfield plan cannot generate (see memory note), so generation has not been run end to end. `scripts/seed-notion-projects.mjs` (226 lines) is also unverified and writes to the live Notion database.
-- Files: `scripts/generate-project-media.mjs`, `scripts/lib/higgsfield.mjs`, `scripts/lib/art-direction.mjs`, `scripts/seed-notion-projects.mjs`
+- Issue: `scripts/generate-project-media.mjs` (376 lines), `scripts/lib/higgsfield.mjs` and `scripts/lib/art-direction.mjs` were added in the latest commits (`b427f41`, `3449e2f`, `e385e65`). The free Higgsfield plan cannot generate (see memory note), so generation has not been run end to end. The earlier Notion seed script was removed in Phase 1 and remains in git history.
+- Files: `scripts/generate-project-media.mjs`, `scripts/lib/higgsfield.mjs`, `scripts/lib/art-direction.mjs`
 - Impact: Credit spend and writes to the live CMS with no safety net. The manifest gate is the only protection against repeat spend.
-- Fix approach: Keep `--dry-run` and `--probe` as the default workflow. Do not run `seed-notion-projects.mjs` against production without a dry-run review.
+- Fix approach: Keep `--dry-run` and `--probe` as the default workflow.
 
 **`@higgsfield/client` is a devDependency but scripts import `sharp`:**
 - `scripts/generate-project-media.mjs` imports `sharp`, which is a runtime dependency. This works only because both are installed. Dockerfile and Vercel builds do not use the scripts.
@@ -120,7 +117,7 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 - 236 lines, imported nowhere (confirmed by grep across tracked files; only `AGENTS.md` mentions it). Safe to delete. It still pulls `three` and `gsap` into lint scope.
 
 **Fonts and images are unoptimised:**
-- Fonts: `public/ppneuemontreal-book.otf` 115,788, `public/Geist-Regular.ttf` 125,956, `public/Satoshi-Medium.otf` 50,352, `public/Satoshi-Regular.otf` 49,560. Total about 341,656 bytes, all declared as `opentype` or `truetype` in `app/globals.css`. Converting to `woff2` would save about 60%. No `font-display` was checked, so verify it in `app/globals.css`.
+- Fonts: resolved in Phase 1. Geist and Geist Mono ship as variable woff2 under `public/fonts/`; removed files remain in git history.
 - Images: `public/` is 3.6 MB (3,699,985 bytes tracked). `public/1.webp` is 688,026 bytes and `public/10.webp` is 559,944. `components/ring/atlas.js` draws each into a 512 x 341 cell (`cellW = 512`, `cellH = cellW / 1.5`), so resolution beyond that is never shown. The ring is served from `public/` only in the fallback case; in the Notion case, covers pass through `/api/media/` and are capped at 1600px, which is still about 3x larger than the atlas needs.
 - Fix approach: Resize sources (or the proxy output for ring covers) to about 1024 x 683, convert fonts to `woff2`. `public/favicon.ico` and `public/logo.png` are byte-identical 512x512 PNGs (170,906 bytes each); the `.ico` is mislabelled. Replace with a real multi-size ico and a smaller logo.
 
@@ -152,7 +149,7 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 - Layout section lists only `app/page.js`, `layout.js`, `globals.css` and `components/Carousel.jsx`, `ring/`, `shaders/`. Missing: `lib/` (book, cms, notion, mail, project), `app/api/*`, `app/booking`, `app/project/[slug]`, `components/project/`, `components/book/`, `components/SharedTransitionProvider.jsx`, `components/HomeRing.jsx`, `components/homeRingContext.js`, `components/CmsLive.jsx`, `scripts/`, `.agents/`.
 - "`app/page.js` renders `<Carousel />`, nothing else" is stale: it fetches `getProjects()`, preloads covers, and renders `RegisterHome` and JSON-LD.
 - "`Carousel.jsx` is ~1400 lines" is stale (2,161).
-- "Commands" and "There are no tests" remain true.
+- "Commands" remains true.
 - "Project column is `pointer-events-none`" is stale (see keyboard item).
 - `docs/NEXT-SESSION-PROMPT.md` is a dated session handoff (September 2026) that duplicates and partly contradicts `AGENTS.md` ("Live Notion currently has 11 published covers"). Treat it as a log, not a spec.
 - `README.md` Quick start tells readers to run with no env, which works only through the placeholder fallback. It does not mention the Notion, Resend or R2 variables listed in `.env.example`.
@@ -160,7 +157,7 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 ## Test Coverage Gaps
 
 **No tests at all:**
-- What's not tested: everything. `package.json` has only `dev`, `build`, `start`, `lint`. No test runner, no CI config (no `.github/`).
+- Resolved in part in Phase 1: `npm test` runs a Playwright smoke test (`tests/smoke.spec.mjs`, port 3100, desktop 1512 and phone 390). It is a control-session gate with `format:check`, `lint` and `build`. No git hook, no CI. Unit logic is still untested.
 - Files with the highest risk and best testability: `lib/book/time.js` (timezone maths, `slotStartMs` loops 4 iterations around DST edges, `wallDateTime` midnight roll-over), `lib/book/validate.js`, `lib/media.js` (`parseMediaSlot`), `lib/notion/projects.js` (`mapPage`, slug uniqueness, ordering, `MAX_PLANES` cap of 32), `lib/book/draft.js`, `scripts/lib/r2.mjs` (signing), `components/ring/utils.js` (`signedOffset`, `chase`).
 - Risk: Booking logic (money-adjacent, customer-facing) can regress silently. A shader typo is invisible to `next build` because GLSL compiles at runtime (`components/shaders/planeShaders.js`, `textShaders.js`), so it ships clean and fails in the browser console.
 - Priority: High for `lib/book/*` and `scripts/lib/r2.mjs`. Medium for the Notion mapping. A single Playwright smoke test that loads `/` and fails on any `console.error` or a missing `canvas` would catch shader and context regressions.

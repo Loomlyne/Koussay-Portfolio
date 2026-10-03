@@ -4,13 +4,9 @@
 
 ## Test Framework
 
-**Runner:** None. There are no tests anywhere in this repo.
+**Runner:** Playwright, via `npm test`. `tests/smoke.spec.mjs` loads the home page (live WebGL2 canvas), every sitemap project page and the booking first step, at desktop 1512 and phone 390, on port 3100 against a production build. It is a control-session gate with `format:check`, `lint` and `build`. No git hook, no CI.
 
-- No `*.test.*` or `*.spec.*` files outside `node_modules`.
-- No `jest`, `vitest`, `playwright`, `cypress` or `testing-library` in `package.json` or `node_modules/.bin`.
-- No `test` script. `package.json` scripts are `dev`, `build`, `start`, `lint` only.
 - `.gitignore` reserves `/coverage` (create-next-app default) but nothing produces it.
-- `README.md` and `AGENTS.md` both state this plainly: "No tests. `npm run build` and `npm run lint` are the whole safety net."
 
 **Assertion Library:** Not applicable.
 
@@ -18,7 +14,8 @@
 ```bash
 npm run build                                   # next build; the fastest correctness check
 npm run lint                                    # eslint (eslint-config-next/core-web-vitals); currently clean
-npx prettier --check "components/**/*.{js,jsx}" "app/**/*.{js,jsx}"   # formatting only; currently reports 17 files
+npm run format:check                            # formatting; clean since the baseline commit
+npm test                                        # Playwright smoke test on port 3100
 npm run dev                                     # localhost:3000, then look at the browser console
 ```
 

@@ -11,7 +11,7 @@ Plain JavaScript (no TypeScript). `jsconfig.json` defines one alias, `@/*` -> `.
 - Non-component modules: camelCase `.js` (`components/ring/splitText.js`, `components/homeRingContext.js`, `lib/og-image.js` is the one kebab-case exception, as are `lib/notion/gallery-pdf.js` and `scripts/lib/load-env.mjs`).
 - Next.js route files use framework names: `page.js`, `route.js`, `loading.js`, `not-found.js`, `opengraph-image.js` under `app/`. Note `app/` pages and `route.js` use `.js`, not `.jsx`, even when they return JSX.
 - CSS Modules sit beside the route and are named `page.module.css` (`app/booking/page.module.css`, `app/project/[slug]/page.module.css`) and are imported by components via `@/app/...`.
-- Scripts: `.mjs`, kebab-case (`scripts/seed-notion-projects.mjs`, `scripts/generate-project-media.mjs`); shared helpers in `scripts/lib/*.mjs`.
+- Scripts: `.mjs`, kebab-case (`scripts/generate-project-media.mjs`); shared helpers in `scripts/lib/*.mjs`.
 
 **Functions:**
 - camelCase. Predicates start `is`/`has` (`isNotionProjectsConfigured`, `isSlotOpen`, `hasAllFitChecks`, `hasCredentials`).
@@ -38,7 +38,7 @@ Plain JavaScript (no TypeScript). `jsconfig.json` defines one alias, `@/*` -> `.
   ```
 - Defaults in effect: double quotes, semicolons, 2-space indent, trailing commas, 80 columns.
 - Opt-out marker used where a long call must stay on one line: `// prettier-ignore` at end of line (`components/ring/gui.js`, e.g. the `textWeight`, `nameWeight` and `nameEdge` lines).
-- Current drift: `npx prettier --check` reports 17 files not formatted (`components/Carousel.jsx`, `components/book/BookFlow.jsx`, `components/SmoothScroll.jsx`, `app/layout.js`, `lib/book/validate.js`, `lib/book/time.js`, `lib/notion/bookings.js`, and others). New and edited files must be formatted; do not reformat unrelated files in a feature commit.
+- The tree is Prettier-clean since the baseline commit (SHA in `.git-blame-ignore-revs`) and `npm run format:check` is a gate. New and edited files must be formatted.
 
 **Linting:**
 - ESLint 9 flat config in `eslint.config.mjs`: `eslint-config-next/core-web-vitals` only, with `.next/**`, `out/**`, `build/**`, `next-env.d.ts` ignored. `npm run lint` currently exits clean.
@@ -85,9 +85,9 @@ Param comments carry units and the reason for the number (`// px`, `// vw of box
 **Dev panel is development-only.** In `components/Carousel.jsx` the panel mounts only inside `if (process.env.NODE_ENV === "development")` and both `lil-gui` and `./ring/gui` are loaded by dynamic `import()` inside `Promise.all`, with a `disposed` guard after the await and `gui?.destroy()` in cleanup. Never import `lil-gui` or `ring/gui.js` statically.
 
 **Font families are matched by name in three places** and a mismatch silently falls back to system sans:
-1. Strings in `components/ring/params.js` (`textFont: "PP Neue Montreal"`, `nameFont: "Satoshi"`, `idxFont: "Geist"`).
-2. A matching `@font-face { font-family: ... }` block in `app/globals.css` (Satoshi 400 and 500, Geist 400, PP Neue Montreal 400).
-3. The dropdown list in `components/ring/gui.js` (`["PP Neue Montreal", "Satoshi", "Geist"]`).
+1. Strings in `components/ring/params.js` (`textFont: "Geist"`, `nameFont: "Geist"`, `idxFont: "Geist Mono"`; `nameTracking` is a styleMeta param).
+2. A matching `@font-face { font-family: ... }` block in `app/globals.css` (two blocks: Geist and Geist Mono, self-hosted variable woff2 under OFL 1.1).
+3. The dropdown list in `components/ring/gui.js` (`["Geist", "Geist Mono"]`).
 Add a family to all three together. `WEIGHTS` in `params.js` lists Light/Regular/Medium/Semibold, but only the weights with a real `@font-face` file render distinctly.
 
 ## Error Handling
@@ -156,8 +156,7 @@ Add a family to all three together. `WEIGHTS` in `params.js` lists Light/Regular
 
 Plain ESM `.mjs` run directly with `node`, no dotenv dependency, top-level `await`.
 
-- **Env loading:** `loadEnv()` reads `.env.local` then `.env`, a real process env var wins over the file, comment and blank lines skipped. The older `scripts/seed-notion-projects.mjs` has its own inline copy of `loadEnv`, `rich`, `textOf`, `sleep` and `withRetry`; newer scripts import the shared `loadEnv`, `root`, `sleep`, `requireEnv` from `scripts/lib/load-env.mjs`. Prefer the shared module for new scripts.
-- **Retry idiom** (`scripts/seed-notion-projects.mjs`): `withRetry(label, fn)`, up to 6 attempts, retries only status 429/409/502, exponential backoff `Math.min(8000, 600 * 2 ** attempt)`, rethrows as `` `${label}: ${error.message}` ``.
+- **Env loading:** `loadEnv()` reads `.env.local` then `.env`, a real process env var wins over the file, comment and blank lines skipped. Scripts import the shared `loadEnv`, `root`, `sleep`, `requireEnv` from `scripts/lib/load-env.mjs`.
 - **CLI flags:** hand-parsed from `process.argv.slice(2)` with `flag(name)` / `value(name, fallback)` helpers (`--only=a,b`, `--limit=3`, `--dry-run`, `--force`, `--probe`, `--check`); no argument library. Usage lines are in the file's header doc block.
 - **Idempotence:** `scripts/generate-project-media.mjs` skips anything already in `scripts/media-manifest.json` unless `--force`, because generations cost credits. Keep paid or destructive operations gated behind a manifest or an explicit flag.
 - **Importing app code:** scripts load app data via `await import(pathToFileURL(join(root, "components/ring/projects.js")).href)`; they do not use the `@/` alias.
@@ -166,7 +165,7 @@ Plain ESM `.mjs` run directly with `node`, no dotenv dependency, top-level `awai
 
 ## Public-repo obligations
 
-- `public/ppneuemontreal-book.otf` is a commercial face kept for development only; keep the README and LICENSE notices, and delete the file if the heading moves to a free face.
+- Every face is Geist or Geist Mono under OFL 1.1. Add no face without a licence that allows redistribution in a public repo. Earlier fonts were removed in Phase 1 and remain only in git history.
 - Sample project art is third-party Behance work and is flagged as such; do not present it as the author's.
 - `.env*` is gitignored except `.env.example`. Never commit or quote env values.
 

@@ -84,7 +84,7 @@ Authoring time only (not imported by app/):
 - Server pages are thin: they call `getProjects()` and pass data down. `RegisterHome` is the bridge that lets a server page feed the persistent client ring (`setProjects`, deduped by `ringKey`).
 - All Notion access is time-boxed and rate-limit-aware (4s timeout, `retry: false`, cached data source id, cached stamp).
 - Placeholder content is a permanent safety net, never a cache entry.
-- Plain JavaScript (JSX), no TypeScript, no test suite. Import alias `@/*` -> repo root (`jsconfig.json`).
+- Plain JavaScript (JSX), no TypeScript, one Playwright smoke test. Import alias `@/*` -> repo root (`jsconfig.json`).
 
 ## Layers
 
@@ -203,7 +203,7 @@ The function-running cost is paid once per version; the versioned `Cache-Control
 
 Modes: `--probe` (one 720p image to `.media-probe/`, no R2, no manifest), `--check` (PUT/HEAD/public GET of `_healthcheck/<ts>.txt`), `--dry-run` (prompts and keys only), `--only=<slug,...>`, `--limit=N`, `--direction=`, `--video`, `--force`.
 
-Deliberate isolation: nothing under `app/`, `components/` or `lib/` imports `scripts/`. A visitor cannot trigger a generation (money, tens of seconds). `lib/env.js` defines `r2PublicBase()`, `isR2Configured()`, `higgsfieldKeyId()`, `isHiggsfieldConfigured()` but no app code calls them yet, and nothing connects R2 URLs to the Notion Cover column or `project.file`. If R2 URLs are later served through `next/image`, `next.config.mjs` needs `images.remotePatterns` (only `localPatterns` exist). `scripts/seed-notion-projects.mjs` is a second authoring script (seeds the Notion database from the placeholders) with its own inline `loadEnv`.
+Deliberate isolation: nothing under `app/`, `components/` or `lib/` imports `scripts/`. A visitor cannot trigger a generation (money, tens of seconds). `lib/env.js` defines `r2PublicBase()`, `isR2Configured()`, `higgsfieldKeyId()`, `isHiggsfieldConfigured()` but no app code calls them yet, and nothing connects R2 URLs to the Notion Cover column or `project.file`. If R2 URLs are later served through `next/image`, `next.config.mjs` needs `images.remotePatterns` (only `localPatterns` exist). The earlier Notion seed script was removed in Phase 1 and remains in git history.
 
 **State Management:**
 - Server: React `cache()` per request, `unstable_cache` (tag `projects`) across requests, module-level `lastGood` and PDF byte map per instance.
@@ -242,7 +242,7 @@ Deliberate isolation: nothing under `app/`, `components/` or `lib/` imports `scr
 **`app/api/revalidate/route.js`, `app/api/cms-stamp/route.js`:**
 - Triggers: Notion webhook; `CmsLive` poll.
 
-**`scripts/generate-project-media.mjs`, `scripts/seed-notion-projects.mjs`:**
+**`scripts/generate-project-media.mjs`:**
 - Triggers: manual CLI runs only.
 
 ## Architectural Constraints

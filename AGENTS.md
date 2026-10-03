@@ -22,12 +22,17 @@ positioned DOM labels over the top of it.
 npm run dev      # localhost:3000
 npm run build    # also the fastest correctness check
 npm run lint     # eslint
-npx prettier --check "components/**/*.{js,jsx}" "app/**/*.{js,jsx}"
+npm run format:check
+npm test         # Playwright smoke test, port 3100, needs a production build
 ```
 
-There are **no tests**. `npm run build` plus `npm run lint` is the whole safety
-net. GLSL is compiled at runtime, not at build time, so a shader typo builds
-fine and fails in the browser console — check shader edits by loading the page.
+`npm test` runs a Playwright smoke test against a production build: the home
+page with a live WebGL2 canvas, every sitemap project page and the booking
+first step, at desktop 1512 and phone 390 (port 3100). It is a control-session
+gate, together with `format:check`, `lint` and `build`, before every ship. There
+is no git hook and no CI. GLSL is compiled at runtime, not at build time, so a
+shader typo builds fine and fails in the browser console — check shader edits
+by loading the page.
 
 ## Layout
 
@@ -197,22 +202,19 @@ is missing versus what is deliberate.
 1. **Clicking a card centres it but nothing opens.** The "View" tag promises a
    destination that does not exist. `pick()` returns early when the card is
    already at the front — that early return is where navigation belongs.
-2. **Fonts are `.otf`/`.ttf`, ~340 KB.** Converting to `woff2` would cut that
-   by roughly 60%. PP Neue Montreal is also gitignored, so the heading falls
-   back on a fresh clone — see below.
-3. **The art is webp but still oversized.** ~3.3 MB across eighteen files. The
+2. **The art is webp but still oversized.** ~3.3 MB across eighteen files. The
    atlas downsamples every one to a 512px cell, so resizing the sources to
    match would cut it again by a large margin.
-4. **`prefers-reduced-motion` is unhandled.** Six seconds of animated blur with
+3. **`prefers-reduced-motion` is unhandled.** Six seconds of animated blur with
    no escape hatch.
-5. **No keyboard control.** Arrow keys should step the ring; the project column
+4. **No keyboard control.** Arrow keys should step the ring; the project column
    is `pointer-events-none` and cannot be clicked to jump.
-6. **All the sample data is placeholder.** Every `type` and `year` in
+5. **All the sample data is placeholder.** Every `type` and `year` in
    `projects.js` is invented and names marked `(*)` are guesses. The images
    are other people's work, collected from Behance to build the layout
    against — not the author's, not licensed, and flagged as such in the README
    and LICENSE. Do not present them as portfolio work or strip those notices.
-7. **Phone widths are approximate.** The `tight` band was tuned at the 640 end
+6. **Phone widths are approximate.** The `tight` band was tuned at the 640 end
    of its range. Below ~500px `minScale` pins the ring's size while `posX`
    keeps scaling, so the front card drifts back toward centre.
 
@@ -220,12 +222,10 @@ is missing versus what is deliberate.
 
 Two things to respect when adding files.
 
-**PP Neue Montreal is bundled but not licensed.** `public/ppneuemontreal-book.otf`
-is a commercial Pangram Pangram face, kept in the repo so the design renders
-during development. It is called out in the README and LICENSE as development
-only, not for commercial use. Do not quietly widen its use, do not remove the
-notices, and if you swap the heading to a free face, take the file out with it.
-Satoshi (ITF Free Font Licence) and Geist (OFL) have no such restriction.
+**Every face is Geist or Geist Mono.** They are self-hosted variable woff2
+files under OFL 1.1, with `public/fonts/OFL.txt`. Do not add a face without a
+licence that allows redistribution in a public repo. Canvas faces are loaded
+with `document.fonts.load` before `startEntry`.
 
 **Keep third-party attribution intact.** The simplex noise in
 `planeShaders.js` carries an MIT notice that has to travel with the code. If
@@ -236,16 +236,11 @@ Source is MIT. The contents of `public/` are explicitly _not_ covered — see
 `LICENSE`.
 
 Font families are looked up **by name**: the strings in `params.js`
-(`nameFont`, `idxFont`, `textFont`) have to match a `@font-face` family in
+(`textFont` and `nameFont` are `"Geist"`, `idxFont` is `"Geist Mono"`;
+`nameTracking` is a styleMeta param) have to match a `@font-face` family in
 `app/globals.css`, and the `textFont` dropdown in `gui.js` lists them a third
 time. A name with no matching block falls back to system sans silently, which
 looks like a rendering bug rather than a missing file.
-
-## Dead files — safe to delete
-
-- `components/TwoPlaneMorph.jsx` — an earlier experiment, nothing imports it.
-- `shader` (repo root, no extension) — a 13 KB paste of somebody's component
-  library docs. Not code, not referenced.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

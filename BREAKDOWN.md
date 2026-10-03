@@ -1,5 +1,10 @@
 # Breakdown
 
+The ring animation and the idea behind it are Yousuf Soomro's. He open-sourced
+them under the MIT licence at
+https://github.com/Yousuf-developer/Viscose-carousel. This portfolio is built on
+top of that work.
+
 Where this came from and how it got built.
 
 ## The idea
