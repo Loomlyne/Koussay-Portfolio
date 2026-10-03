@@ -1669,7 +1669,13 @@ export default function Carousel({
           : Promise.resolve(),
       ),
     )
-      .then(startEntry)
+      .then(() => {
+        if (disposed) return;
+        // The fallback may have started the entry already; the tag texture
+        // is a uniform swap, not part of the timeline, so redraw it alone.
+        if (tl) tag.build();
+        startEntry();
+      })
       .catch(startEntry);
 
     /* ------------------------------------------------------- dev controls */
