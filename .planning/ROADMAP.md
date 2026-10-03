@@ -82,7 +82,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 01-05-PLAN.md — Dead files and dead env accessors removed, .agents/skills untracked
+- [x] 01-05-PLAN.md — Dead files and dead env accessors removed, .agents/skills untracked
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -281,7 +281,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Baseline and licence hygiene | 4/6 | In Progress|  |
+| 1. Baseline and licence hygiene | 5/6 | In Progress|  |
 | 2. Projects served from the repo | 0/TBD | Not started | - |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
