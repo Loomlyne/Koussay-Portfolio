@@ -1,5 +1,6 @@
 import "./globals.css";
 
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "./providers";
 import JsonLd from "@/components/JsonLd";
@@ -66,6 +67,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         <JsonLd data={siteGraph} />
         <Providers>{children}</Providers>
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
