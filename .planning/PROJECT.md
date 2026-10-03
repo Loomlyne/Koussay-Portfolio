@@ -45,7 +45,6 @@ A prospect can go from the ring to a true case study to a booked call without me
 
 ### Out of Scope
 
-- Moving hosting to Cloudflare Workers — native `sharp` and PDF code block it today; revisit as a later milestone once the proxy is gone
 - Video textures inside the ring shader — heavy; only after the image version ships, as its own phase
 - Moving bookings to Supabase or Neon — Notion works at a one-person calendar's volume; revisit if double bookings happen
 - Obox MENA and ZARA Dubai Hills cards — Koussay chose client sites and own products only
@@ -68,7 +67,7 @@ A prospect can go from the ring to a true case study to a booked call without me
 
 ## Constraints
 
-- **Hosting**: Vercel, deploys from `main` — moving is out of scope for this milestone
+- **Hosting**: Vercel until Phase 3.1, then Cloudflare Workers in Koussay's own Cloudflare account (decided 2026-10-03)
 - **Bookings store**: Notion stays for bookings and blocked time — zero migration, Koussay reads them in Notion Calendar
 - **Media host**: Cloudflare R2 with content-addressed immutable URLs — Notion signed URLs expire and were the cause of slow cold loads
 - **Licensing**: nothing served that Koussay does not own or hold a licence for — public repo, commercial site
@@ -86,7 +85,7 @@ A prospect can go from the ring to a true case study to a booked call without me
 | Content in the repo, written by Claude from interviews | Koussay answers questions, Claude drafts, Koussay approves | — Pending |
 | Media on R2, immutable URLs | Decided earlier (auto memory); removes the proxy and PDF code | — Pending |
 | Launch video per project via brag skill plus Higgsfield; still on the ring, video on the page hero | Ring stays an image atlas; video in the shader deferred | — Pending |
-| Stay on Vercel | Native deps block Workers; the deploy works | — Pending |
+| Stay on Vercel until Phase 3, then move to Cloudflare Workers (Phase 3.1) | Koussay wants everything on Cloudflare; native deps are gone after Phase 3 | — Pending |
 | Switch heading to a free face, delete PP Neue Montreal | Not licensed for commercial use; Satoshi and Geist are in the repo | — Pending |
 | Keep upstream MIT notice, add README attribution | MIT requires it; honest provenance | — Pending |
 | Next patched to 16.3.8 in-place, `sharp` major deferred to a phase | Critical RCE fixed same day; `sharp` is breaking and may be removed entirely | ✓ Good |

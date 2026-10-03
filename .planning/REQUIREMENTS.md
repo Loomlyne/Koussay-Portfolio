@@ -82,6 +82,10 @@ Requirements for this milestone. Each maps to a roadmap phase.
 - [ ] **HYG-07**: AGENTS.md matches the tree: layout, line counts, known gaps, the content and media model, and the smoke test
 - [ ] **HYG-08**: Vercel Deployment Protection is set so retired deployment URLs no longer serve removed files; Koussay checks it in one numbered step
 
+### Platform (PLAT)
+
+- [ ] **PLAT-01**: The site is served by Cloudflare Workers in Koussay's Cloudflare account, every page and the booking flow work there, and the Vercel project is removed after a week of clean running
+
 ### Tests (TEST)
 
 - [ ] **TEST-01**: `npm test` runs a Playwright smoke test against `next build` output that loads `/` and one `/project/<slug>`, fails on any console error except the Speed Insights 404, and fails when the canvas is missing
@@ -105,7 +109,6 @@ Deferred. Tracked but not in this roadmap.
 - **RING-03**: Video textures inside the ring shader
 
 ### Platform
-- **PLAT-01**: Move hosting to Cloudflare Workers once no native dependency remains
 - **PLAT-02**: Arabic/RTL version of the site
 - **PLAT-03**: CI running build, lint, prettier and the smoke test on every push
 
@@ -182,10 +185,11 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | HYG-08 | Phase 2 | Pending |
 | TEST-01 | Phase 1 | Pending |
 | TEST-02 | Phase 4 | Pending |
+| PLAT-01 | Phase 3.1 | Pending |
 
 **Coverage:**
-- v1 requirements: 53 total
-- Mapped to phases: 53
+- v1 requirements: 54 total
+- Mapped to phases: 54
 - Unmapped: 0
 
 ---

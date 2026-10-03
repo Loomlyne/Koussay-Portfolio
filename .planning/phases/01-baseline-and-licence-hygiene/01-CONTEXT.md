@@ -109,7 +109,7 @@ The repo gets a formatting-only baseline commit, a Playwright smoke test that pa
 <deferred>
 ## Deferred Ideas
 
-- **Move hosting from Vercel to Cloudflare Workers right after Phase 3.** Koussay approved this on 2026-10-03 ("keep all in Cloudflare"). Needs a new roadmap phase inserted after Phase 3 (once the Notion proxy, PDF renderer and request-time `sharp` are gone) and PLAT-01 promoted from v2. Roadmap edit pending his sign-off on the inserted phase.
+- **Hosting move to Cloudflare Workers** — added to the roadmap as Phase 3.1 on 2026-10-03 with Koussay's sign-off (PLAT-01 promoted to v1). Not Phase 1 work.
 
 </deferred>
 

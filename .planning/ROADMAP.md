@@ -17,6 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Baseline and licence hygiene** - Prettier-only commit first, a green smoke test, Geist for every face, licence notices correct, dead files gone
 - [ ] **Phase 2: Projects served from the repo** - The live eight read from content modules with the full schema and build-time validation; placeholders gone; no visible change
 - [ ] **Phase 3: Notion projects path removed** - Proxy, PDF renderer, CMS cache and runtime `sharp` deleted; OG images static; bookings proven still working
+- [ ] **Phase 3.1: Hosting on Cloudflare Workers** (INSERTED) - The site runs on Workers in Koussay's Cloudflare account; Vercel serves nothing
 - [ ] **Phase 4: R2 media delivery** - Media on `media.koussay.online` with immutable URLs and CORS; one script writes R2 and the manifest; ring proven safe on a warm cache
 - [ ] **Phase 5: Case-study page that closes** - Facts strip, ordered narrative, honest image labels, Identity section, status chip, closing call to action with WhatsApp and `?from=` booking
 - [ ] **Phase 6: Ring accessibility and reduced motion** - Keyboard stepping, live region, real project list, focus handling, reduced motion, WebGL-failure fallback
@@ -82,6 +83,24 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Koussay's steps**:
   1. Make one test booking on the preview URL and confirm the Notion row and both emails.
   2. Remove the two dead Vercel env vars and delete the Notion webhook subscription (one numbered step).
+**Plans**: TBD
+
+### Phase 3.1: Hosting on Cloudflare Workers (INSERTED)
+**Goal**: koussay.online is served by Cloudflare Workers in Koussay's own Cloudflare account, every page and the booking flow work there, and Vercel serves nothing.
+**Mode:** mvp
+**Depends on**: Phase 3 (no Notion proxy, PDF renderer or request-time `sharp` left in the runtime)
+**Requirements**: PLAT-01
+**Research**: yes (Next.js 16 on Workers: OpenNext vs vinext, Speed Insights replacement, image optimisation without Vercel, env and secrets on Workers, preview deployments)
+**Success Criteria** (what must be TRUE):
+  1. `koussay.online` and `www` resolve to a Worker in Koussay's account (`4afee478…`, `cf` profile `koussay`); a response header or `cf-ray` proves Cloudflare served the HTML, not Vercel.
+  2. Every route the smoke test covers (home, every project, booking, desktop and phone) passes against the Workers build and against production after the switch.
+  3. A booking made on the Workers preview creates the Notion row, shows in Notion Calendar, and sends both Resend emails; blocked time still hides its slots.
+  4. Secrets live as Worker secrets set by Koussay in his terminal; no secret is in the repo, the Worker config or a log.
+  5. After a week of clean running on Workers, the Vercel project is removed and no Vercel deployment URL serves the site.
+**Koussay's steps**:
+  1. Set each Worker secret in his terminal (one numbered step per secret batch).
+  2. Approve the DNS switch from the Vercel records to the Worker route.
+  3. Remove the Vercel project after the week of clean running.
 **Plans**: TBD
 
 ### Phase 4: R2 media delivery
@@ -185,13 +204,14 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Phases 5 and 6 can be built in worktrees once Phase 2 ships; the DNS track runs from Phase 1 until Phase 4.
+Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 → 8. Phases 5 and 6 can be built in worktrees once Phase 2 ships; the DNS track runs from Phase 1 until Phase 4.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 0/TBD | Not started | - |
 | 2. Projects served from the repo | 0/TBD | Not started | - |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
+| 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | 0/TBD | Not started | - |
 | 5. Case-study page that closes | 0/TBD | Not started | - |
 | 6. Ring accessibility and reduced motion | 0/TBD | Not started | - |

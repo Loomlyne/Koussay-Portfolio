@@ -15,7 +15,7 @@ The ring is the hook. The case studies and the booking form are the close.
 
 ### Constraints
 
-- **Hosting**: Vercel, deploys from `main` — moving is out of scope for this milestone
+- **Hosting**: Vercel until Phase 3.1, then Cloudflare Workers in Koussay's own Cloudflare account (decided 2026-10-03)
 - **Bookings store**: Notion stays for bookings and blocked time — zero migration, Koussay reads them in Notion Calendar
 - **Media host**: Cloudflare R2 with content-addressed immutable URLs — Notion signed URLs expire and were the cause of slow cold loads
 - **Licensing**: nothing served that Koussay does not own or hold a licence for — public repo, commercial site
