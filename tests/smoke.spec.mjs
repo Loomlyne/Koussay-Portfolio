@@ -46,8 +46,13 @@ test("home renders the ring", async ({ page }) => {
     return !!gl && !gl.isContextLost();
   });
   expect(alive).toBe(true);
+  // The counter follows a GSAP tween, and GSAP lag smoothing advances the
+  // timeline by only 33 ms for any frame over 500 ms. Under SwiftShader on a
+  // loaded Mac that stretches the entry far past wall-clock expectations (a
+  // 94 reading at 45 s was this). Keep the budget generous; do not shorten it.
+  test.setTimeout(240_000);
   await expect(page.locator("[data-loader-count]")).toHaveText("100", {
-    timeout: 45_000,
+    timeout: 150_000,
   });
   await page.waitForTimeout(1_000);
   // HYG-01: one preload, both woff2 served 200, FontFace status loaded.
