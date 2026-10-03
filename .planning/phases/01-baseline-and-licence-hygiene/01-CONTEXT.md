@@ -117,3 +117,9 @@ The repo gets a formatting-only baseline commit, a Playwright smoke test that pa
 
 *Phase: 01-baseline-and-licence-hygiene*
 *Context gathered: 2026-10-03*
+
+## Addendum after research (2026-10-03, Koussay)
+
+- **D-23:** The cursor tag's arrow is drawn in code in `components/ring/tag.js` with the same geometry; `public/arrow-top-right-svgrepo-com.svg` is deleted (its licence could not be confirmed).
+- **D-24:** For the formatting-only commit, an AST-equivalence check (espree, `astDiff: 0` on every changed file) replaces the preview booking that the cross-phase rule otherwise requires for booking files. Any non-formatting change to booking code still needs a preview booking.
+- **D-25:** The heading and cursor-tag fonts are loaded explicitly (`document.fonts.load(...)`) before the canvas measures or rasterises them, since `document.fonts.ready` ignores canvas-only faces (reproduced in research).
