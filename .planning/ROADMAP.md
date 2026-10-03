@@ -74,7 +74,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03-PLAN.md — Geist and Geist Mono for every face, old fonts and arrow SVG removed, fonts.load gate
+- [x] 01-03-PLAN.md — Geist and Geist Mono for every face, old fonts and arrow SVG removed, fonts.load gate
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -281,7 +281,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Baseline and licence hygiene | 2/6 | In Progress|  |
+| 1. Baseline and licence hygiene | 3/6 | In Progress|  |
 | 2. Projects served from the repo | 0/TBD | Not started | - |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
