@@ -4,6 +4,14 @@ import { defineConfig } from "@playwright/test";
 const PORT = 3100;
 const baseURL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
+// The suite loads pages and the booking flow; never point it at production.
+const host = new URL(baseURL).hostname;
+if (host === "koussay.online" || host.endsWith(".koussay.online")) {
+  throw new Error(
+    `Refusing to run the tests against production (${host}). Unset BASE_URL.`,
+  );
+}
+
 export default defineConfig({
   testDir: "tests",
   testIgnore: "**/screens.spec.mjs",
@@ -41,6 +49,16 @@ export default defineConfig({
     ? undefined
     : {
         command: `npm run build && npx next start -p ${PORT}`,
+        // An empty value is "defined" to @next/env, so it wins over
+        // .env.local. The server under test must not hold live booking or
+        // mail credentials: /api/book* then answers 503 by itself.
+        env: {
+          NOTION_BOOKINGS_DATABASE_ID: "",
+          NOTION_CALENDAR_DATABASE_ID: "",
+          RESEND_API_KEY: "",
+          RESEND_FROM: "",
+          BOOKING_NOTIFY_EMAIL: "",
+        },
         url: baseURL,
         // A busy 3100 must fail loudly, not test someone else's server.
         reuseExistingServer: false,
