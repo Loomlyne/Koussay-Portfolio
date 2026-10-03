@@ -52,3 +52,6 @@ next-env.d.ts
 
 # font sign-off screenshots (local only)
 /.screens/
+
+# third-party agent skills; skills-lock.json restores them
+/.agents/skills/
