@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 1 context gathered
-last_updated: "2026-10-03T17:49:25.366Z"
+last_updated: "2026-10-03T18:38:42.147Z"
 last_activity: 2026-10-03
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 1 (Baseline and licence hygiene) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-10-03
 
@@ -68,6 +68,7 @@ Recent decisions affecting current work:
 - Research recommends Geist for every face (Satoshi licence bars public-repo distribution); awaiting Koussay's confirmation in Phase 1.
 - [Phase 01]: Phase 1 Plan 02: screenshot moments timed from DOM signals, not wall clock
 - [Phase 01]: Geist/Geist Mono variable woff2; -0.02em tracking proposals await Plan 04 sign-off — D-06
+- [Phase ?]: Koussay signed the Geist type 2026-10-03 22:38: tracking -0.02 em heading and names; Geist Mono for booking weekday letters
 
 ### Pending Todos
 
