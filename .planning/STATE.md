@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 1 context gathered
-last_updated: "2026-10-03T17:49:18.972Z"
+last_updated: "2026-10-03T17:49:25.366Z"
 last_activity: 2026-10-03
 progress:
   total_phases: 9
@@ -67,6 +67,7 @@ Recent decisions affecting current work:
 - Roadmap: OG images become static pre-rendered files in Phase 3 so runtime `sharp` leaves early.
 - Research recommends Geist for every face (Satoshi licence bars public-repo distribution); awaiting Koussay's confirmation in Phase 1.
 - [Phase 01]: Phase 1 Plan 02: screenshot moments timed from DOM signals, not wall clock
+- [Phase 01]: Geist/Geist Mono variable woff2; -0.02em tracking proposals await Plan 04 sign-off — D-06
 
 ### Pending Todos
 
