@@ -46,3 +46,10 @@ next-env.d.ts
 
 # local output from scripts/generate-project-media.mjs --probe
 .media-probe/
+
+# playwright
+/playwright-report/
+/test-results/
+
+# font sign-off screenshots (local only)
+/.screens/
