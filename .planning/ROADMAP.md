@@ -15,7 +15,7 @@ Every phase leaves the live site deployable and no worse than before. Koussay si
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Baseline and licence hygiene** - Prettier-only commit first, a green smoke test, Geist for every face, licence notices correct, dead files gone
+- [x] **Phase 1: Baseline and licence hygiene** - Prettier-only commit first, a green smoke test, Geist for every face, licence notices correct, dead files gone (completed 2026-10-03)
 - [ ] **Phase 2: Projects served from the repo** - The live eight read from content modules with the full schema and build-time validation; placeholders gone; no visible change
 - [ ] **Phase 3: Notion projects path removed** - Proxy, PDF renderer, CMS cache and runtime `sharp` deleted; OG images static; bookings proven still working
 - [ ] **Phase 3.1: Hosting on Cloudflare Workers** (INSERTED) - The site runs on Workers in Koussay's Cloudflare account; Vercel serves nothing
@@ -86,7 +86,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 01-06-PLAN.md — LICENSE, README, BREAKDOWN credit, AGENTS font facts, phase-end gate
+- [x] 01-06-PLAN.md — LICENSE, README, BREAKDOWN credit, AGENTS font facts, phase-end gate
 
 ### Phase 2: Projects served from the repo
 
@@ -281,7 +281,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Baseline and licence hygiene | 5/6 | In Progress|  |
+| 1. Baseline and licence hygiene | 6/6 | Complete   | 2026-10-03 |
 | 2. Projects served from the repo | 0/TBD | Not started | - |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
