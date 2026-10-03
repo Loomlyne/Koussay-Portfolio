@@ -583,14 +583,18 @@ The empty string lets the small (index/year) span inherit the wrapper's `trackin
 | A6 | `favicon.ico` / `logo.png` are Koussay's own mark | Pattern 5 | Licence note incomplete |
 | A7 | The SVG Repo arrow (#509306) is CC0 (search snippet only; page was blocked) | Pattern 5 | Licence note wrong; Open Q1 |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Arrow icon licence (`public/arrow-top-right-svgrepo-com.svg`)**
    - What we know: the bytes match SVG Repo #509306 "Arrow Top Right"; a search result says CC0; the page returned a Vercel security checkpoint, so the licence could not be read directly.
    - Recommendation: either Koussay opens svgrepo.com/svg/509306 once and confirms the licence line (one numbered step), then LICENSE gets "Arrow icon: SVG Repo #509306, CC0"; or draw the same three-segment path with `ctx.stroke()` in `tag.js` and delete the file. The first is smaller.
+   - RESOLVED: D-23 — Koussay chose to draw the arrow in code in `tag.js` and delete the SVG (Plan 01-03).
 2. **`.calendarWeekdays` (weekday letters) → Geist Mono or Geist?** D-04 covers digits. Recommendation: Geist Mono, so every small uppercase data label on the booking page uses one face; flag it in the screenshots.
+   - RESOLVED: Geist Mono for `.calendarWeekdays` (Plan 01-03), flagged for Koussay's screenshot sign-off in Plan 01-04.
 3. **README screenshots in `docs/*.png` show Behance art.** Recommendation: the new README embeds none of them. Deleting them belongs with Phase 2's Behance removal (CONT-08); the planner may pull it forward. `docs/NEXT-SESSION-PROMPT.md` is stale; deleting it is optional.
+   - RESOLVED: the new README embeds no `docs/*.png` (Plan 01-06); deleting them stays with Phase 2.
 4. **Does the AST proof replace the preview booking for the baseline commit?** The cross-phase rule names `lib/book/*`. Recommendation: present the AST result at ship and let Koussay decide; no code depends on the answer.
+   - RESOLVED: D-24 — Koussay accepted the AST proof in place of a preview booking for the formatting-only commit.
 
 ## Environment Availability
 

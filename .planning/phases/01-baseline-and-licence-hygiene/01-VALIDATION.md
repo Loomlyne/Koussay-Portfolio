@@ -48,7 +48,7 @@ Task IDs are filled in by the planner; each task's `<acceptance_criteria>` must 
 | TEST-01 | Booking first step renders, no `/api/book` request | e2e | `npx playwright test -g booking` | ❌ W0 | ⬜ pending |
 | TEST-01 | Test fails when it should | manual-once | inject `console.error` / remove canvas → `npm test` fails → revert | — | ⬜ pending |
 | HYG-01 | No `.otf`/`.ttf` tracked; woff2 + OFL present | static | `test -z "$(git ls-files '*.otf' '*.ttf')" && test -f public/fonts/OFL.txt` | — | ⬜ pending |
-| HYG-01 | Geist and Geist Mono loaded on cold load | e2e | home test asserts `document.fonts.check` for both families and no `.otf`/`.ttf` response | ❌ swap task | ⬜ pending |
+| HYG-01 | Geist and Geist Mono loaded on cold load | e2e | home test asserts the Geist and Geist Mono `FontFace` entries reach status `loaded`, the woff2 requests return 200, and no `.otf`/`.ttf` is requested (not `document.fonts.check`, which is true when no face matches) | ❌ swap task | ⬜ pending |
 | HYG-02 | Every family string has a `@font-face` | static | only `"Geist"` and `"Geist Mono"` found in `app` and `components`; two `@font-face` blocks | — | ⬜ pending |
 | HYG-03 | Upstream notices intact, credit present | static | LICENSE diff removes no line of the MIT or simplex blocks; Yousuf line count = 1; README and BREAKDOWN.md link Viscose-carousel | — | ⬜ pending |
 | HYG-04 | No Satoshi / PP Neue Montreal bundling claims | static | grep README, LICENSE, AGENTS.md for satoshi / neue montreal → history mention only | — | ⬜ pending |
