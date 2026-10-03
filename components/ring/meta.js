@@ -167,6 +167,7 @@ export function createMeta(refs, params, projects = FALLBACK_PROJECTS) {
     const smallFace = `"${params.idxFont}", ui-sans-serif, system-ui, sans-serif`;
     const bigWeight = `${params.nameWeight}`;
     const smallWeight = `${params.idxWeight}`;
+    const bigTrack = `${params.nameTracking}em`;
     const h = bigVw * 3;
     const cornerH = bigVw * 1.35;
 
@@ -220,9 +221,11 @@ export function createMeta(refs, params, projects = FALLBACK_PROJECTS) {
         lead.style.fontFamily = isRight ? bigFace : smallFace;
         lead.style.fontSize = isRight ? big : small;
         lead.style.fontWeight = isRight ? bigWeight : smallWeight;
+        lead.style.letterSpacing = isRight ? bigTrack : "";
         trail.style.fontFamily = isRight ? smallFace : bigFace;
         trail.style.fontSize = isRight ? small : big;
         trail.style.fontWeight = isRight ? smallWeight : bigWeight;
+        trail.style.letterSpacing = isRight ? "" : bigTrack;
       }
     }
 

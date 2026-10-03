@@ -1630,9 +1630,6 @@ export default function Carousel({
     };
 
     tag.build();
-    tag.load(() => {
-      if (!disposed) tag.build();
-    });
     styleMeta();
 
     let tl = null;
@@ -1656,10 +1653,22 @@ export default function Carousel({
       replay();
     };
 
-    // fonts.ready is reliable, but nothing here is worth a permanently blank
-    // page if it ever is not.
+    // fonts.ready ignores faces only the canvas uses, so request the exact
+    // cuts. Nothing here is worth a permanently blank page if that stalls.
     const fontFallback = setTimeout(startEntry, 3000);
-    (document.fonts?.ready ?? Promise.resolve())
+    const cuts = [
+      [params.textWeight, params.textFont],
+      [params.tagWeight, params.textFont],
+      [params.nameWeight, params.nameFont],
+      [params.idxWeight, params.idxFont],
+    ];
+    Promise.all(
+      cuts.map(([w, f]) =>
+        document.fonts
+          ? document.fonts.load(`${w} 1em "${f}"`)
+          : Promise.resolve(),
+      ),
+    )
       .then(startEntry)
       .catch(startEntry);
 
@@ -1979,7 +1988,7 @@ export default function Carousel({
         role="list"
         aria-label="Projects"
         style={{
-          fontFamily: '"Satoshi", ui-sans-serif, system-ui, sans-serif',
+          fontFamily: '"Geist", ui-sans-serif, system-ui, sans-serif',
         }}
         className="pointer-events-auto fixed right-[12vw] top-[2.4vh] z-10 flex flex-col items-end text-right leading-[1.4] tracking-[0.01em] text-[#0a0a0a] opacity-0 max-sm:hidden"
       >

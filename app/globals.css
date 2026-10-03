@@ -1,41 +1,20 @@
 @import "tailwindcss";
 
-/* Family names here have to match the strings in ring/params.js — nameFont,
-   idxFont and textFont are looked up by name, not imported. */
-
-/* Project names and disciplines. Two real weights, so nameWeight 400 and 500
-   both resolve to a cut rather than a synthesised one. */
-@font-face {
-  font-family: "Satoshi";
-  src: url("/Satoshi-Regular.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Satoshi";
-  src: url("/Satoshi-Medium.otf") format("opentype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Numbers, years and the load counter. */
+/* Family names here have to match the strings in ring/params.js: textFont,
+   nameFont and idxFont are looked up by name, not imported. One variable file
+   per family makes every weight a real cut. */
 @font-face {
   font-family: "Geist";
-  src: url("/Geist-Regular.ttf") format("truetype");
-  font-weight: 400;
+  src: url("/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
-/* The intro heading and the cursor tag, both rasterised to canvas. Book is
-   the only cut installed, so textWeight has nothing to switch between. */
 @font-face {
-  font-family: "PP Neue Montreal";
-  src: url("/ppneuemontreal-book.otf") format("opentype");
-  font-weight: 400;
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -130,7 +109,7 @@ html.ring-lock body {
 
 .ring-loader-label,
 .ring-loader-time {
-  font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   font-size: 0.68rem;
   font-weight: 500;
   letter-spacing: 0.14em;
@@ -143,7 +122,7 @@ html.ring-lock body {
 }
 
 .ring-loader-count {
-  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(2.4rem, 7vw, 4.5rem);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.08em;
@@ -151,7 +130,7 @@ html.ring-lock body {
 }
 
 .ring-loader-time {
-  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.08em;
 }
@@ -174,7 +153,7 @@ html.ring-lock body {
   align-items: flex-end;
   gap: 0.22rem;
   color: rgba(10, 10, 10, 0.5);
-  font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   text-align: right;
   pointer-events: none;
 }
@@ -232,7 +211,7 @@ html.ring-lock body {
   width: min(100%, 34rem);
   margin: 0 0 0.85rem;
   color: rgba(10, 10, 10, 0.46);
-  font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   font-size: 0.68rem;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -423,7 +402,7 @@ html[data-shared-transition="complete"] .project-transition-content {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   color: var(--ink, #0a0a0a);
-  font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: -0.01em;

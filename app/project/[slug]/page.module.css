@@ -8,7 +8,7 @@
   min-height: 100svh;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   overflow: visible;
 }
 
@@ -112,7 +112,7 @@
 .sectionNumber,
 .pagerIndex,
 .heroYear {
-  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
 }
 
@@ -270,7 +270,7 @@ html[data-project-pager] .mediaFigure,
 
 .mediaFallbackFile {
   color: rgba(10, 10, 10, 0.5);
-  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
 }
 

@@ -63,7 +63,7 @@
   padding-bottom: var(--progress-inset);
   background: var(--paper);
   color: var(--ink);
-  font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
 }
 
 .page::before,
@@ -546,7 +546,7 @@
 
 .fitIndex {
   color: var(--muted);
-  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
   font-size: 0.68rem;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.08em;
@@ -767,7 +767,7 @@
 .calendarWeekdays {
   margin-bottom: var(--space-2);
   color: var(--muted);
-  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
   font-size: var(--text-caption);
   letter-spacing: 0.08em;
   text-align: center;
@@ -952,7 +952,7 @@
   justify-content: space-between;
   margin: 0 auto;
   color: var(--muted);
-  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
   font-size: var(--text-caption);
   letter-spacing: 0.04em;
   text-transform: uppercase;

@@ -20,8 +20,6 @@ export const TAG_H = 40;
  */
 export function createTag(params, uniforms) {
   const box = { sx: 0.5, sy: 0 };
-  const arrow = new Image();
-  let arrowReady = false;
   let tex = null;
 
   const build = () => {
@@ -46,9 +44,24 @@ export function createTag(params, uniforms) {
       x0 + params.tagArrow + params.tagGap,
       TAG_H * 0.5,
     );
-    if (arrowReady) {
-      const y = (TAG_H - params.tagArrow) * 0.5;
-      ctx.drawImage(arrow, x0, y, params.tagArrow, params.tagArrow);
+    if (params.tagArrow > 0) {
+      // The old SVG's geometry (20x20 box, 2 wide, round ends) as three strokes.
+      const k = params.tagArrow / 20;
+      ctx.save();
+      ctx.translate(x0, (TAG_H - params.tagArrow) * 0.5);
+      ctx.scale(k, k);
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#fff";
+      ctx.beginPath();
+      ctx.moveTo(4.343, 15.657);
+      ctx.lineTo(15.657, 4.343);
+      ctx.moveTo(15.657, 14.243);
+      ctx.lineTo(15.657, 4.343);
+      ctx.lineTo(5.757, 4.343);
+      ctx.stroke();
+      ctx.restore();
     }
 
     tex?.dispose();
@@ -73,18 +86,10 @@ export function createTag(params, uniforms) {
     }
   };
 
-  const load = (onReady) => {
-    arrow.onload = () => {
-      arrowReady = true;
-      onReady?.();
-    };
-    arrow.src = "/arrow-top-right-svgrepo-com.svg";
-  };
-
   const dispose = () => {
     gsap.killTweensOf(box);
     tex?.dispose();
   };
 
-  return { box, build, show, load, dispose };
+  return { box, build, show, dispose };
 }

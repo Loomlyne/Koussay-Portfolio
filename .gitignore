@@ -24,8 +24,7 @@
 .DS_Store
 *.pem
 
-# Fonts are committed. See the licence notice in README.md — PP Neue Montreal
-# is included for local development only and is not licensed by this project.
+# Fonts are committed under public/fonts with their OFL licence.
 
 # debug
 npm-debug.log*

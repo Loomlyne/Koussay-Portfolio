@@ -141,9 +141,9 @@ export function defaultParams() {
     // -- the intro heading, in the scene ---------------------------------
     text: "Works '26",
     textSize: 41,
-    textFont: "PP Neue Montreal",
-    textWeight: 400,
-    textTracking: 0, // em
+    textFont: "Geist",
+    textWeight: 300,
+    textTracking: -0.02, // em
     textColor: "#0a0a0a",
     textAt: 0.42, // fraction of the spread
     textTime: 0.95,
@@ -163,10 +163,11 @@ export function defaultParams() {
     metaGapR: 3.6,
     metaWidth: 34, // this box is the filter region
     nameSize: (24 / 1440) * 100, // vw, quoted at 1440
-    nameFont: "Satoshi",
+    nameFont: "Geist",
     nameWeight: 500,
+    nameTracking: -0.02, // em
     idxSize: (16 / 1440) * 100, // a step lighter and smaller than the name
-    idxFont: "Geist",
+    idxFont: "Geist Mono",
     idxWeight: 400,
     listSize: 0.9, // vw; the column's line height is unitless so rows follow
 
@@ -222,7 +223,7 @@ export function defaultParams() {
     tagText: "View",
     tagSize: 14,
     tagWeight: 500,
-    tagArrow: 14, // px, the svg in /public
+    tagArrow: 14, // px, drawn in tag.js
     tagGap: 6,
     // Offset off the cursor deliberately: sitting under it, the tag covers
     // the thing being pointed at. World px, so +y is up like posY.

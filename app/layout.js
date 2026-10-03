@@ -1,5 +1,6 @@
 import "./globals.css";
 
+import { preload } from "react-dom";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "./providers";
 import JsonLd from "@/components/JsonLd";
@@ -69,6 +70,11 @@ const siteGraph = graph([
 ]);
 
 export default function RootLayout({ children }) {
+  preload("/fonts/Geist-Variable.woff2", {
+    as: "font",
+    type: "font/woff2",
+    crossOrigin: "anonymous",
+  });
   return (
     <html lang="en">
       <body className="min-h-full flex flex-col">

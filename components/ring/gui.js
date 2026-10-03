@@ -139,7 +139,7 @@ export function mountGui(GUI, { params, state, info, actions }) {
   text
     // Only families with an @font-face block in globals.css — anything else
     // silently falls back to system sans and looks like a bug.
-    .add(params, "textFont", ["PP Neue Montreal", "Satoshi", "Geist"])
+    .add(params, "textFont", ["Geist", "Geist Mono"])
     .name("family")
     .onChange(rebuildText);
   text.add(params, "textWeight", { Light: 300, Regular: 400 }).onChange(rebuildText); // prettier-ignore
@@ -172,6 +172,7 @@ export function mountGui(GUI, { params, state, info, actions }) {
   onMeta("idxSize", 0.4, 8, 0.01, "number size (vw)");
   onMeta("listSize", 0.3, 4, 0.01, "column size (vw)");
   meta.add(params, "nameWeight", WEIGHTS).name("name weight").onChange(styleMeta); // prettier-ignore
+  onMeta("nameTracking", -0.1, 0.1, 0.001, "name tracking (em)");
   meta.add(params, "idxWeight", WEIGHTS).name("number weight").onChange(styleMeta); // prettier-ignore
   meta.add(params, "nameMorphTime", 0.1, 4, 0.05).name("morph time");
   meta.add(params, "nameEase", EASES).name("ease");

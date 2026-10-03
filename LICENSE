@@ -26,19 +26,10 @@ This license covers the source code only.
 
 The contents of `public/` are NOT covered by it:
 
-  - PP Neue Montreal (`public/ppneuemontreal-book.otf`) is a commercial
-    typeface by Pangram Pangram. It is bundled here for local development and
-    evaluation only. It is not licensed by this project, must not be used for
-    commercial purposes, and no rights to it are granted by the terms above.
-    Buy a licence from the foundry, or substitute another face.
-
-  - Satoshi (`public/Satoshi-*.otf`) is licensed under the Indian Type
-    Foundry Free Font Licence via Fontshare — free for personal and
-    commercial use.
-
-  - Geist (`public/Geist-Regular.ttf`) is licensed under the SIL Open Font
-    Licence 1.1. Copyright 2024 The Geist Project Authors.
-    https://github.com/vercel/geist-font
+  - Geist and Geist Mono (`public/fonts/*.woff2`) are licensed under the SIL
+    Open Font Licence 1.1. Copyright 2024 The Geist Project Authors.
+    https://github.com/vercel/geist-font. The licence text is in
+    `public/fonts/OFL.txt`.
 
   - Project imagery (`public/*.webp`) is not mine. It was collected
     from Behance, more or less at random, purely so there was real work to
