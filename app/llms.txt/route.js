@@ -1,6 +1,11 @@
 import { getProjects } from "@/lib/cms/projects";
 import { projectHref } from "@/lib/projects";
-import { BOOKING_PATH, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import {
+  BOOKING_PATH,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/site";
 
 export const revalidate = 60;
 

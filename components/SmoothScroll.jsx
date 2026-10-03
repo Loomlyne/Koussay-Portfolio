@@ -39,7 +39,11 @@ function LenisGate() {
     const observer = new MutationObserver(apply);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class", "data-project-pager", "data-shared-transition"],
+      attributeFilter: [
+        "class",
+        "data-project-pager",
+        "data-shared-transition",
+      ],
     });
 
     return () => observer.disconnect();

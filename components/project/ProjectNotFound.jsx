@@ -11,13 +11,7 @@ export default function ProjectNotFound() {
       <h1 className="sr-only">404</h1>
       <section className={styles.notFoundState}>
         <Link href="/" aria-label="Home" className={styles.notFoundMark}>
-          <Image
-            src="/404.webp"
-            alt="404"
-            width={908}
-            height={636}
-            priority
-          />
+          <Image src="/404.webp" alt="404" width={908} height={636} priority />
         </Link>
       </section>
     </main>

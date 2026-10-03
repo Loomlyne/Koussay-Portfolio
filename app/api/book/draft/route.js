@@ -1,8 +1,5 @@
 import { sanitizeDraft } from "@/lib/book/draft";
-import {
-  isNotionBookingsConfigured,
-  isResendConfigured,
-} from "@/lib/env";
+import { isNotionBookingsConfigured, isResendConfigured } from "@/lib/env";
 import { sendDraftNotice } from "@/lib/mail/booking";
 import { upsertNotionDraft } from "@/lib/notion/bookings";
 

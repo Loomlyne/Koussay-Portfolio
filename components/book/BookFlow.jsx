@@ -29,11 +29,7 @@ import {
   writeLocalDraft,
 } from "@/lib/book/draft";
 import { bookStepHref, stepFromSlug } from "@/lib/book/steps";
-import {
-  dateStamp,
-  firstInvalidStep,
-  issueForStep,
-} from "@/lib/book/validate";
+import { dateStamp, firstInvalidStep, issueForStep } from "@/lib/book/validate";
 import { busyFromResponse, isSlotOpen } from "@/lib/book/time";
 
 import styles from "@/app/booking/page.module.css";
@@ -60,7 +56,11 @@ function FieldError({ message }) {
 
 function FitMark({ on }) {
   return (
-    <span className={styles.fitMark} data-on={on || undefined} aria-hidden="true">
+    <span
+      className={styles.fitMark}
+      data-on={on || undefined}
+      aria-hidden="true"
+    >
       <svg className={styles.fitCheck} viewBox="0 0 16 16">
         <path d="M3.6 8.2 6.6 11.1 12.4 4.9" />
       </svg>
@@ -750,11 +750,7 @@ export default function BookFlow() {
                   </button>
                 )}
               </div>
-              {step !== 1 &&
-              step !== 2 &&
-              step !== 5 &&
-              step !== 6 &&
-              error ? (
+              {step !== 1 && step !== 2 && step !== 5 && step !== 6 && error ? (
                 <p className={styles.formError}>{error}</p>
               ) : null}
             </>

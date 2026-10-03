@@ -1,6 +1,7 @@
 import ProjectNotFound from "@/components/project/ProjectNotFound";
 
-const description = "This address does not match a project in the current index.";
+const description =
+  "This address does not match a project in the current index.";
 
 export const metadata = {
   title: "Project not found",

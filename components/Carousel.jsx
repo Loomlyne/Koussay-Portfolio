@@ -841,8 +841,7 @@ export default function Carousel({
       // ring while the timeline is still drawing it.
       // Phone uses the same hover as desktop. A finger still has to sit still
       // long enough to count (see engaged); a swipe stays a swipe.
-      const live =
-        params.hover && engaged() && pointer.seeded && interactive;
+      const live = params.hover && engaged() && pointer.seeded && interactive;
       cursor.amt += ((live ? 1 : 0) - cursor.amt) * chase(dt, 0.12);
 
       const k = chase(dt, params.lag);

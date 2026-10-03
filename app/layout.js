@@ -28,10 +28,18 @@ export const metadata = {
   creator: SITE_NAME,
   icons: {
     icon: [
-      { url: `${SITE_MARK_PATH}?v=portrait`, type: "image/png", sizes: "512x512" },
+      {
+        url: `${SITE_MARK_PATH}?v=portrait`,
+        type: "image/png",
+        sizes: "512x512",
+      },
     ],
     apple: [
-      { url: `${SITE_MARK_PATH}?v=portrait`, sizes: "512x512", type: "image/png" },
+      {
+        url: `${SITE_MARK_PATH}?v=portrait`,
+        sizes: "512x512",
+        type: "image/png",
+      },
     ],
     shortcut: `${SITE_MARK_PATH}?v=portrait`,
   },

@@ -5,7 +5,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { projectImageSrc } from "@/lib/projects";
-import { HERO_IMAGE_SIZES, rememberProject, warmProject } from "@/lib/project/warm";
+import {
+  HERO_IMAGE_SIZES,
+  rememberProject,
+  warmProject,
+} from "@/lib/project/warm";
 import styles from "@/app/project/[slug]/page.module.css";
 
 export default function ProjectWarm({ current, previous, next }) {
@@ -25,12 +29,7 @@ export default function ProjectWarm({ current, previous, next }) {
         if (!src) return null;
         return (
           <span key={project.slug} className={styles.warmSlot}>
-            <Image
-              src={src}
-              alt=""
-              fill
-              sizes={HERO_IMAGE_SIZES}
-            />
+            <Image src={src} alt="" fill sizes={HERO_IMAGE_SIZES} />
           </span>
         );
       })}

@@ -1,0 +1,10 @@
+# GSD rewrites these at every phase transition
+.planning/
+CLAUDE.md
+
+# Third-party agent skills, untracked in a later plan
+.agents/
+
+# Test output
+playwright-report/
+test-results/

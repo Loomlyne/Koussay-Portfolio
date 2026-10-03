@@ -3,7 +3,12 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
-import { vertexShader, fragmentShader, MAX_PLANES, MAX_LINKS } from "./shaders/planeShaders";
+import {
+  vertexShader,
+  fragmentShader,
+  MAX_PLANES,
+  MAX_LINKS,
+} from "./shaders/planeShaders";
 
 // Aspect is 1.5 : 1, landscape. The planes sit side by side and pull apart
 // along their long axis, so the edges facing each other are the short ones.
@@ -54,12 +59,20 @@ export default function TwoPlaneMorph() {
       uSize: { value: new THREE.Vector2(PLANE_WIDTH, PLANE_HEIGHT) },
       uRadius: { value: params.radius },
       uCount: { value: 2 },
-      uPos: { value: Array.from({ length: MAX_PLANES }, () => new THREE.Vector2()) },
+      uPos: {
+        value: Array.from({ length: MAX_PLANES }, () => new THREE.Vector2()),
+      },
       uRot: { value: new Float32Array(MAX_PLANES) },
-      uScale: { value: Array.from({ length: MAX_PLANES }, () => new THREE.Vector2()) },
+      uScale: {
+        value: Array.from({ length: MAX_PLANES }, () => new THREE.Vector2()),
+      },
       uLinkCount: { value: 1 },
-      uLinkA: { value: Array.from({ length: MAX_LINKS }, () => new THREE.Vector2()) },
-      uLinkB: { value: Array.from({ length: MAX_LINKS }, () => new THREE.Vector2()) },
+      uLinkA: {
+        value: Array.from({ length: MAX_LINKS }, () => new THREE.Vector2()),
+      },
+      uLinkB: {
+        value: Array.from({ length: MAX_LINKS }, () => new THREE.Vector2()),
+      },
       // (rEnd, rMid, sag, fillet) packed, matching the shader's layout.
       uLinkPar: {
         value: Array.from({ length: MAX_LINKS }, () => new THREE.Vector4()),
@@ -91,7 +104,7 @@ export default function TwoPlaneMorph() {
         uniforms,
         transparent: true,
         depthWrite: false,
-      })
+      }),
     );
     scene.add(mesh);
 
@@ -165,8 +178,8 @@ export default function TwoPlaneMorph() {
         // with the thread instead of bulging the plane edges after it has gone.
         Math.min(
           params.fillet * z * smoothstep(0, 0.35, v),
-          Math.max(rMid, 0) * 1.5
-        )
+          Math.max(rMid, 0) * 1.5,
+        ),
       );
     };
 

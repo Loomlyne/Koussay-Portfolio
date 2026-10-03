@@ -28,8 +28,12 @@ export default function ProjectHero({ project, displayIndex }) {
 
       {project.type || project.year ? (
         <div className={styles.heroInfo}>
-          {project.type ? <p className={styles.heroType}>{project.type}</p> : null}
-          {project.year ? <p className={styles.heroYear}>{project.year}</p> : null}
+          {project.type ? (
+            <p className={styles.heroType}>{project.type}</p>
+          ) : null}
+          {project.year ? (
+            <p className={styles.heroYear}>{project.year}</p>
+          ) : null}
         </div>
       ) : null}
 
