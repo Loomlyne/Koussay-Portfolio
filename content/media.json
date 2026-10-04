@@ -8,7 +8,7 @@
         "key": "projects/almar-private-journey/cover-fdcce970.webp",
         "origin": {
           "at": "2026-10-04T12:29:57.377Z",
-          "from": "https://koussay.online/api/media/3d11a384621f81ed87b4da65cd242aee?v=2026-09-04T19%3A16%3A00.000Z-2f68578f",
+          "from": "notion-snapshot:3d11a384621f81ed87b4da65cd242aee",
           "kind": "snapshot"
         },
         "sha256": "fdcce970ae72b544ea420464a005067f29be519d1b5fd0a1cc4dc9750e33c7d9",
@@ -16,7 +16,17 @@
         "url": "https://media.koussay.online/projects/almar-private-journey/cover-fdcce970.webp",
         "width": 1600
       },
-      "gallery": {}
+      "gallery": {},
+      "og": {
+        "bytes": 35478,
+        "height": 630,
+        "inputs": "d15921be0661191aa2a5079a792aae2c7d923090861c8f6ed0fb30adbaad8e35",
+        "key": "projects/almar-private-journey/og-66eeff54.jpg",
+        "sha256": "66eeff540e6c031d8d7b547d8f956a15cc3d90ec31c1a5b04693955e90ffd6ff",
+        "type": "image/jpeg",
+        "url": "https://media.koussay.online/projects/almar-private-journey/og-66eeff54.jpg",
+        "width": 1200
+      }
     },
     "artemis-luxe": {
       "cover": {
@@ -25,7 +35,7 @@
         "key": "projects/artemis-luxe/cover-452355e2.webp",
         "origin": {
           "at": "2026-10-04T12:30:03.636Z",
-          "from": "https://koussay.online/api/media/3d11a384621f81c48ff3deed646fea12?v=2026-09-04T19%3A32%3A00.000Z-7801ddaf",
+          "from": "notion-snapshot:3d11a384621f81c48ff3deed646fea12",
           "kind": "snapshot"
         },
         "sha256": "452355e2eb1c773c0f16f3794d10d9774ac9509f1a6a5b304a2c63c5c4c40871",
@@ -33,7 +43,17 @@
         "url": "https://media.koussay.online/projects/artemis-luxe/cover-452355e2.webp",
         "width": 1600
       },
-      "gallery": {}
+      "gallery": {},
+      "og": {
+        "bytes": 60403,
+        "height": 630,
+        "inputs": "a3aef0442e997f135d1d23f356538e8d1a1010e10d7ef9b5e7521f7e6446f2a5",
+        "key": "projects/artemis-luxe/og-c33c441e.jpg",
+        "sha256": "c33c441e8aa2725bcee409d3ee2970febaeeacb60511f80bba921f0ca7c66980",
+        "type": "image/jpeg",
+        "url": "https://media.koussay.online/projects/artemis-luxe/og-c33c441e.jpg",
+        "width": 1200
+      }
     },
     "clickit-story": {
       "cover": {
@@ -42,7 +62,7 @@
         "key": "projects/clickit-story/cover-402de68b.webp",
         "origin": {
           "at": "2026-10-04T12:30:01.717Z",
-          "from": "https://koussay.online/api/media/3d11a384621f819a86a9cb0ccf77349f?v=2026-09-04T19%3A28%3A00.000Z-c0f4b2d8",
+          "from": "notion-snapshot:3d11a384621f819a86a9cb0ccf77349f",
           "kind": "snapshot"
         },
         "sha256": "402de68bfdaaf74d82c789c17b73fda7e9ebbd2f40f20b9213c5d35b1979fd94",
@@ -50,7 +70,17 @@
         "url": "https://media.koussay.online/projects/clickit-story/cover-402de68b.webp",
         "width": 1600
       },
-      "gallery": {}
+      "gallery": {},
+      "og": {
+        "bytes": 80504,
+        "height": 630,
+        "inputs": "fcb893a295b4e1683049c97fd1b4709cb346c9eded00545a3e7fdc0bcdf86b42",
+        "key": "projects/clickit-story/og-d0fa4b33.jpg",
+        "sha256": "d0fa4b33491bc3b5c9f9507fd008acce10a5fca8d490450678e727612afc0da9",
+        "type": "image/jpeg",
+        "url": "https://media.koussay.online/projects/clickit-story/og-d0fa4b33.jpg",
+        "width": 1200
+      }
     },
     "elysee-home-design": {
       "cover": {
@@ -59,7 +89,7 @@
         "key": "projects/elysee-home-design/cover-e5d494f8.webp",
         "origin": {
           "at": "2026-10-04T12:30:00.155Z",
-          "from": "https://koussay.online/api/media/3d11a384621f81d8b16ce007e68c39c8?v=2026-09-04T19%3A23%3A00.000Z-aace0ee6",
+          "from": "notion-snapshot:3d11a384621f81d8b16ce007e68c39c8",
           "kind": "snapshot"
         },
         "sha256": "e5d494f807ade1d719b1c934d39dfe71fe245dd904f4a24a03d41af93a537888",
@@ -67,7 +97,17 @@
         "url": "https://media.koussay.online/projects/elysee-home-design/cover-e5d494f8.webp",
         "width": 1600
       },
-      "gallery": {}
+      "gallery": {},
+      "og": {
+        "bytes": 97674,
+        "height": 630,
+        "inputs": "a5c5b9f396ef26007713f9dc54496b329ed2a05c34d93b2a4a010decf8a2290c",
+        "key": "projects/elysee-home-design/og-b6fff25a.jpg",
+        "sha256": "b6fff25a43201d281ed7ff6344ee61174e72c741a6507b2ba54eb7297862d7e0",
+        "type": "image/jpeg",
+        "url": "https://media.koussay.online/projects/elysee-home-design/og-b6fff25a.jpg",
+        "width": 1200
+      }
     },
     "fido-homes": {
       "cover": {
@@ -76,7 +116,7 @@
         "key": "projects/fido-homes/cover-f6624200.webp",
         "origin": {
           "at": "2026-10-04T12:29:58.618Z",
-          "from": "https://koussay.online/api/media/3d11a384621f8154a6e3f05c57f18a14?v=2026-09-04T19%3A20%3A00.000Z-e2d7e0d4",
+          "from": "notion-snapshot:3d11a384621f8154a6e3f05c57f18a14",
           "kind": "snapshot"
         },
         "sha256": "f66242004767dd900eac9b801a1d5da48a94e7e18c32228b06af8f4d0a2e31ab",
@@ -84,7 +124,17 @@
         "url": "https://media.koussay.online/projects/fido-homes/cover-f6624200.webp",
         "width": 1600
       },
-      "gallery": {}
+      "gallery": {},
+      "og": {
+        "bytes": 78412,
+        "height": 630,
+        "inputs": "f72901840afe96bbbbf3204f2b1ea3722593abf16bf06018c3acad23163872ef",
+        "key": "projects/fido-homes/og-b163df98.jpg",
+        "sha256": "b163df98e32fbc5f1bef894ac6aa0de042082329bb252718fb5d489dfb6e10d7",
+        "type": "image/jpeg",
+        "url": "https://media.koussay.online/projects/fido-homes/og-b163df98.jpg",
+        "width": 1200
+      }
     },
     "looma-kitchen": {
       "cover": {
@@ -93,7 +143,7 @@
         "key": "projects/looma-kitchen/cover-2c301bda.webp",
         "origin": {
           "at": "2026-10-04T12:29:56.171Z",
-          "from": "https://koussay.online/api/media/3d11a384621f813b8d92fe88bcf82a58?v=2026-09-04T19%3A11%3A00.000Z-b132893a",
+          "from": "notion-snapshot:3d11a384621f813b8d92fe88bcf82a58",
           "kind": "snapshot"
         },
         "sha256": "2c301bda34bd6feafefeb4b4a8cd7c55c2923a69df677eb14ba941c3301ad792",
@@ -101,7 +151,17 @@
         "url": "https://media.koussay.online/projects/looma-kitchen/cover-2c301bda.webp",
         "width": 1600
       },
-      "gallery": {}
+      "gallery": {},
+      "og": {
+        "bytes": 47126,
+        "height": 630,
+        "inputs": "4c6479c5fa004dc7da35d193f94849e95f1987a4056ede66ad958b5145d31294",
+        "key": "projects/looma-kitchen/og-275ff54d.jpg",
+        "sha256": "275ff54d45e3ecfd0f3a2c090721f56c41e7f41ba0efbb9668519c43dd8fbf38",
+        "type": "image/jpeg",
+        "url": "https://media.koussay.online/projects/looma-kitchen/og-275ff54d.jpg",
+        "width": 1200
+      }
     },
     "pixenhouse": {
       "cover": {
@@ -110,7 +170,7 @@
         "key": "projects/pixenhouse/cover-b5c64eb5.webp",
         "origin": {
           "at": "2026-10-04T12:29:52.767Z",
-          "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf?v=2026-09-14T11%3A45%3A00.000Z-1c14cb7c",
+          "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf",
           "kind": "snapshot"
         },
         "sha256": "b5c64eb58c7b8293ca563cdd0cf1c50b724c4a8de0b7d2f9ceb924deee4565d1",
@@ -125,7 +185,7 @@
           "key": "projects/pixenhouse/brand-guideline-p01-32344187.webp",
           "origin": {
             "at": "2026-10-04T12:30:04.895Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p1?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p1",
             "kind": "snapshot"
           },
           "sha256": "32344187b7c30a49eba7b508e03a6582a5dc3909dd1dfd863bf9d2fa3ba8978c",
@@ -139,7 +199,7 @@
           "key": "projects/pixenhouse/brand-guideline-p02-264e7175.webp",
           "origin": {
             "at": "2026-10-04T12:30:06.181Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p2?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p2",
             "kind": "snapshot"
           },
           "sha256": "264e7175db9a5596f5bc24308159d6f63b3866bc5e65bb190468eb508f025976",
@@ -153,7 +213,7 @@
           "key": "projects/pixenhouse/brand-guideline-p03-77f6cbd1.webp",
           "origin": {
             "at": "2026-10-04T12:30:07.452Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p3?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p3",
             "kind": "snapshot"
           },
           "sha256": "77f6cbd1166f557dc67b8de5cda1351d3ee0b5beaec378d8bdba787175ba0456",
@@ -167,7 +227,7 @@
           "key": "projects/pixenhouse/brand-guideline-p04-3662201e.webp",
           "origin": {
             "at": "2026-10-04T12:30:09.131Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p4?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p4",
             "kind": "snapshot"
           },
           "sha256": "3662201e65c27cfcac20370896144f45647e70b0263c3c205c57743d6b2a7855",
@@ -181,7 +241,7 @@
           "key": "projects/pixenhouse/brand-guideline-p05-6f25f0d2.webp",
           "origin": {
             "at": "2026-10-04T12:30:10.920Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p5?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p5",
             "kind": "snapshot"
           },
           "sha256": "6f25f0d210bee3b0c225413897e6db7850aaeab53064646dcbbabce2f4a1b68a",
@@ -195,7 +255,7 @@
           "key": "projects/pixenhouse/brand-guideline-p06-defd0473.webp",
           "origin": {
             "at": "2026-10-04T12:30:12.112Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p6?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p6",
             "kind": "snapshot"
           },
           "sha256": "defd0473cb65e6b322c108f7854356cc3fc000a57a3b9d1d0ce9d57ca6b4bdb7",
@@ -209,7 +269,7 @@
           "key": "projects/pixenhouse/brand-guideline-p07-af18edeb.webp",
           "origin": {
             "at": "2026-10-04T12:30:13.275Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p7?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p7",
             "kind": "snapshot"
           },
           "sha256": "af18edebb19813883d90b741c200a44a9370518736e5065e57ce93c77ae9be59",
@@ -223,7 +283,7 @@
           "key": "projects/pixenhouse/brand-guideline-p08-a1cfeb3e.webp",
           "origin": {
             "at": "2026-10-04T12:30:14.658Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p8?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p8",
             "kind": "snapshot"
           },
           "sha256": "a1cfeb3e24be44b5de418bd5568fde80e2ee102741ef18597aab741f3b5465f5",
@@ -237,7 +297,7 @@
           "key": "projects/pixenhouse/brand-guideline-p09-49ea6f73.webp",
           "origin": {
             "at": "2026-10-04T12:30:15.895Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p9?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p9",
             "kind": "snapshot"
           },
           "sha256": "49ea6f73b49cb46f818716aa279cb2b9e3c99b4e4284468bfe20d3c3ddeaf251",
@@ -251,7 +311,7 @@
           "key": "projects/pixenhouse/brand-guideline-p10-b93e2d04.webp",
           "origin": {
             "at": "2026-10-04T12:30:17.655Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p10?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p10",
             "kind": "snapshot"
           },
           "sha256": "b93e2d04a74bebd452aa0a0b45f2e242309c890aa8e3cc1f5ca7ff38019305ec",
@@ -265,7 +325,7 @@
           "key": "projects/pixenhouse/brand-guideline-p11-942fe8b5.webp",
           "origin": {
             "at": "2026-10-04T12:30:19.040Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p11?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p11",
             "kind": "snapshot"
           },
           "sha256": "942fe8b507f1ae31f69157b981ecf590f87b473c4a71c463fa47553d72e59533",
@@ -279,7 +339,7 @@
           "key": "projects/pixenhouse/brand-guideline-p12-d45d09e7.webp",
           "origin": {
             "at": "2026-10-04T12:30:20.344Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p12?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p12",
             "kind": "snapshot"
           },
           "sha256": "d45d09e763488065470c82fda223c8e4ea08d8e5727ab96aa99d92755c7e5920",
@@ -293,7 +353,7 @@
           "key": "projects/pixenhouse/brand-guideline-p13-b1343f2e.webp",
           "origin": {
             "at": "2026-10-04T12:30:21.745Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p13?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p13",
             "kind": "snapshot"
           },
           "sha256": "b1343f2e0466c5d65e5dc23f8b2e36acca824f4f2bbd159d246d1eaed33b9e0e",
@@ -307,7 +367,7 @@
           "key": "projects/pixenhouse/brand-guideline-p14-00fe3236.webp",
           "origin": {
             "at": "2026-10-04T12:30:22.956Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p14?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p14",
             "kind": "snapshot"
           },
           "sha256": "00fe32369965019e14a16810d91a80e21dfcd4015979793ef2d1ebe309dec328",
@@ -321,7 +381,7 @@
           "key": "projects/pixenhouse/brand-guideline-p15-956fec99.webp",
           "origin": {
             "at": "2026-10-04T12:30:24.133Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p15?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p15",
             "kind": "snapshot"
           },
           "sha256": "956fec990b37b957d1acac604ab2e8331de061a7b5b5230417d48fac2b78d1a1",
@@ -335,7 +395,7 @@
           "key": "projects/pixenhouse/brand-guideline-p16-0f7952f9.webp",
           "origin": {
             "at": "2026-10-04T12:30:25.719Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p16?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p16",
             "kind": "snapshot"
           },
           "sha256": "0f7952f9835055b30bb38e3c96df83069c52c6027aac947e6a873577ba6712c3",
@@ -349,7 +409,7 @@
           "key": "projects/pixenhouse/brand-guideline-p17-3fc75a42.webp",
           "origin": {
             "at": "2026-10-04T12:30:26.978Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p17?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p17",
             "kind": "snapshot"
           },
           "sha256": "3fc75a428400949fc859c28615ccc9aecb003bd4ad488bdda8ee81236d195f8e",
@@ -363,7 +423,7 @@
           "key": "projects/pixenhouse/brand-guideline-p18-9dd0df20.webp",
           "origin": {
             "at": "2026-10-04T12:30:28.232Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p18?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p18",
             "kind": "snapshot"
           },
           "sha256": "9dd0df20a36962d6e19c6b99cb36795adbd88cc6a6d9f9e8d59bec8f1cfe4636",
@@ -377,7 +437,7 @@
           "key": "projects/pixenhouse/brand-guideline-p19-59a7f66a.webp",
           "origin": {
             "at": "2026-10-04T12:30:29.511Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p19?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p19",
             "kind": "snapshot"
           },
           "sha256": "59a7f66a3fc637f3463194850c722737bf573b79ec0522c169ff41e423c45762",
@@ -391,7 +451,7 @@
           "key": "projects/pixenhouse/brand-guideline-p20-89f60f0d.webp",
           "origin": {
             "at": "2026-10-04T12:30:30.820Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p20?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p20",
             "kind": "snapshot"
           },
           "sha256": "89f60f0dbb7c7a29f2d6d482c1ee34d72238f2ec8c0003a671737444f5714fdc",
@@ -405,7 +465,7 @@
           "key": "projects/pixenhouse/brand-guideline-p21-4c72c1a8.webp",
           "origin": {
             "at": "2026-10-04T12:30:32.000Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p21?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p21",
             "kind": "snapshot"
           },
           "sha256": "4c72c1a8619202b6d84f4c39489fad417d236306d5a558ac064276e30566172b",
@@ -419,7 +479,7 @@
           "key": "projects/pixenhouse/brand-guideline-p22-5c07d616.webp",
           "origin": {
             "at": "2026-10-04T12:30:33.183Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p22?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p22",
             "kind": "snapshot"
           },
           "sha256": "5c07d6167e789093f5cd717582b762361547d8dec187c0638121887161f492db",
@@ -433,7 +493,7 @@
           "key": "projects/pixenhouse/brand-guideline-p23-7c00c63a.webp",
           "origin": {
             "at": "2026-10-04T12:30:34.530Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p23?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p23",
             "kind": "snapshot"
           },
           "sha256": "7c00c63aaafdd801c62dc68d9d7b4efea147f4faa08feed91d07b2461a2f0ae3",
@@ -447,7 +507,7 @@
           "key": "projects/pixenhouse/brand-guideline-p24-f9fa11f5.webp",
           "origin": {
             "at": "2026-10-04T12:30:35.826Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p24?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p24",
             "kind": "snapshot"
           },
           "sha256": "f9fa11f5e4bd18c5cdd9f384252b42769598a65846012a9ee7b37a771653eff7",
@@ -461,7 +521,7 @@
           "key": "projects/pixenhouse/brand-guideline-p25-3a653b72.webp",
           "origin": {
             "at": "2026-10-04T12:30:37.140Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p25?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p25",
             "kind": "snapshot"
           },
           "sha256": "3a653b72e8a1ebd05e57d94309e8386e6e0079728e430cdbbdea6b82ebf3e013",
@@ -475,7 +535,7 @@
           "key": "projects/pixenhouse/brand-guideline-p26-6ad349fc.webp",
           "origin": {
             "at": "2026-10-04T12:30:38.470Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p26?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p26",
             "kind": "snapshot"
           },
           "sha256": "6ad349fcdb26ce1d4081cf07ef19da66d582833737c2e96db50a44e79737e128",
@@ -489,7 +549,7 @@
           "key": "projects/pixenhouse/brand-guideline-p27-d37a8c73.webp",
           "origin": {
             "at": "2026-10-04T12:30:39.751Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p27?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p27",
             "kind": "snapshot"
           },
           "sha256": "d37a8c73d51e738069d5cc877ac6f2b9b4220609bb51530e38b151de5fe84ec7",
@@ -503,7 +563,7 @@
           "key": "projects/pixenhouse/brand-guideline-p28-1c8e9c7e.webp",
           "origin": {
             "at": "2026-10-04T12:30:41.081Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p28?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p28",
             "kind": "snapshot"
           },
           "sha256": "1c8e9c7e5f3e406eebcf455d0756dca19e8687c621f6800552cf54b291d5daa9",
@@ -517,7 +577,7 @@
           "key": "projects/pixenhouse/brand-guideline-p29-5b5aff51.webp",
           "origin": {
             "at": "2026-10-04T12:30:42.349Z",
-            "from": "https://koussay.online/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p29?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "from": "notion-snapshot:3d11a384621f8123a0ebccc65b2d6ccf/g0p29",
             "kind": "snapshot"
           },
           "sha256": "5b5aff5148c0ed981f0509d2115db34b508f18bbe3bbd30856185935dc6798ad",
@@ -525,6 +585,16 @@
           "url": "https://media.koussay.online/projects/pixenhouse/brand-guideline-p29-5b5aff51.webp",
           "width": 1600
         }
+      },
+      "og": {
+        "bytes": 54741,
+        "height": 630,
+        "inputs": "6aea517a838f03d200ef1a7f3e421dbe8e08a3c53bf795d8aa58704ee3df55aa",
+        "key": "projects/pixenhouse/og-f20c9cbb.jpg",
+        "sha256": "f20c9cbb750c03b9a80e3b035217dc7e5ebdcfa0761d519708c71f73af2cbb0b",
+        "type": "image/jpeg",
+        "url": "https://media.koussay.online/projects/pixenhouse/og-f20c9cbb.jpg",
+        "width": 1200
       }
     },
     "vamos-taxi": {
@@ -534,7 +604,7 @@
         "key": "projects/vamos-taxi/cover-8fa9c769.webp",
         "origin": {
           "at": "2026-10-04T12:29:54.434Z",
-          "from": "https://koussay.online/api/media/3d11a384621f81ddb906c53ebb1e049a?v=2026-09-14T11%3A43%3A00.000Z-e53ac2f0",
+          "from": "notion-snapshot:3d11a384621f81ddb906c53ebb1e049a",
           "kind": "snapshot"
         },
         "sha256": "8fa9c769888352f6f504d0f838fdac348c0d8dcd33d2dc28b6da40bbff3161cf",
@@ -542,7 +612,29 @@
         "url": "https://media.koussay.online/projects/vamos-taxi/cover-8fa9c769.webp",
         "width": 1600
       },
-      "gallery": {}
+      "gallery": {},
+      "og": {
+        "bytes": 80876,
+        "height": 630,
+        "inputs": "df39242797c4bbacf952d338593486cfed7e6a100bc28f837c870646b4935e85",
+        "key": "projects/vamos-taxi/og-21263e7e.jpg",
+        "sha256": "21263e7e04fd137549c49f0a319fb930603d4bd82fe617d13f5088fc540eb959",
+        "type": "image/jpeg",
+        "url": "https://media.koussay.online/projects/vamos-taxi/og-21263e7e.jpg",
+        "width": 1200
+      }
+    }
+  },
+  "site": {
+    "home": {
+      "bytes": 56955,
+      "height": 630,
+      "inputs": "b25ac29093b40a4c42ac30429d75c23cac2c08f1c366d0e0c045dd5fdbfb7270",
+      "key": "projects/_site/og-home-839a1a24.jpg",
+      "sha256": "839a1a24f42d457208dc72aa16331c70aeae9fd7dc8db950daf55807c81b2a5a",
+      "type": "image/jpeg",
+      "url": "https://media.koussay.online/projects/_site/og-home-839a1a24.jpg",
+      "width": 1200
     }
   }
 }

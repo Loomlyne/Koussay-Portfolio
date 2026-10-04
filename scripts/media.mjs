@@ -6,12 +6,12 @@
  * because generations cost credits and imports must not rewrite anything.
  *
  *   node scripts/media.mjs check
- *   node scripts/media.mjs import-live [--force] [--only=slug,...] [--dry-run]
  *   node scripts/media.mjs verify
  *   node scripts/media.mjs generate [--dry-run] [--force] [--only=slug]
  *       [--limit=3] [--direction=chrome] [--video] [--probe]
- *   node scripts/media.mjs share [--preview] [--booking] [--only=slug,...]
+ *   node scripts/media.mjs share [--preview] [--booking] [--only=slug,...|home]
  *       [--force] [--dry-run] [--labels=slug:Label,...]
+ *     (no --preview/--booking: render, upload og cards to R2, record them)
  */
 import { createHash } from "node:crypto";
 import {
@@ -41,7 +41,7 @@ import {
   VIDEO_ENDPOINT,
 } from "./lib/higgsfield.mjs";
 import { loadEnv, root, sleep } from "./lib/load-env.mjs";
-import { homeLines, OWNER, projectLines } from "../lib/share.mjs";
+import { homeLines, inputsHash, OWNER, projectLines } from "../lib/share.mjs";
 import { SITE_DESCRIPTION, SITE_MARK_ALT, SITE_NAME } from "../lib/site.js";
 import { renderBooking, renderCard } from "./lib/share.mjs";
 import {
@@ -80,15 +80,12 @@ const labels = value("labels");
 const USAGE = [
   "usage: node scripts/media.mjs <command>",
   "  check",
-  "  import-live [--force] [--only=slug,...] [--dry-run]",
   "  verify",
   "  generate [--dry-run] [--force] [--only=slug] [--limit=n] [--direction=key] [--video] [--probe]",
   "  share [--preview] [--booking] [--only=slug,...] [--force] [--dry-run] [--labels=slug:Label,...]",
 ].join("\n");
 
-if (
-  !["check", "import-live", "verify", "generate", "share"].includes(command)
-) {
+if (!["check", "verify", "generate", "share"].includes(command)) {
   console.error(USAGE);
   process.exit(1);
 }
@@ -102,7 +99,7 @@ const env = loadEnv();
 const r2 = r2Config(env);
 
 const needsR2 =
-  !(["generate", "import-live"].includes(command) && dryRun) &&
+  !(command === "generate" && dryRun) &&
   !(command === "share" && (preview || booking || dryRun));
 if (needsR2) {
   if (!isR2Configured(r2)) {
@@ -192,7 +189,7 @@ async function getPublic(url, origin) {
   return { response, body };
 }
 
-/** Header and body checks shared by import-live and verify. Returns problems. */
+/** Header and body checks shared by share, generate and verify. Returns problems. */
 function checkPublic(
   { response, body },
   expectedSha,
@@ -268,99 +265,6 @@ async function check() {
   console.log("check ok");
 }
 
-async function importLive() {
-  const snapshotPath = value(
-    "snapshot",
-    join(
-      root,
-      ".planning/phases/02-projects-served-from-the-repo/snapshot/live-2026-10-04.json",
-    ),
-  );
-  const snapshot = JSON.parse(readFileSync(snapshotPath, "utf8"));
-  const manifest = readManifest();
-  manifest.host = HOST;
-  let failed = 0;
-
-  for (const { slug, slot, from } of snapshot.media) {
-    if (only.length && !only.includes(slug)) continue;
-    const label = `${slug}/${slot}`;
-    const record = projectRecord(manifest, slug);
-    const recorded = slot === "cover" ? record.cover : record.gallery[slot];
-    if (recorded && !force) {
-      console.log(`skip ${label}`);
-      continue;
-    }
-    try {
-      const source = new URL(from, SITE);
-      if (source.host !== "koussay.online") {
-        throw new Error(`refusing host ${source.host}`);
-      }
-      const live = await fetch(source, {
-        signal: AbortSignal.timeout(30000),
-      });
-      if (live.status !== 200) throw new Error(`live ${live.status}`);
-      if (!(live.headers.get("content-type") || "").includes("image/webp")) {
-        throw new Error(
-          `live content-type ${live.headers.get("content-type")}`,
-        );
-      }
-      const buffer = Buffer.from(await live.arrayBuffer());
-      const hash = sha256(buffer);
-      const at = new Date().toISOString();
-
-      const { width, height } = await sharp(buffer).metadata();
-      const key = `projects/${slug}/${slot}-${hash.slice(0, 8)}.webp`;
-      // A dry run touches nothing: no disk, no provenance, no upload.
-      if (dryRun) {
-        console.log(`dry ${key} ${width}x${height}`);
-        continue;
-      }
-
-      // Raw bytes and provenance reach disk before anything is uploaded.
-      mkdirSync(join(WORK, slug), { recursive: true });
-      writeFileSync(join(WORK, slug, `${slot}.webp`), buffer);
-      appendProvenance(slug, {
-        slot,
-        from: source.href,
-        at,
-        bytes: buffer.length,
-        sha256: hash,
-      });
-
-      await putObject(r2, key, buffer, "image/webp", {
-        cacheControl: IMMUTABLE,
-      });
-      const head = await headObject(r2, key);
-      if (head?.size !== buffer.length) {
-        throw new Error(`head size ${head?.size} != ${buffer.length}`);
-      }
-      const url = publicUrl(r2, key);
-      const got = await getPublic(url);
-      const problems = checkPublic(got, hash);
-      if (problems.length) throw new Error(problems.join(", "));
-
-      const entry = {
-        key,
-        url,
-        type: "image/webp",
-        width,
-        height,
-        bytes: buffer.length,
-        sha256: hash,
-        origin: { kind: "snapshot", from: source.href, at },
-      };
-      if (slot === "cover") record.cover = entry;
-      else record.gallery[slot] = entry;
-      writeManifest(manifest);
-      console.log(`ok ${label} ${got.response.headers.get("cf-cache-status")}`);
-    } catch (error) {
-      failed += 1;
-      console.error(`[media] ${label}: ${error.message || error}`);
-    }
-  }
-  if (failed) process.exit(1);
-}
-
 async function verify() {
   const manifest = readManifest();
   const entries = [];
@@ -369,7 +273,9 @@ async function verify() {
     for (const [slot, entry] of Object.entries(record.gallery || {})) {
       entries.push([`${slug}/${slot}`, entry]);
     }
+    if (record.og) entries.push([`${slug}/og`, record.og]);
   }
+  if (manifest.site?.home) entries.push(["site/home", manifest.site.home]);
   let bad = 0;
   for (const [label, entry] of entries) {
     const problems = [];
@@ -378,7 +284,7 @@ async function verify() {
       for (const origin of [undefined, SITE]) {
         const got = await getPublic(entry.url, origin);
         const acao = got.response.headers.get("access-control-allow-origin");
-        for (const p of checkPublic(got, entry.sha256)) {
+        for (const p of checkPublic(got, entry.sha256, entry.type)) {
           problems.push(`${origin ? "origin " : ""}${p}`);
         }
         if (acao && acao.includes(",")) problems.push("duplicate acao");
@@ -613,14 +519,96 @@ async function fetchCover(slug, cover) {
 
 const esc = (text) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
+/** Render and publish the signed og cards; skip any whose inputs are unchanged. */
+async function shareUpload() {
+  const { PROJECTS_IN_ORDER, ORDER } = await import(
+    pathToFileURL(join(root, "content", "projects", "index.mjs")).href
+  );
+  const manifest = readManifest();
+  let failed = 0;
+  const targets = PROJECTS_IN_ORDER.filter(
+    (p) => !only.length || only.includes(p.slug),
+  ).map((p) => ({
+    label: `${p.slug}/og`,
+    coverSlug: p.slug,
+    lines: projectLines(p),
+    prefix: `projects/${p.slug}/og-`,
+    get: () => manifest.projects[p.slug]?.og,
+    set: (entry) => {
+      manifest.projects[p.slug].og = entry;
+    },
+  }));
+  if (!only.length || only.includes("home")) {
+    targets.push({
+      label: "site/home",
+      coverSlug: ORDER[0],
+      lines: homeLines(SITE_NAME, SITE_DESCRIPTION),
+      prefix: "projects/_site/og-home-",
+      get: () => manifest.site?.home,
+      set: (entry) => {
+        manifest.site ||= {};
+        manifest.site.home = entry;
+      },
+    });
+  }
+  for (const target of targets) {
+    try {
+      const cover = manifest.projects[target.coverSlug]?.cover;
+      if (!cover) throw new Error("no cover in manifest");
+      const inputs = inputsHash(cover.sha256, target.lines);
+      if (target.get()?.inputs === inputs && !force) {
+        console.log(`skip ${target.label} (inputs unchanged)`);
+        continue;
+      }
+      const jpeg = await renderCard(
+        await fetchCover(target.coverSlug, cover),
+        target.lines,
+        {
+          label: target.label,
+        },
+      );
+      const hash = sha256(jpeg);
+      const key = `${target.prefix}${hash.slice(0, 8)}.jpg`;
+      if (dryRun) {
+        console.log(`would upload ${key} ${jpeg.length}`);
+        continue;
+      }
+      await putObject(r2, key, jpeg, "image/jpeg", { cacheControl: IMMUTABLE });
+      const head = await headObject(r2, key);
+      if (head?.size !== jpeg.length) {
+        throw new Error(`head size ${head?.size} != ${jpeg.length}`);
+      }
+      const url = publicUrl(r2, key);
+      const problems = checkPublic(await getPublic(url), hash, "image/jpeg");
+      if (problems.length) throw new Error(problems.join(", "));
+      target.set({
+        key,
+        url,
+        type: "image/jpeg",
+        width: 1200,
+        height: 630,
+        bytes: jpeg.length,
+        sha256: hash,
+        inputs,
+      });
+      writeManifest(manifest);
+      console.log(`ok ${target.label} ${key} ${jpeg.length}`);
+    } catch (error) {
+      failed += 1;
+      console.error(`[media] ${target.label}: ${error.message || error}`);
+    }
+  }
+  if (failed) process.exit(1);
+}
+
 /**
  * D-07 sign-off pictures. Preview only: writes under .media-probe/share/,
  * never R2, never the manifest. Proposed labels (D-03) exist only here.
  */
 async function share() {
   if (!preview && !booking) {
-    console.error("[media] share upload lands after the D-07 signature");
-    process.exit(1);
+    await shareUpload();
+    return;
   }
   const out = join(root, ".media-probe", "share");
   mkdirSync(out, { recursive: true });
@@ -789,6 +777,5 @@ async function share() {
 
 if (command === "share") await share();
 else if (command === "check") await check();
-else if (command === "import-live") await importLive();
 else if (command === "verify") await verify();
 else await generateMedia();
