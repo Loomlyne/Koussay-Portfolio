@@ -182,7 +182,7 @@ All plans run sequentially in the main checkout (control session).
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02-PLAN.md — Package gate for geist and fontkit (Koussay confirms), Geist share-card renderer with tests
+- [x] 03-02-PLAN.md — Package gate for geist and fontkit (Koussay confirms), Geist share-card renderer with tests
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -344,7 +344,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
 | 2. Projects served from the repo | 11/11 | Complete    | 2026-10-04 |
-| 3. Notion projects path removed | 1/7 | In Progress|  |
+| 3. Notion projects path removed | 2/7 | In Progress|  |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |
 | 5. Case-study page that closes | 0/TBD | Not started | - |
