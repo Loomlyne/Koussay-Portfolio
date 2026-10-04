@@ -50,7 +50,77 @@ function meta(html, name) {
   return null;
 }
 
-function extract(html) {
+// React streams a Suspense fallback first and a hidden segment after it; the
+// browser's inline $RC script swaps them. Do the same swap on the raw HTML so
+// both sides are measured as rendered, not as streamed.
+function divEnd(html, from) {
+  let depth = 0;
+  const re = /<div\b|<\/div>/g;
+  re.lastIndex = from;
+  for (let m = re.exec(html); m; m = re.exec(html)) {
+    depth += m[0] === "</div>" ? -1 : 1;
+    if (depth === 0) return m.index + m[0].length;
+  }
+  return -1;
+}
+
+function boundaryEnd(html, from) {
+  let depth = 0;
+  const re = /<!--\$[?!]?-->|<!--\/\$-->/g;
+  re.lastIndex = from;
+  for (let m = re.exec(html); m; m = re.exec(html)) {
+    depth += m[0] === "<!--/$-->" ? -1 : 1;
+    if (depth === 0) return m.index + m[0].length;
+  }
+  return -1;
+}
+
+function resolveStreaming(input) {
+  let html = input;
+  const segments = new Map();
+  for (;;) {
+    const seg = html.match(/<div hidden id="S:(\d+)">/);
+    if (!seg) break;
+    const end = divEnd(html, seg.index);
+    if (end < 0) throw new Error(`unbalanced streamed segment S:${seg[1]}`);
+    segments.set(
+      seg[1],
+      html.slice(seg.index + seg[0].length, end - "</div>".length),
+    );
+    html = html.slice(0, seg.index) + html.slice(end);
+  }
+  // A segment's boundary can sit inside another segment, so swap until none
+  // is left that has a boundary to land in.
+  for (let progress = true; progress && segments.size;) {
+    progress = false;
+    for (const [id, inner] of segments) {
+      // $RS: the segment replaces its placeholder template in place.
+      const slot = `<template id="P:${id}"></template>`;
+      if (html.includes(slot)) {
+        html = html.replace(slot, () => inner);
+        segments.delete(id);
+        progress = true;
+        continue;
+      }
+      const open = html.indexOf(`<!--$?--><template id="B:${id}"></template>`);
+      if (open < 0) continue;
+      const close = boundaryEnd(html, open);
+      if (close < 0) throw new Error(`unbalanced boundary B:${id}`);
+      html = `${html.slice(0, open)}<!--$-->${inner}<!--/$-->${html.slice(close)}`;
+      segments.delete(id);
+      progress = true;
+    }
+  }
+  if (segments.size) {
+    throw new Error(
+      `streamed segments without a boundary: ${[...segments.keys()]}`,
+    );
+  }
+  return html.replace(/<script>\$R[CS]\([^<]*<\/script>/g, "");
+}
+
+function extract(raw) {
+  const html = resolveStreaming(raw);
   const t = html.match(/<title[^>]*>([\s\S]*?)<\/title>/);
   const h1 =
     html.match(/<h1[^>]*id="project-title"[^>]*>([\s\S]*?)<\/h1>/) ??
@@ -65,10 +135,12 @@ function extract(html) {
         .filter(Boolean)
         .map((m) => decode(m[1]))
     : [];
-  const main = html.match(/<main[^>]*>([\s\S]*?)<\/main>/);
+  const main = [...html.matchAll(/<main([^>]*)>([\s\S]*?)<\/main>/g)].find(
+    (m) => !/aria-busy="true"/.test(m[1]),
+  );
   const mainText = main
     ? text(
-        main[1]
+        main[2]
           .replace(/<script[\s\S]*?<\/script>/g, "")
           .replace(/<style[\s\S]*?<\/style>/g, "")
           .replace(/<noscript[\s\S]*?<\/noscript>/g, "")
