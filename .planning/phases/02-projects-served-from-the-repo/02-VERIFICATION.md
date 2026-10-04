@@ -1,7 +1,7 @@
 ---
 phase: 02-projects-served-from-the-repo
 verified: 2026-10-04T18:24:00+04:00
-status: human_needed
+status: passed
 score: 9/9 success criteria verified by code and command; SC1 visual side-by-side awaits Koussay's UAT
 overrides_applied: 0
 human_verification:
@@ -161,3 +161,7 @@ No blocking gaps. Every success criterion, requirement and decision is met in th
 
 _Verified: 2026-10-04 18:24 +04_
 _Verifier: Claude (gsd-verifier)_
+
+## UAT
+
+Koussay ran the six UAT steps on the final local build (port 3100) and answered "All pass" in the control session, 2026-10-04 18:35 +0400. The SC1 visual check is closed.

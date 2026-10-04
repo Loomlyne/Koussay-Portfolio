@@ -23,6 +23,7 @@ A prospect can go from the ring to a true case study to a booked call without me
 - ✓ Next.js patched to 16.3.8 for the critical Image Optimization RCE — this session
 - ✓ Prettier baseline, Playwright smoke test (home, every project, booking; desktop and phone) — Phase 1
 - ✓ Geist and Geist Mono for every face, OFL shipped; PP Neue Montreal and Satoshi removed — Phase 1
+- ✓ The live eight projects served from repo content modules; images on Cloudflare R2 at media.koussay.online; placeholders and Behance art removed — Phase 2
 - ✓ LICENSE credits Koussay above Yousuf Soomro, upstream MIT and simplex notices intact; README and BREAKDOWN credit the upstream ring — Phase 1
 
 ### Active
@@ -32,7 +33,6 @@ A prospect can go from the ring to a true case study to a booked call without me
 - [ ] Each project has a Higgsfield-generated cover and gallery art; branding Koussay made for the project is in its gallery
 - [ ] Each project has a launch video (brag skill plus Higgsfield); the ring shows a still, the project page hero autoplays it muted with the still as poster
 - [ ] Payme shows a pre-launch state (no live URL yet) without looking broken
-- [ ] Project content and media references live in the repo; Notion is no longer read for projects
 - [ ] All media served from Cloudflare R2 with immutable URLs; the Notion media proxy and PDF renderer are deleted
 - [ ] Bookings and blocked time keep working through Notion and Resend after the projects side is removed
 - [ ] No Behance art, no invented names, types or years in the tree or served to visitors (fonts done in Phase 1)
@@ -80,7 +80,7 @@ A prospect can go from the ring to a true case study to a booked call without me
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Real work plus generated art, eight cards | Every click must land on a true project; generated covers fill where screenshots are weak | — Pending |
-| Drop Notion for projects, keep it for bookings | Notion caused the slow loads and 429s on the content path; bookings work and are read there | — Pending |
+| Drop Notion for projects, keep it for bookings | Notion caused the slow loads and 429s on the content path; bookings work and are read there | ✓ Good (Phase 2) |
 | Content in the repo, written by Claude from interviews | Koussay answers questions, Claude drafts, Koussay approves | — Pending |
 | Media on R2, immutable URLs | Decided earlier (auto memory); removes the proxy and PDF code | — Pending |
 | Launch video per project via brag skill plus Higgsfield; still on the ring, video on the page hero | Ring stays an image atlas; video in the shader deferred | — Pending |
@@ -107,4 +107,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-04 after Phase 1*
+*Last updated: 2026-10-04 after Phase 2*
