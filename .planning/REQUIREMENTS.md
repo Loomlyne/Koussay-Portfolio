@@ -161,7 +161,7 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | MEDIA-05 | Phase 7 | Pending |
 | MEDIA-06 | Phase 2 | Complete |
 | MEDIA-07 | Phase 3 | Complete |
-| MEDIA-08 | Phase 3 | In progress |
+| MEDIA-08 | Phase 3 | Complete |
 | MEDIA-09 | Phase 3 | Complete (amended) |
 | RING-01 | Phase 7 | Pending |
 | RING-02 | Phase 7 | Pending |
