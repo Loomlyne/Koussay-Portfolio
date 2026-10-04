@@ -16,7 +16,7 @@ The ring is the hook. The case studies and the booking form are the close.
 ### Constraints
 
 - **Hosting**: Vercel until Phase 3.1, then Cloudflare Workers in Koussay's own Cloudflare account (decided 2026-10-03)
-- **Bookings store**: Notion stays for bookings and blocked time — zero migration, Koussay reads them in Notion Calendar
+- **Bookings store**: Notion is dropped completely (2026-10-04); bookings and blocked time move to Cloudflare D1 in Phase 3.1, Resend sends the emails. Until then the live booking flow runs through Notion unchanged
 - **Media host**: Cloudflare R2 with content-addressed immutable URLs — Notion signed URLs expire and were the cause of slow cold loads
 - **Licensing**: nothing served that Koussay does not own or hold a licence for — public repo, commercial site
 - **Ring internals**: the non-obvious designs in `AGENTS.md` (packed `uScale`, fan-order indices, one-frame-stale focus, snap-only-decelerates, `forceContextLoss`) are preserved

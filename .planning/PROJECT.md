@@ -34,7 +34,7 @@ A prospect can go from the ring to a true case study to a booked call without me
 - [ ] Each project has a launch video (brag skill plus Higgsfield); the ring shows a still, the project page hero autoplays it muted with the still as poster
 - [ ] Payme shows a pre-launch state (no live URL yet) without looking broken
 - [ ] All media served from Cloudflare R2 with immutable URLs; the Notion media proxy and PDF renderer are deleted
-- [ ] Bookings and blocked time keep working through Notion and Resend after the projects side is removed
+- [ ] Bookings and blocked time keep working through Notion and Resend after the projects side is removed (Phase 3: booking code unchanged); then Notion is dropped completely and bookings move to Cloudflare D1 with Resend emails in Phase 3.1
 - [ ] No Behance art, no invented names, types or years in the tree or served to visitors (fonts done in Phase 1)
 - [ ] `/api/revalidate` fails closed without a secret, or is removed with the Notion projects path
 - [ ] `prefers-reduced-motion` skips the entry timeline and spin blur
@@ -45,7 +45,7 @@ A prospect can go from the ring to a true case study to a booked call without me
 ### Out of Scope
 
 - Video textures inside the ring shader — heavy; only after the image version ships, as its own phase
-- Moving bookings to Supabase or Neon — Notion works at a one-person calendar's volume; revisit if double bookings happen
+- Moving bookings to Supabase or Neon — superseded 2026-10-04: bookings move to Cloudflare D1 in Phase 3.1
 - Obox MENA and ZARA Dubai Hills cards — Koussay chose client sites and own products only
 - Blog, CMS admin, multi-language — not asked for
 - Rewriting git history to purge the Behance files — public repo risk is noted; decided separately from this milestone
@@ -67,7 +67,7 @@ A prospect can go from the ring to a true case study to a booked call without me
 ## Constraints
 
 - **Hosting**: Vercel until Phase 3.1, then Cloudflare Workers in Koussay's own Cloudflare account (decided 2026-10-03)
-- **Bookings store**: Notion stays for bookings and blocked time — zero migration, Koussay reads them in Notion Calendar
+- **Bookings store**: Notion is dropped completely (Koussay, 2026-10-04 21:25 +04). Bookings and blocked time move to Cloudflare D1 in Phase 3.1; Resend sends the emails. Until 3.1 ships, the live site keeps booking through Notion unchanged
 - **Media host**: Cloudflare R2 with content-addressed immutable URLs — Notion signed URLs expire and were the cause of slow cold loads
 - **Licensing**: nothing served that Koussay does not own or hold a licence for — public repo, commercial site
 - **Ring internals**: the non-obvious designs in `AGENTS.md` (packed `uScale`, fan-order indices, one-frame-stale focus, snap-only-decelerates, `forceContextLoss`) are preserved
@@ -81,6 +81,7 @@ A prospect can go from the ring to a true case study to a booked call without me
 |----------|-----------|---------|
 | Real work plus generated art, eight cards | Every click must land on a true project; generated covers fill where screenshots are weak | — Pending |
 | Drop Notion for projects, keep it for bookings | Notion caused the slow loads and 429s on the content path; bookings work and are read there | ✓ Good (Phase 2) |
+| Drop Notion completely; bookings to D1 in Phase 3.1, emails via Resend | Koussay's decision 2026-10-04 21:25 +04; one move with the Workers cut-over instead of building twice | Pending (Phase 3.1) |
 | Content in the repo, written by Claude from interviews | Koussay answers questions, Claude drafts, Koussay approves | — Pending |
 | Media on R2, immutable URLs | Decided earlier (auto memory); removes the proxy and PDF code | — Pending |
 | Launch video per project via brag skill plus Higgsfield; still on the ring, video on the page hero | Ring stays an image atlas; video in the shader deferred | — Pending |

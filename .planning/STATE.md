@@ -93,7 +93,7 @@ None yet.
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Booking | Live blocked time: Vercel Production has no `NOTION_CALENDAR_DATABASE_ID`, so Notion Calendar blocks do not hide slots on koussay.online. Koussay chose to set it with the Worker secrets in Phase 3.1, not on Vercel | Phase 3.1 | 2026-10-04 |
+| Booking | Live blocked time: Vercel Production has no `NOTION_CALENDAR_DATABASE_ID`, so Notion Calendar blocks do not hide slots on koussay.online. Superseded 2026-10-04 21:25 +04: Notion is dropped; bookings and blocked time move to D1 in Phase 3.1 | Phase 3.1 | 2026-10-04 |
 
 ## Session Continuity
 

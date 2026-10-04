@@ -47,7 +47,7 @@ Requirements for this milestone. Each maps to a roadmap phase.
 - [x] **MEDIA-06**: `next.config.mjs` allows the R2 host in `images.remotePatterns`; ring stills and hero posters bypass the Vercel optimiser, gallery screenshots use `next/image`
 - [x] **MEDIA-07**: Open Graph and Twitter images are pre-rendered by the script and served as static files; no `sharp` runs at request time
 - [x] **MEDIA-08**: The Notion projects path is deleted: `/api/media/*`, `/api/cms-stamp`, `/api/revalidate`, `CmsLive`, `lib/pdf.js`, `lib/notion/gallery-pdf.js`, `lib/notion/projects.js`, the `unstable_cache` layer, `pdfjs-dist`, `unpdf`, `@napi-rs/canvas`, the canvas `outputFileTracingIncludes`; `sharp` leaves `dependencies`
-- [ ] **MEDIA-09**: Bookings and blocked time keep working through Notion and Resend after the removal; `lib/notion/client.js` and `lib/notion/bookings.js` stay; Koussay removes the dead Vercel env vars and the Notion webhook in one numbered step
+- [x] **MEDIA-09**: Bookings and blocked time keep working through Notion and Resend after the removal; `lib/notion/client.js` and `lib/notion/bookings.js` stay; Koussay removes the dead Vercel env vars and the Notion webhook in one numbered step. *Amended 2026-10-04 21:25 +04: Notion is being dropped, so the local Notion test booking is not run; proof is the booking code being byte-identical to `ca24456` and the live booking flow unchanged.*
 
 ### Ring (RING)
 
@@ -84,6 +84,7 @@ Requirements for this milestone. Each maps to a roadmap phase.
 
 ### Platform (PLAT)
 
+- [ ] **PLAT-02**: Notion is removed completely: bookings and blocked time are stored in Cloudflare D1 in Koussay's account, Resend sends the visitor and owner emails, and `@notionhq/client`, `lib/notion/*` and every `NOTION_*` variable are gone (Koussay, 2026-10-04 21:25 +04)
 - [ ] **PLAT-01**: The site is served by Cloudflare Workers in Koussay's Cloudflare account, every page and the booking flow work there, and the Vercel project is removed after a week of clean running
 
 ### Tests (TEST)
@@ -161,7 +162,7 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | MEDIA-06 | Phase 2 | Complete |
 | MEDIA-07 | Phase 3 | Complete |
 | MEDIA-08 | Phase 3 | In progress |
-| MEDIA-09 | Phase 3 | In progress |
+| MEDIA-09 | Phase 3 | Complete (amended) |
 | RING-01 | Phase 7 | Pending |
 | RING-02 | Phase 7 | Pending |
 | A11Y-01 | Phase 6 | Pending |
@@ -186,6 +187,7 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | TEST-01 | Phase 1 | Complete |
 | TEST-02 | Phase 2 | Complete |
 | PLAT-01 | Phase 3.1 | Pending |
+| PLAT-02 | Phase 3.1 | Pending |
 
 **Coverage:**
 - v1 requirements: 54 total

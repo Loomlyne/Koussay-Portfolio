@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Baseline and licence hygiene** - Prettier-only commit first, a green smoke test, Geist for every face, licence notices correct, dead files gone (completed 2026-10-03)
 - [x] **Phase 2: Projects served from the repo, media on R2** - The live eight read from content modules with the full schema and build-time validation; placeholders gone; no visible change (completed 2026-10-04)
-- [ ] **Phase 3: Notion projects path removed** - Proxy, PDF renderer, CMS cache and runtime `sharp` deleted; OG images static; bookings proven still working
+- [x] **Phase 3: Notion projects path removed** - Proxy, PDF renderer, CMS cache and runtime `sharp` deleted; OG images static; bookings proven still working (completed 2026-10-04)
 - [ ] **Phase 3.1: Hosting on Cloudflare Workers** (INSERTED) - The site runs on Workers in Koussay's Cloudflare account; Vercel serves nothing
 - [x] **Phase 4: R2 media delivery** - Merged into Phase 2 (2026-10-04); DNS done 2026-10-03
 - [ ] **Phase 5: Case-study page that closes** - Facts strip, ordered narrative, honest image labels, Identity section, status chip, closing call to action with WhatsApp and `?from=` booking
@@ -163,7 +163,7 @@ Plans:
 
   1. A grep for `lib/cms`, `notion/projects`, `api/media`, `gallery-pdf`, `lib/pdf`, `cms-stamp`, `api/revalidate`, `CmsLive` and `unstable_cache` is clean outside `.planning/`; `pdfjs-dist`, `unpdf` and `@napi-rs/canvas` are uninstalled; `sharp` is not in `dependencies`; `serverExternalPackages` and `outputFileTracingIncludes` are gone from `next.config.mjs`.
   2. Each project's Open Graph and Twitter image is a pre-rendered static file showing that project's cover, the home and booking pages keep a working image, and no request runs `sharp`.
-  3. A booking made on the preview deployment creates the Notion row, shows in Notion Calendar, and sends both the visitor and owner Resend emails; a blocked-time entry still hides its slots. `lib/notion/client.js` and `lib/notion/bookings.js` are intact.
+  3. Booking code (`lib/book/*`, `lib/notion/bookings.js`, `lib/mail/*`, `app/api/book/*`, `components/book/*`) is byte-identical to before the phase, so the live booking flow is unchanged. *Amended 2026-10-04 21:25 +04: the Notion test booking is dropped because Notion is being removed in Phase 3.1.*
   4. `NOTION_PROJECTS_DATABASE_ID` and `NOTION_WEBHOOK_SECRET` are gone from Vercel, `.env.example` and the README Quick start, and the Notion webhook subscription no longer exists.
 
 **Koussay's steps**:
@@ -202,21 +202,21 @@ All plans run sequentially in the main checkout (control session).
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 03-07-PLAN.md — Booking proof on localhost:3100 with real keys (D-08) and a Notion calendar block (D-10), Koussay deletes the TEST row (D-09), criterion 4 pending post-ship
+- [x] 03-07-PLAN.md — Booking proof on localhost:3100 with real keys (D-08) and a Notion calendar block (D-10), Koussay deletes the TEST row (D-09), criterion 4 pending post-ship
 
 ### Phase 3.1: Hosting on Cloudflare Workers (INSERTED)
 
-**Goal**: koussay.online is served by Cloudflare Workers in Koussay's own Cloudflare account, every page and the booking flow work there, and Vercel serves nothing.
+**Goal**: koussay.online is served by Cloudflare Workers in Koussay's own Cloudflare account, bookings live in Cloudflare D1 with Resend emails and Notion is gone completely, every page and the booking flow work there, and Vercel serves nothing.
 **Mode:** mvp
 **Depends on**: Phase 3 (no Notion proxy, PDF renderer or request-time `sharp` left in the runtime)
-**Requirements**: PLAT-01
-**Research**: yes (Next.js 16 on Workers: OpenNext vs vinext, Speed Insights replacement, image optimisation without Vercel, env and secrets on Workers, preview deployments)
+**Requirements**: PLAT-01, PLAT-02
+**Research**: yes (D1 schema for bookings and blocked time, how Koussay sees bookings and blocks time without Notion Calendar, migrating existing Notion bookings; Next.js 16 on Workers: OpenNext vs vinext, Speed Insights replacement, image optimisation without Vercel, env and secrets on Workers, preview deployments)
 **Success Criteria** (what must be TRUE):
 
   1. `koussay.online` and `www` resolve to a Worker in Koussay's account (`4afee478…`, `cf` profile `koussay`); a response header or `cf-ray` proves Cloudflare served the HTML, not Vercel.
   2. Every route the smoke test covers (home, every project, booking, desktop and phone) passes against the Workers build and against production after the switch.
-  3. A booking made on the Workers preview creates the Notion row, shows in Notion Calendar, and sends both Resend emails; blocked time still hides its slots.
-  4. Secrets live as Worker secrets set by Koussay in his terminal, including `NOTION_CALENDAR_DATABASE_ID` (missing on Vercel Production since before Phase 3, so live blocked time starts working here); no secret is in the repo, the Worker config or a log.
+  3. A booking made on the Workers preview is stored in D1 and sends both Resend emails; blocked time still hides its slots; `@notionhq/client`, `lib/notion/*` and every `NOTION_*` variable are gone.
+  4. Secrets live as Worker secrets set by Koussay in his terminal, (no Notion secrets; Notion is dropped); no secret is in the repo, the Worker config or a log.
   5. After a week of clean running on Workers, the Vercel project is removed and no Vercel deployment URL serves the site.
 
 **Koussay's steps**:
@@ -344,7 +344,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
 | 2. Projects served from the repo | 11/11 | Complete    | 2026-10-04 |
-| 3. Notion projects path removed | 6/7 | In Progress|  |
+| 3. Notion projects path removed | 7/7 | Complete   | 2026-10-04 |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |
 | 5. Case-study page that closes | 0/TBD | Not started | - |
