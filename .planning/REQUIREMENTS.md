@@ -10,7 +10,7 @@ Requirements for this milestone. Each maps to a roadmap phase.
 ### Content (CONT)
 
 - [ ] **CONT-01**: The eight live Notion projects are snapshotted into repo content modules under their exact slugs (`fido-homes`, `elysee-home-design`, `clickit-story`, `artemis-luxe`, `vamos-taxi` kept verbatim; `invios`, `payme` and `numai-trading` added), with the three retired projects (Pixenhouse, Looma Kitchen, ALMAR) removed
-- [ ] **CONT-02**: The content schema carries `kind` (client | own), `client`, `industry`, `location`, `year`, `role`, `services[]`, `status` (live | pre-launch), `liveUrl`, `summary`, `challenge`, `approach`, `outcome`, `tools[]`, `identity` (logos, fonts, colours, author credit), gallery items with `kind` (screenshot | generated | identity | video) and `caption`
+- [x] **CONT-02**: The content schema carries `kind` (client | own), `client`, `industry`, `location`, `year`, `role`, `services[]`, `status` (live | pre-launch), `liveUrl`, `summary`, `challenge`, `approach`, `outcome`, `tools[]`, `identity` (logos, fonts, colours, author credit), gallery items with `kind` (screenshot | generated | identity | video) and `caption`
 - [ ] **CONT-03**: Each of the eight projects has a case study written by Claude from an interview with Koussay and approved by him before it is committed; summaries are answer-first; outcomes are checkable facts, never invented metrics
 - [ ] **CONT-04**: Payme is a complete pre-launch case study: status chip, no live link, full story written as pre-launch, with wording Koussay approved
 - [ ] **CONT-05**: Branding shown in any Identity section is credited to its author; where Khadija made it, the credit names her
@@ -133,7 +133,7 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CONT-01 | Phase 7 | Pending |
-| CONT-02 | Phase 2 | Pending |
+| CONT-02 | Phase 2 | Complete |
 | CONT-03 | Phase 7 | Pending |
 | CONT-04 | Phase 7 | Pending |
 | CONT-05 | Phase 7 | Pending |
