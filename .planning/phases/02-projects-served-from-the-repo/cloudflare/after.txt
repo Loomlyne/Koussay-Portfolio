@@ -1,0 +1,75 @@
+# After apply, 2026-10-04 16:26 +04
+
+## Read-back
+{
+  "description": "",
+  "id": "3062585e605b450bb0b3adc72a3ca668",
+  "kind": "zone",
+  "last_updated": "2026-10-04T12:25:40.971008Z",
+  "name": "default",
+  "phase": "http_response_headers_transform",
+  "rules": [
+    {
+      "action": "rewrite",
+      "action_parameters": {
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "operation": "set",
+            "value": "*"
+          }
+        }
+      },
+      "description": "media.koussay.online: CORS on every response",
+      "enabled": true,
+      "expression": "(http.host eq \"media.koussay.online\")",
+      "id": "f055f0404f6d40bfb251e74e65152374",
+      "last_updated": "2026-10-04T12:25:40.971008Z",
+      "ref": "f055f0404f6d40bfb251e74e65152374",
+      "version": "1"
+    }
+  ],
+  "version": "1"
+}
+
+## media, no Origin
+HTTP/2 404 
+date: Sun, 04 Oct 2026 12:26:32 GMT
+content-type: text/html
+access-control-allow-origin: *
+server: cloudflare
+cf-cache-status: DYNAMIC
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=6MtJomjkJaFE%2B5mWVd2x9vE8t0TQWHI2zWbvQv7%2BAlBAHZf0iL9hcdw3E4CnTMeK4SLVRGwoKC1IAymgZSqYarGBdSyZue0fIQj3MtUwqYkKClgsB7SkKaKXe6SoGBNsmPqlWBTEWQ%3D%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cf-ray: a4542cf06933aa73-LHR
+
+## media, Origin https://koussay.online
+HTTP/2 404 
+date: Sun, 04 Oct 2026 12:26:33 GMT
+content-type: text/html
+access-control-allow-origin: *
+vary: Origin
+access-control-expose-headers: Content-Length,Content-Range,ETag
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-cache-status: DYNAMIC
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=m02QUjYAlIVlU%2Bv%2BPX7TaJUXtn5zELmx5AacWO7DsRy0xqIkRzsaE33fVKY5gV7QDd%2F9eGzjfDIXrv%2BlhyXLtDRhQfaUR54JXSw1Y%2FvEcAnjMM%2F6TWUis4CV604p7y0xzX1gDLD%2BdQ%3D%3D"}]}
+cf-ray: a4542cf4dfec416a-LHR
+
+## apex https://koussay.online/
+HTTP/2 200 
+age: 21
+cache-control: public, max-age=0, must-revalidate
+content-type: text/html; charset=utf-8
+date: Sun, 04 Oct 2026 12:16:47 GMT
+etag: "l5dalpsmf2pd2"
+server: Vercel
+strict-transport-security: max-age=63072000
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+x-matched-path: /
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+x-powered-by: Next.js
+x-vercel-cache: HIT
+x-vercel-id: bom1::iad1::ffjdl-1791116793490-1c307e4b67d6
+content-length: 32893
+

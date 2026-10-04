@@ -1,0 +1,21 @@
+Captured 2026-10-04, from the repo folder, cf profile koussay
+Account: 4afee478d464878bd7c06b92b6b526c3 (koussay.online), zone d98c6ae2d8f14c329dafe0fa530a9d98
+
+== read http_response_headers_transform entrypoint (exit 1)
+[10003] could not find entrypoint ruleset in the http_response_headers_transform phase (404)
+
+== probe https://media.koussay.online/__acao-probe-404, no Origin
+HTTP/2 404
+cf-cache-status: DYNAMIC
+(no access-control-allow-origin, no vary)
+
+== probe, Origin: https://koussay.online
+HTTP/2 404
+access-control-allow-origin: *
+vary: Origin
+cf-cache-status: DYNAMIC
+(this ACAO comes from the R2 bucket CORS, only when Origin is sent)
+
+== dry run (--validate-only true), exit 0, no output
+== read again after dry run (exit 1)
+[10003] entrypoint still absent, nothing persisted

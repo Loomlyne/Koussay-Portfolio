@@ -1,0 +1,13 @@
+[
+  {
+    "description": "media.koussay.online: CORS on every response",
+    "expression": "(http.host eq \"media.koussay.online\")",
+    "action": "rewrite",
+    "action_parameters": {
+      "headers": {
+        "Access-Control-Allow-Origin": { "operation": "set", "value": "*" }
+      }
+    },
+    "enabled": true
+  }
+]
