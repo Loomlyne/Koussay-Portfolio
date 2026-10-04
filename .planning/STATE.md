@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: ready_to_plan
-stopped_at: Phase 1 complete (6/6) — ready to discuss Phase 2
-last_updated: 2026-10-03T20:52:46.880Z
-last_activity: 2026-10-03
+stopped_at: Phase 1 shipped 2026-10-04 — ready to discuss Phase 2
+last_updated: "2026-10-04T10:35:06.184Z"
+last_activity: 2026-10-04
 progress:
   total_phases: 9
   completed_phases: 1
@@ -69,6 +69,7 @@ Recent decisions affecting current work:
 - [Phase 01]: Phase 1 Plan 02: screenshot moments timed from DOM signals, not wall clock
 - [Phase 01]: Geist/Geist Mono variable woff2; -0.02em tracking proposals await Plan 04 sign-off — D-06
 - [Phase ?]: Koussay signed the Geist type 2026-10-03 22:38: tracking -0.02 em heading and names; Geist Mono for booking weekday letters
+- [Phase ?]: Phase 1 shipped 2026-10-04 14:25 +04 (c557904..a408371); archive/pre-phase-1 tag on GitHub
 
 ### Pending Todos
 
