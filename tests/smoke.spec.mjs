@@ -137,9 +137,12 @@ test("every project page renders", async ({ page, request }) => {
       await expect
         .soft(page.locator("#project-title"), path)
         .toHaveText(project.name);
-      await expect
-        .soft(page.getByText(project.summary, { exact: true }), path)
-        .toBeVisible();
+      // The schema allows an empty summary (D-09); nothing renders then.
+      if (project.summary) {
+        await expect
+          .soft(page.getByText(project.summary, { exact: true }), path)
+          .toBeVisible();
+      }
       // The hero is eager and preloaded, so currentSrc is safe to read here.
       const hero = page.locator(`main header img[src^="${R2}"]`).first();
       await expect
@@ -162,12 +165,18 @@ test("every project page renders", async ({ page, request }) => {
 });
 
 test("gallery items come from R2 through the optimizer", async ({ page }) => {
-  const project = PROJECTS_IN_ORDER[0];
+  // Pick by data, not ring position: any project may have an empty gallery.
+  const project = PROJECTS_IN_ORDER.find((p) => p.gallery.length > 0);
+  test.skip(!project, "no project has gallery items");
   await page.goto(`/project/${project.slug}`);
   const imgs = page.locator('section[aria-label="Gallery"] img');
   await expect(imgs).toHaveCount(project.gallery.length);
   const alts = await imgs.evaluateAll((els) => els.map((e) => e.alt));
-  expect(alts).toEqual(project.gallery.map((g) => g.alt));
+  // A null alt falls back to a generated one; it must still be non-empty.
+  for (const [n, g] of project.gallery.entries()) {
+    if (g.alt) expect(alts[n]).toBe(g.alt);
+    else expect(alts[n]).not.toBe("");
+  }
   // Attributes, not currentSrc: most items are lazy and have not loaded.
   const marker = "/_next/image?url=https%3A%2F%2Fmedia.koussay.online";
   const attrs = await imgs.evaluateAll((els) =>
