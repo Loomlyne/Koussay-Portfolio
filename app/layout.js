@@ -4,6 +4,7 @@ import { preload } from "react-dom";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "./providers";
 import JsonLd from "@/components/JsonLd";
+import { getHomeShare } from "@/lib/content";
 import {
   graph,
   localBusinessSchema,
@@ -16,6 +17,8 @@ import {
   SITE_NAME,
   SITE_URL,
 } from "@/lib/site";
+
+const homeShare = getHomeShare();
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -55,6 +58,14 @@ export const metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — Identities and digital experiences`,
     description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: homeShare.url,
+        width: homeShare.width,
+        height: homeShare.height,
+        alt: homeShare.alt,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

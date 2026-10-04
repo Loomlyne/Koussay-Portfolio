@@ -1,12 +1,13 @@
 import { RegisterHome } from "@/components/HomeRing";
 import JsonLd from "@/components/JsonLd";
-import { getProjects } from "@/lib/content";
+import { getHomeShare, getProjects } from "@/lib/content";
 import { projectImageSrc } from "@/lib/projects";
 import { graph, projectListSchema } from "@/lib/seo";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 export async function generateMetadata() {
   const title = `${SITE_NAME} — Identities and digital experiences`;
+  const home = getHomeShare();
 
   return {
     title: { absolute: title },
@@ -18,6 +19,14 @@ export async function generateMetadata() {
       title,
       description: SITE_DESCRIPTION,
       url: SITE_URL,
+      images: [
+        {
+          url: home.url,
+          width: home.width,
+          height: home.height,
+          alt: home.alt,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",

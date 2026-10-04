@@ -11,6 +11,7 @@ import {
   getProjectNavigation,
   getProjectStaticParams,
   projectHref,
+  shareImageAlt,
 } from "@/lib/projects";
 import { breadcrumbSchema, graph, projectSchema } from "@/lib/seo";
 
@@ -47,6 +48,14 @@ export async function generateMetadata({ params }) {
       description,
       url,
       type: "article",
+      images: [
+        {
+          url: project.og.url,
+          width: 1200,
+          height: 630,
+          alt: shareImageAlt(project),
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
