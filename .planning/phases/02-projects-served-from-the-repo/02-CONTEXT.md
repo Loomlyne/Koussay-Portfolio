@@ -107,3 +107,11 @@ Requirements: CONT-02, CONT-06, CONT-08, HYG-08, plus (moved from Phase 4) MEDIA
 
 *Phase: 02-projects-served-from-the-repo*
 *Context gathered: 2026-10-04*
+
+## Addendum after research (2026-10-04, Koussay)
+
+- **D-12:** `overview` is kept as a required content key with its live text (every live page renders an Overview section). `approach` stays empty until Phase 7.
+- **D-13:** Pixenhouse's 29 PDF-page gallery images get gallery `kind: "identity"`.
+- **D-14:** The 404 page's `public/404.webp` is replaced by live "404" text in Geist at the same size and position; Koussay signs a before/after screenshot at UAT.
+- **D-15:** LICENSE's Behance note is replaced by this approved wording: "Project images and videos served from media.koussay.online belong to Koussay Zayani or to the clients named on each project page. They are not covered by the MIT licence and may not be reused."
+- **D-16:** HYG-08 is already satisfied per research (Vercel Standard Protection; old deployment URLs 302 to login); Koussay confirms in the dashboard and with one private-window check.
