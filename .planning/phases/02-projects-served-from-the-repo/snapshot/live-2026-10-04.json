@@ -1,0 +1,652 @@
+{
+  "capturedAt": "2026-10-04T12:16:52.042Z",
+  "source": "https://koussay.online",
+  "order": [
+    "pixenhouse",
+    "vamos-taxi",
+    "looma-kitchen",
+    "almar-private-journey",
+    "fido-homes",
+    "elysee-home-design",
+    "clickit-story",
+    "artemis-luxe"
+  ],
+  "projects": [
+    {
+      "id": "3d11a384-621f-8123-a0eb-ccc65b2d6ccf",
+      "updatedAt": "2026-09-14T11:45:00.000Z",
+      "file": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf?v=2026-09-14T11%3A45%3A00.000Z-1c14cb7c",
+      "slug": "pixenhouse",
+      "name": "PIXENHOUSE",
+      "type": "Brand & Web",
+      "year": "2026",
+      "liveUrl": "https://www.pixenhouse.ae",
+      "order": 1,
+      "detail": {
+        "summary": "Brand and website for a Dubai production studio. New identity, their green kept, built in Framer so a first visit explains who they are.",
+        "overview": "PIXENHOUSE makes commercials, brand films, social content, and influencer work. I designed the logo, colour, type, and guidelines from scratch, then designed and built the full site in Framer. The page answers questions as you scroll: who they are, who they work with, what they do, how they work, their network, what people say, then what people ask. Green is the one thing I kept.",
+        "challenge": "The old brand was basic and the site was broken, so the studio was hard to read. They needed a fresh identity without losing the green people already knew, and a site that could stand in for a pitch. 11 days, 4 to 15 February 2026.",
+        "outcome": "The studio can explain itself in one scroll. Since launch they signed two large clients on one-year contracts from the website.",
+        "gallery": [
+          {
+            "file": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+            "alt": "Brand Guideline Pixenhouse.pdf",
+            "kind": "pdf"
+          }
+        ],
+        "testimonial": {
+          "quote": "",
+          "author": "",
+          "role": ""
+        },
+        "tools": [
+          "Framer",
+          "Adobe illustrator",
+          "Adobe Photoshop"
+        ]
+      },
+      "index": 0
+    },
+    {
+      "id": "3d11a384-621f-81dd-b906-c53ebb1e049a",
+      "updatedAt": "2026-09-14T11:43:00.000Z",
+      "file": "/api/media/3d11a384621f81ddb906c53ebb1e049a?v=2026-09-14T11%3A43%3A00.000Z-e53ac2f0",
+      "slug": "vamos-taxi",
+      "name": "Vamos Taxi",
+      "type": "Full System",
+      "year": "2026",
+      "liveUrl": "https://www.vamostaxi.site",
+      "order": 2,
+      "detail": {
+        "summary": "Booking system for a Swiss airport-transfer company. I cut a long checkout down to two steps and built the client site and the dispatcher dashboard.",
+        "overview": "Vamos Taxi runs airport transfers and limousines in Switzerland. I designed the product interface and built the system in Next.js. Branded by Khadija. On vamostaxi.site the guest sets the trip and the car in the hero, then signs in or adds details and pays. Dispatchers work at dashboard.vamostaxi.site. Cloudflare, Resend, Mapbox, Google Maps, email, and WhatsApp sit in the same product.",
+        "challenge": "Bookings were almost all manual. He confirmed each one from his phone and lived in email. The old checkout was six or seven steps: details, add, flight, contact, pay, wait, check. The job was a two-step path for the guest and a board for him, not another inbox.",
+        "outcome": "The site is public. Booking, email confirmation, and WhatsApp work. Fixes are still landing. Work started 15 August 2026.",
+        "gallery": [],
+        "testimonial": {
+          "quote": "",
+          "author": "",
+          "role": ""
+        },
+        "tools": [
+          "Next.js",
+          "Cloudflare",
+          "Resend",
+          "Mapbox",
+          "Google Maps",
+          "Hermes_Agent"
+        ]
+      },
+      "index": 1
+    },
+    {
+      "id": "3d11a384-621f-813b-8d92-fe88bcf82a58",
+      "updatedAt": "2026-09-04T19:11:00.000Z",
+      "file": "/api/media/3d11a384621f813b8d92fe88bcf82a58?v=2026-09-04T19%3A11%3A00.000Z-b132893a",
+      "slug": "looma-kitchen",
+      "name": "Looma Kitchen",
+      "type": "Full System",
+      "year": "2026",
+      "liveUrl": "https://www.loomakitchen.com",
+      "order": 3,
+      "detail": {
+        "summary": "Full restaurant system for a Dubai delivery kitchen. Guests order from the menu. The kitchen gets the ticket, assigns a chef, and the customer can follow the order out to delivery. Catering sits on the same product.",
+        "overview": "Looma Kitchen is a delivery-only kitchen in Business Bay. The client is Gabriel. Abood recommended me to him. I designed the product and built the public site and the kitchen dashboard from scratch. Branded by Khadija. Guests read the menu, order, and pay on loomakitchen.com. Large orders go through catering. On admin.loomakitchen.com the kitchen sees the full ticket, assigns it to a chef, and marks it out for delivery. The customer can check that status from their side.",
+        "challenge": "There was no system. Orders and kitchen flow had to be invented as one product: menu and checkout for the guest, tickets and chef assignment for the restaurant, tracking for the customer, and catering for bigger jobs. Three weeks in August 2026.",
+        "outcome": "The site is live. Everyday orders and catering both run through it. The kitchen can move an order from ticket to chef to delivery, and the customer can follow it.",
+        "gallery": [],
+        "testimonial": {
+          "quote": "",
+          "author": "",
+          "role": ""
+        },
+        "tools": [
+          "Figma",
+          "Adobe illustrator",
+          "Adobe Photoshop",
+          "Hermes_Agent"
+        ]
+      },
+      "index": 2
+    },
+    {
+      "id": "3d11a384-621f-81ed-87b4-da65cd242aee",
+      "updatedAt": "2026-09-04T19:16:00.000Z",
+      "file": "/api/media/3d11a384621f81ed87b4da65cd242aee?v=2026-09-04T19%3A16%3A00.000Z-2f68578f",
+      "slug": "almar-private-journey",
+      "name": "Almar Private Journey",
+      "type": "Brand & Web",
+      "year": "2026",
+      "liveUrl": "https://almarprod.framer.website/",
+      "order": 4,
+      "detail": {
+        "summary": "Brand and Framer site for a new private-travel studio. Services and experiences only. Guests request a consultation. No booking, no dashboard.",
+        "overview": "ALMAR plans private Colombia journeys for travellers in the UAE and GCC: vetted stays, concierge, cars, airport meet-and-greet, Cartagena and Medellín. The client is Maria V. Branded by Khadija. I designed and built the site in Framer as a showcase of what she can offer, with a consultation request, not a checkout. She did not want a booking system or a dashboard.",
+        "challenge": "A new business. Nothing existed yet. The site had to explain the offer, the stays, the services, and the journey tiers, then send people to a conversation. Two weeks of work, February to April 2026.",
+        "outcome": "The site is live. Consultation requests work. It shows the inventory and the three journey levels without turning into a booking product.",
+        "gallery": [],
+        "testimonial": {
+          "quote": "",
+          "author": "",
+          "role": ""
+        },
+        "tools": [
+          "Framer",
+          "Figma",
+          "Adobe illustrator",
+          "Adobe Photoshop"
+        ]
+      },
+      "index": 3
+    },
+    {
+      "id": "3d11a384-621f-8154-a6e3-f05c57f18a14",
+      "updatedAt": "2026-09-04T19:20:00.000Z",
+      "file": "/api/media/3d11a384621f8154a6e3f05c57f18a14?v=2026-09-04T19%3A20%3A00.000Z-e2d7e0d4",
+      "slug": "fido-homes",
+      "name": "Fido Homes",
+      "type": "Brand & Web",
+      "year": "2026",
+      "liveUrl": "https://www.fidohomes.ae",
+      "order": 5,
+      "detail": {
+        "summary": "Brand and Framer site for a new Dubai real estate agency. A project showcase they can update from the CMS.",
+        "overview": "Fido Homes is a Dubai agency for buying, selling, and investing. Wafa Dridi is the sales representative we worked with. Branded by Khadija. I designed and built the site in Framer: home, listings, about, contact, and a CMS so they can add projects themselves. It is a showcase, not a booking product.",
+        "challenge": "A new business. Nothing existed yet. They needed a brand and a site that could show developments clearly and stay current without a rebuild each time a project launched. February 2026.",
+        "outcome": "The site is live at fidohomes.ae. Brand, pages, and CMS are in their hands. Inquiry is on the site.",
+        "gallery": [],
+        "testimonial": {
+          "quote": "",
+          "author": "",
+          "role": ""
+        },
+        "tools": [
+          "Framer",
+          "Figma",
+          "Adobe illustrator",
+          "Adobe Photoshop"
+        ]
+      },
+      "index": 4
+    },
+    {
+      "id": "3d11a384-621f-81d8-b16c-e007e68c39c8",
+      "updatedAt": "2026-09-04T19:23:00.000Z",
+      "file": "/api/media/3d11a384621f81d8b16ce007e68c39c8?v=2026-09-04T19%3A23%3A00.000Z-aace0ee6",
+      "slug": "elysee-home-design",
+      "name": "Élysée Home Design",
+      "type": "Brand & Web",
+      "year": "2026",
+      "liveUrl": "https://www.elyseehomedesign.com",
+      "order": 6,
+      "detail": {
+        "summary": "Brand and Framer site for a new Dubai interior design studio. A project showcase they can update from the CMS.",
+        "overview": "Élysée Home Design is a Dubai interior studio for homes, offices, and commercial spaces: concept, 3D, materials, and site supervision. The client is Wafa Dridi, the founder. Branded by Khadija. I designed and built the site in Framer: projects, process, team, contact, and a CMS so they can add work themselves. It is a showcase, not a booking product.",
+        "challenge": "A new business. Nothing existed yet. They needed a brand and a site that could show interiors clearly and stay current without a rebuild each time a project finished. February 2026.",
+        "outcome": "The site is live at elyseehomedesign.com. Brand, pages, and CMS are in their hands. Inquiry is on the site.",
+        "gallery": [],
+        "testimonial": {
+          "quote": "",
+          "author": "",
+          "role": ""
+        },
+        "tools": [
+          "Framer",
+          "Figma",
+          "Adobe illustrator",
+          "Adobe Photoshop"
+        ]
+      },
+      "index": 5
+    },
+    {
+      "id": "3d11a384-621f-819a-86a9-cb0ccf77349f",
+      "updatedAt": "2026-09-04T19:28:00.000Z",
+      "file": "/api/media/3d11a384621f819a86a9cb0ccf77349f?v=2026-09-04T19%3A28%3A00.000Z-c0f4b2d8",
+      "slug": "clickit-story",
+      "name": "Clickit Story",
+      "type": "Full System",
+      "year": "2026",
+      "liveUrl": "https://www.clickitstory.ae",
+      "order": 7,
+      "detail": {
+        "summary": "Streaming platform for a Dubai production agency. People watch their shows and exclusive content on their own site. The dashboard is connected and live.",
+        "overview": "Clickit Story makes podcasts and shows. The owners are Issam Dridi and Nejib. They wanted their own streaming platform, not only social posts. I designed the interface and built the public site and the dashboard. They are fully connected. Guests sign in, watch originals, shorts, and live, in English and Arabic. Figma and Claude for design. Built with Hermes, Supabase, and Resend.",
+        "challenge": "A production house with no place of its own to publish exclusive work. They needed a watch experience and a board to run the catalogue, accounts, and sends, as one system.",
+        "outcome": "The platform is live at clickitstory.ae. Watching, sign-in, and the dashboard work together.",
+        "gallery": [],
+        "testimonial": {
+          "quote": "",
+          "author": "",
+          "role": ""
+        },
+        "tools": [
+          "Figma",
+          "Hermes_Agent",
+          "Supabase",
+          "Resend"
+        ]
+      },
+      "index": 6
+    },
+    {
+      "id": "3d11a384-621f-81c4-8ff3-deed646fea12",
+      "updatedAt": "2026-09-04T19:32:00.000Z",
+      "file": "/api/media/3d11a384621f81c48ff3deed646fea12?v=2026-09-04T19%3A32%3A00.000Z-7801ddaf",
+      "slug": "artemis-luxe",
+      "name": "Artemis Luxe",
+      "type": "Web Design",
+      "year": "2025",
+      "liveUrl": "https://www.artemis-luxe.com",
+      "order": 8,
+      "detail": {
+        "summary": "Framer site for a new Dubai luxury brand studio. Her identity. I built the site so consultation actually works.",
+        "overview": "Artemis Luxe is Anna Perrotta’s studio: brand consultancy, PR, events, social, influencer and press for luxury houses between Europe and the GCC. The client is Anna. The brand came from her. I designed and built the site in Framer: method, crafts, about, board, and a working consultation path.",
+        "challenge": "A new business in January 2025. Nothing existed yet. The site had to explain a high-touch offer and send people into a real conversation, without inventing a new brand for her.",
+        "outcome": "The site is live at artemis-luxe.com. Pages and inquiry work. Brand stays hers.",
+        "gallery": [],
+        "testimonial": {
+          "quote": "",
+          "author": "",
+          "role": ""
+        },
+        "tools": [
+          "Framer"
+        ]
+      },
+      "index": 7
+    }
+  ],
+  "pixenhouseGallery": [
+    {
+      "page": 1,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p1?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 1 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 2,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p2?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 2 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 3,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p3?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 3 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 4,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p4?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 4 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 5,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p5?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 5 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 6,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p6?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 6 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 7,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p7?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 7 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 8,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p8?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 8 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 9,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p9?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 9 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 10,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p10?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 10 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 11,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p11?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 11 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 12,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p12?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 12 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 13,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p13?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 13 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 14,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p14?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 14 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 15,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p15?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 15 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 16,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p16?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 16 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 17,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p17?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 17 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 18,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p18?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 18 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 19,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p19?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 19 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 20,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p20?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 20 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 21,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p21?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 21 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 22,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p22?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 22 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 23,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p23?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 23 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 24,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p24?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 24 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 25,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p25?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 25 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 26,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p26?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 26 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 27,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p27?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 27 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 28,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p28?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 28 of 29. Brand & Web by Koussay Zayani."
+    },
+    {
+      "page": 29,
+      "pages": 29,
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p29?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8",
+      "rscAlt": "Brand Guideline Pixenhouse.pdf",
+      "alt": "PIXENHOUSE — page 29 of 29. Brand & Web by Koussay Zayani."
+    }
+  ],
+  "media": [
+    {
+      "slug": "pixenhouse",
+      "slot": "cover",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf?v=2026-09-14T11%3A45%3A00.000Z-1c14cb7c"
+    },
+    {
+      "slug": "vamos-taxi",
+      "slot": "cover",
+      "from": "/api/media/3d11a384621f81ddb906c53ebb1e049a?v=2026-09-14T11%3A43%3A00.000Z-e53ac2f0"
+    },
+    {
+      "slug": "looma-kitchen",
+      "slot": "cover",
+      "from": "/api/media/3d11a384621f813b8d92fe88bcf82a58?v=2026-09-04T19%3A11%3A00.000Z-b132893a"
+    },
+    {
+      "slug": "almar-private-journey",
+      "slot": "cover",
+      "from": "/api/media/3d11a384621f81ed87b4da65cd242aee?v=2026-09-04T19%3A16%3A00.000Z-2f68578f"
+    },
+    {
+      "slug": "fido-homes",
+      "slot": "cover",
+      "from": "/api/media/3d11a384621f8154a6e3f05c57f18a14?v=2026-09-04T19%3A20%3A00.000Z-e2d7e0d4"
+    },
+    {
+      "slug": "elysee-home-design",
+      "slot": "cover",
+      "from": "/api/media/3d11a384621f81d8b16ce007e68c39c8?v=2026-09-04T19%3A23%3A00.000Z-aace0ee6"
+    },
+    {
+      "slug": "clickit-story",
+      "slot": "cover",
+      "from": "/api/media/3d11a384621f819a86a9cb0ccf77349f?v=2026-09-04T19%3A28%3A00.000Z-c0f4b2d8"
+    },
+    {
+      "slug": "artemis-luxe",
+      "slot": "cover",
+      "from": "/api/media/3d11a384621f81c48ff3deed646fea12?v=2026-09-04T19%3A32%3A00.000Z-7801ddaf"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p01",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p1?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p02",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p2?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p03",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p3?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p04",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p4?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p05",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p5?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p06",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p6?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p07",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p7?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p08",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p8?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p09",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p9?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p10",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p10?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p11",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p11?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p12",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p12?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p13",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p13?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p14",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p14?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p15",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p15?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p16",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p16?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p17",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p17?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p18",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p18?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p19",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p19?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p20",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p20?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p21",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p21?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p22",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p22?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p23",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p23?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p24",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p24?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p25",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p25?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p26",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p26?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p27",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p27?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p28",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p28?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    },
+    {
+      "slug": "pixenhouse",
+      "slot": "brand-guideline-p29",
+      "from": "/api/media/3d11a384621f8123a0ebccc65b2d6ccf/g0p29?v=2026-09-14T11%3A45%3A00.000Z-ab0a41e8"
+    }
+  ]
+}

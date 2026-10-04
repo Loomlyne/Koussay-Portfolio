@@ -1,0 +1,101 @@
+{
+  "home": {
+    "title": "Koussay Zayani — Identities and digital experiences",
+    "description": "Creative developer and brand designer. Identities and digital experiences, from first mark to live product.",
+    "h1": "Koussay Zayani"
+  },
+  "pixenhouse": {
+    "title": "PIXENHOUSE — Koussay Zayani",
+    "description": "Brand and website for a Dubai production studio. New identity, their green kept, built in Framer so a first visit explains who they are.",
+    "h1": "PIXENHOUSE",
+    "liveHref": "https://www.pixenhouse.ae",
+    "ogImage": "/project/pixenhouse/opengraph-image/cover?d1ee88d9f5b3c7f0",
+    "galleryAlts": [
+      "PIXENHOUSE — page 1 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 2 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 3 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 4 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 5 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 6 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 7 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 8 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 9 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 10 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 11 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 12 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 13 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 14 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 15 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 16 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 17 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 18 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 19 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 20 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 21 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 22 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 23 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 24 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 25 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 26 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 27 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 28 of 29. Brand & Web by Koussay Zayani.",
+      "PIXENHOUSE — page 29 of 29. Brand & Web by Koussay Zayani."
+    ]
+  },
+  "vamos-taxi": {
+    "title": "Vamos Taxi — Koussay Zayani",
+    "description": "Booking system for a Swiss airport-transfer company. I cut a long checkout down to two steps and built the client site and the dispatcher dashboard.",
+    "h1": "Vamos Taxi",
+    "liveHref": "https://www.vamostaxi.site",
+    "ogImage": "/project/vamos-taxi/opengraph-image/cover?d1ee88d9f5b3c7f0",
+    "galleryAlts": []
+  },
+  "looma-kitchen": {
+    "title": "Looma Kitchen — Koussay Zayani",
+    "description": "Full restaurant system for a Dubai delivery kitchen. Guests order from the menu. The kitchen gets the ticket, assigns a chef, and the customer can follow the order out to delivery. Catering sits on the same product.",
+    "h1": "Looma Kitchen",
+    "liveHref": "https://www.loomakitchen.com",
+    "ogImage": "/project/looma-kitchen/opengraph-image/cover?d1ee88d9f5b3c7f0",
+    "galleryAlts": []
+  },
+  "almar-private-journey": {
+    "title": "Almar Private Journey — Koussay Zayani",
+    "description": "Brand and Framer site for a new private-travel studio. Services and experiences only. Guests request a consultation. No booking, no dashboard.",
+    "h1": "Almar Private Journey",
+    "liveHref": "https://almarprod.framer.website/",
+    "ogImage": "/project/almar-private-journey/opengraph-image/cover?d1ee88d9f5b3c7f0",
+    "galleryAlts": []
+  },
+  "fido-homes": {
+    "title": "Fido Homes — Koussay Zayani",
+    "description": "Brand and Framer site for a new Dubai real estate agency. A project showcase they can update from the CMS.",
+    "h1": "Fido Homes",
+    "liveHref": "https://www.fidohomes.ae",
+    "ogImage": "/project/fido-homes/opengraph-image/cover?d1ee88d9f5b3c7f0",
+    "galleryAlts": []
+  },
+  "elysee-home-design": {
+    "title": "Élysée Home Design — Koussay Zayani",
+    "description": "Brand and Framer site for a new Dubai interior design studio. A project showcase they can update from the CMS.",
+    "h1": "Élysée Home Design",
+    "liveHref": "https://www.elyseehomedesign.com",
+    "ogImage": "/project/elysee-home-design/opengraph-image/cover?d1ee88d9f5b3c7f0",
+    "galleryAlts": []
+  },
+  "clickit-story": {
+    "title": "Clickit Story — Koussay Zayani",
+    "description": "Streaming platform for a Dubai production agency. People watch their shows and exclusive content on their own site. The dashboard is connected and live.",
+    "h1": "Clickit Story",
+    "liveHref": "https://www.clickitstory.ae",
+    "ogImage": "/project/clickit-story/opengraph-image/cover?d1ee88d9f5b3c7f0",
+    "galleryAlts": []
+  },
+  "artemis-luxe": {
+    "title": "Artemis Luxe — Koussay Zayani",
+    "description": "Framer site for a new Dubai luxury brand studio. Her identity. I built the site so consultation actually works.",
+    "h1": "Artemis Luxe",
+    "liveHref": "https://www.artemis-luxe.com",
+    "ogImage": "/project/artemis-luxe/opengraph-image/cover?d1ee88d9f5b3c7f0",
+    "galleryAlts": []
+  }
+}

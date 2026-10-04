@@ -1,0 +1,29 @@
+# Koussay Zayani
+
+> Creative developer and brand designer. Identities and digital experiences, from first mark to live product.
+
+- Site: https://koussay.online
+- Booking: https://koussay.online/booking
+- Sitemap: https://koussay.online/sitemap.xml
+- Robots: https://koussay.online/robots.txt
+
+## Pages
+
+- [Home](https://koussay.online): selected projects on a ring
+- [Start a project](https://koussay.online/booking): booking form
+- Project URLs follow https://koussay.online/project/[slug]
+
+## Projects
+
+- [PIXENHOUSE](https://koussay.online/project/pixenhouse) — Brand & Web · 2026 · Brand and website for a Dubai production studio. New identity, their green kept, built in Framer so a first visit explains who they are. · live: https://www.pixenhouse.ae
+- [Vamos Taxi](https://koussay.online/project/vamos-taxi) — Full System · 2026 · Booking system for a Swiss airport-transfer company. I cut a long checkout down to two steps and built the client site and the dispatcher dashboard. · live: https://www.vamostaxi.site
+- [Looma Kitchen](https://koussay.online/project/looma-kitchen) — Full System · 2026 · Full restaurant system for a Dubai delivery kitchen. Guests order from the menu. The kitchen gets the ticket, assigns a chef, and the customer can follow the order out to delivery. Catering sits on the same product. · live: https://www.loomakitchen.com
+- [Almar Private Journey](https://koussay.online/project/almar-private-journey) — Brand & Web · 2026 · Brand and Framer site for a new private-travel studio. Services and experiences only. Guests request a consultation. No booking, no dashboard. · live: https://almarprod.framer.website/
+- [Fido Homes](https://koussay.online/project/fido-homes) — Brand & Web · 2026 · Brand and Framer site for a new Dubai real estate agency. A project showcase they can update from the CMS. · live: https://www.fidohomes.ae
+- [Élysée Home Design](https://koussay.online/project/elysee-home-design) — Brand & Web · 2026 · Brand and Framer site for a new Dubai interior design studio. A project showcase they can update from the CMS. · live: https://www.elyseehomedesign.com
+- [Clickit Story](https://koussay.online/project/clickit-story) — Full System · 2026 · Streaming platform for a Dubai production agency. People watch their shows and exclusive content on their own site. The dashboard is connected and live. · live: https://www.clickitstory.ae
+- [Artemis Luxe](https://koussay.online/project/artemis-luxe) — Web Design · 2025 · Framer site for a new Dubai luxury brand studio. Her identity. I built the site so consultation actually works. · live: https://www.artemis-luxe.com
+
+## Contact
+
+Use https://koussay.online/booking. Do not invent testimonials, live URLs, tools, addresses, or project facts that are not listed here.
