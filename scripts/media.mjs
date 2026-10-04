@@ -85,7 +85,7 @@ if (!["check", "import-live", "verify", "generate"].includes(command)) {
 const env = loadEnv();
 const r2 = r2Config(env);
 
-const needsR2 = !(command === "generate" && dryRun);
+const needsR2 = !(["generate", "import-live"].includes(command) && dryRun);
 if (needsR2) {
   if (!isR2Configured(r2)) {
     console.error(
@@ -286,6 +286,14 @@ async function importLive() {
       const hash = sha256(buffer);
       const at = new Date().toISOString();
 
+      const { width, height } = await sharp(buffer).metadata();
+      const key = `projects/${slug}/${slot}-${hash.slice(0, 8)}.webp`;
+      // A dry run touches nothing: no disk, no provenance, no upload.
+      if (dryRun) {
+        console.log(`dry ${key} ${width}x${height}`);
+        continue;
+      }
+
       // Raw bytes and provenance reach disk before anything is uploaded.
       mkdirSync(join(WORK, slug), { recursive: true });
       writeFileSync(join(WORK, slug, `${slot}.webp`), buffer);
@@ -296,13 +304,6 @@ async function importLive() {
         bytes: buffer.length,
         sha256: hash,
       });
-
-      const { width, height } = await sharp(buffer).metadata();
-      const key = `projects/${slug}/${slot}-${hash.slice(0, 8)}.webp`;
-      if (dryRun) {
-        console.log(`dry ${key}`);
-        continue;
-      }
 
       await putObject(r2, key, buffer, "image/webp", {
         cacheControl: IMMUTABLE,
