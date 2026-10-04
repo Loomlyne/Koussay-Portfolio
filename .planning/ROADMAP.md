@@ -123,7 +123,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-04-PLAN.md — scripts/media.mjs single writer (healthcheck cleans up); 37 live images on R2; content/media.json; verify 37/37
+- [x] 02-04-PLAN.md — scripts/media.mjs single writer (healthcheck cleans up); 37 live images on R2; content/media.json; verify 37/37
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -312,7 +312,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
-| 2. Projects served from the repo | 3/11 | In Progress|  |
+| 2. Projects served from the repo | 4/11 | In Progress|  |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |

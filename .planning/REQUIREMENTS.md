@@ -40,9 +40,9 @@ Requirements for this milestone. Each maps to a roadmap phase.
 ### Media hosting and pipeline (MEDIA)
 
 - [x] **MEDIA-01**: `koussay.online` is served through Cloudflare DNS in a Cloudflare account dedicated to Koussay, with every Vercel and Resend record carried over and verified before the nameserver switch
-- [ ] **MEDIA-02**: An R2 bucket behind a custom domain on `koussay.online` serves all covers, stills, screenshots, identity assets, posters and videos with content-addressed names and `Cache-Control: public, max-age=31536000, immutable`
+- [x] **MEDIA-02**: An R2 bucket behind a custom domain on `koussay.online` serves all covers, stills, screenshots, identity assets, posters and videos with content-addressed names and `Cache-Control: public, max-age=31536000, immutable`
 - [ ] **MEDIA-03**: The media host returns `Access-Control-Allow-Origin` on every response; the atlas loader and the home-page preload links request images cross-origin, so the ring renders R2 covers
-- [ ] **MEDIA-04**: One script is the only writer to R2 and to `content/media.json`; it records the Higgsfield request id and raw output before upload, verifies each object after upload, and never regenerates a recorded entry without `--force`
+- [x] **MEDIA-04**: One script is the only writer to R2 and to `content/media.json`; it records the Higgsfield request id and raw output before upload, verifies each object after upload, and never regenerates a recorded entry without `--force`
 - [ ] **MEDIA-05**: Higgsfield generation runs through the repo script against the current API with the key from `HF_CREDENTIALS` in `.env.local`, uses an idempotency key per submit, and prints a cost estimate in `--dry-run` that Koussay approves before any paid run
 - [ ] **MEDIA-06**: `next.config.mjs` allows the R2 host in `images.remotePatterns`; ring stills and hero posters bypass the Vercel optimiser, gallery screenshots use `next/image`
 - [ ] **MEDIA-07**: Open Graph and Twitter images are pre-rendered by the script and served as static files; no `sharp` runs at request time
@@ -154,9 +154,9 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | VID-04 | Phase 8 | Pending |
 | VID-05 | Phase 8 | Pending |
 | MEDIA-01 | Phase 4 (done outside phase, 2026-10-03) | Complete |
-| MEDIA-02 | Phase 2 | Pending |
+| MEDIA-02 | Phase 2 | Complete |
 | MEDIA-03 | Phase 2 | Pending |
-| MEDIA-04 | Phase 2 | Pending |
+| MEDIA-04 | Phase 2 | Complete |
 | MEDIA-05 | Phase 7 | Pending |
 | MEDIA-06 | Phase 2 | Pending |
 | MEDIA-07 | Phase 3 | Pending |
