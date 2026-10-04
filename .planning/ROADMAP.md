@@ -112,7 +112,46 @@ Plans:
 
   1. Check Vercel Deployment Protection (Standard, covering old deployment URLs) and open one old deployment's `/1.webp` to confirm it is blocked.
 
-**Plans**: TBD
+**Plans**: 11 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Live snapshot committed first (data, rendered strings, home and project HTML, llms.txt, sitemap, home and project screenshots)
+- [ ] 02-02-PLAN.md — Cloudflare zone rule: ACAO * on media.koussay.online (Koussay approves the command)
+- [ ] 02-03-PLAN.md — HYG-08: Vercel Standard Protection read, old URL probed, Koussay confirms
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-04-PLAN.md — scripts/media.mjs single writer (healthcheck cleans up); 37 live images on R2; content/media.json; verify 37/37
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 02-05-PLAN.md — Content schema validator (TDD), check-content, 8 content modules equal to the snapshot
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 02-06-PLAN.md — Smoke test for the cut-over (red), cross-origin on every cover loader, remotePatterns, compare-rendered script
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 02-07-PLAN.md — Atomic switch to lib/content.js and R2 covers; compare-rendered run proves no visible change
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 02-08-PLAN.md — Placeholders, old resolver and Notion polling removed
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 02-09-PLAN.md — 404 in Geist text: before/after, Koussay signs, then 404.webp removed
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 02-10-PLAN.md — LICENSE media wording (D-15), README, AGENTS.md, CLAUDE.md and codebase docs
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 02-11-PLAN.md — TEST-02 and build mutation proofs, phase-end gate, rendered comparison, after-screenshots, media proof
 
 ### Phase 3: Notion projects path removed
 
@@ -273,7 +312,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
-| 2. Projects served from the repo | 0/TBD | Not started | - |
+| 2. Projects served from the repo | 0/11 | Planned | - |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |
