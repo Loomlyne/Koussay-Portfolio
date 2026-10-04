@@ -620,7 +620,7 @@ async function share() {
   };
 
   if (!preview) {
-    // Plan 05 runs this once app/booking/opengraph-image.js is deleted.
+    // --booking: the static /booking share image, committed under app/booking.
     const png = await renderBooking(
       readFileSync(join(root, "public", "logo.png")),
     );

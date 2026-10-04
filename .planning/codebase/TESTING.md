@@ -64,14 +64,13 @@ Not applicable. There is no suite organisation, setup, teardown or assertion pat
 
 **What to Mock (if tests are added):**
 - `@notionhq/client`, `fetch`, and the `lib/env.js` accessors.
-- `next/cache` (`unstable_cache`, `revalidateTag`, `revalidatePath`).
 
 **What NOT to Mock:**
 - Pure modules: `components/ring/utils.js`, `lib/book/validate.js`, `lib/book/time.js`, `lib/content-schema.mjs`, `lib/projects.js`.
 
 ## Fixtures and Factories
 
-**Test Data:** Project content is the repo's own `content/projects` (eight projects). `node scripts/check-content.mjs` validates it in under a second and `scripts/content-schema.test.mjs` covers the schema. `npm test` needs network because covers load from media.koussay.online.
+**Test Data:** Project content is the repo's own `content/projects` (eight projects). `node scripts/check-content.mjs` validates it in under a second and `scripts/content-schema.test.mjs` and `scripts/share.test.mjs` (`node --test`) cover the schema and the share cards. `npm test` needs network because covers load from media.koussay.online.
 
 **Location:** `.env.example` documents the variables; `.env.local` exists locally and is gitignored (never read or quote it).
 
@@ -89,7 +88,7 @@ Not applicable. There is no suite organisation, setup, teardown or assertion pat
 
 **E2E Tests:** Not used.
 
-**Script smoke checks (manual, not tests):** `scripts/media.mjs` has operator commands (`check`, `verify`, `generate --dry-run`) that verify the manifest and R2 objects. They exercise real services and are not repeatable assertions.
+**Script smoke checks (manual, not tests):** `scripts/media.mjs` has operator commands (`check`, `verify`, `generate --dry-run`, `share --preview`) that verify the manifest and R2 objects. They exercise real services and are not repeatable assertions.
 
 ## Areas Most Exposed By Having No Tests
 
@@ -105,31 +104,18 @@ Ordered by blast radius if broken silently.
 - Risk: regressions show up only on real devices; desktop mouse testing will pass while swipes read as taps.
 - Priority: High.
 
-**3. Legacy Notion path (`lib/notion/projects.js`, unreferenced by pages, removed in Phase 3)**
-- What is not tested: slug generation and uniqueness (`slugify`, `uniqueSlug`) and media path/version building (`mediaPath`). The old fallback precedence is resolved in Phase 2 and its files remain in git history.
-- Risk: low while the path stays unreferenced; it goes away in Phase 3. `app/api/cms-stamp/route.js` answers a constant empty stamp.
-- Priority: High.
-
-**4. R2 SigV4 signing (`scripts/lib/r2.mjs`)**
+**3. R2 SigV4 signing (`scripts/lib/r2.mjs`)**
 - What is not tested: canonical request construction, header sorting and lower-casing, `uriEncode` handling of `!'()*`, scope/date derivation, signing-key chain, `Authorization` header format. `scripts/media.mjs verify` is the intended check against the real bucket.
 - Risk: a signing bug returns 403 from R2 on every upload and is indistinguishable from bad credentials. The function is deterministic given a fixed date, so it is a good unit-test candidate against AWS's published SigV4 test vectors (inject the clock into `signedRequest`, which currently calls `new Date()` directly).
 - Priority: High for the script's purpose; low for the live site, which reads R2 through a public base URL only.
 
-**5. Booking flow (`lib/book/*`, `app/api/book/*`, `components/book/*`)**
+**4. Booking flow (`lib/book/*`, `app/api/book/*`, `components/book/*`)**
 - What is not tested: `issueForStep` validation per step, `isWebsiteValid` / `normalizeWebsite`, `parseClock` (12h/24h parsing), `slotStartMs` timezone conversion (DST-sensitive, uses `Intl.DateTimeFormat`), `isSlotOpen` against busy slots, `sanitizeDraft` truncation limits, attachment size cap (`MAX_ATTACHMENT_BYTES`).
 - Risk: wrong slot offered or accepted in the wrong timezone; customer-facing. These are pure functions and the best value-for-effort unit tests in the repo after `ring/utils.js`.
 - Priority: Medium to High.
 
-**6. Webhook and cache-bust route (`app/api/revalidate/route.js`)**
-- What is not tested: signature verification branch, the `verification_token` handshake, the no-secret fallback that accepts any body with a `type` field, GET secret check.
-- Risk: auth bypass or failure to revalidate goes unnoticed. Priority: Medium.
-
-**7. Shaders (`components/shaders/*.js`)**
+**5. Shaders (`components/shaders/*.js`)**
 - Covered by nothing before runtime. Priority: High, but not unit-testable in practice; mitigate with the manual protocol above, or a Playwright smoke test that loads `/` and fails on any `console.error`.
-
-**8. Media pipeline (`app/api/media/[...parts]/route.js`, `lib/notion/gallery-pdf.js`, `lib/pdf.js`)**
-- What is not tested: Notion signed-URL expiry handling (403/404 retry through `notionMediaUrl`), PDF page expansion and the `g\d+p\d+` slot format, refusal of non-PDF types.
-- Priority: Medium.
 
 ## Common Patterns
 

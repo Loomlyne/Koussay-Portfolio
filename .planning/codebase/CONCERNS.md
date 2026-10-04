@@ -2,9 +2,9 @@
 
 **Analysis Date:** 2026-10-02
 
-Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.online` on Vercel. Projects are read from `content/projects` and images from media.koussay.online; the placeholder fallback is resolved in Phase 2.
+Scope: full repo. Next.js 16.3.8 WebGL portfolio, live at `https://koussay.online` on Vercel. Projects are read from `content/projects` and images and share cards from media.koussay.online; the Notion projects path, PDF renderer and request-time image library were removed in Phase 3.
 
-`AGENTS.md` describes the original single-page carousel. The repo has since grown a Notion CMS, project detail pages, a booking flow and API routes (`lib/`, `app/api/`, `app/project/`, `app/booking/`, `components/project/`, `components/book/`). `AGENTS.md` does not cover any of this. See "AGENTS.md Staleness".
+`AGENTS.md` describes the original single-page carousel. The repo has since grown project detail pages, a booking flow and API routes (`lib/`, `app/api/`, `app/project/`, `app/booking/`, `components/project/`, `components/book/`). `AGENTS.md` does not cover any of this. See "AGENTS.md Staleness".
 
 ## Licensing and Provenance (highest priority)
 
@@ -37,17 +37,8 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 
 ## Security Considerations
 
-**Known critical and high advisories in pinned dependencies:**
-- Risk: `npm audit --omit=dev` (run 2026-10-02) reports `next` 16.0.0 to 16.3.5 as critical: RCE in `next/og` ImageResponse (GHSA-vcvr-r3jv-pc5j), RCE in the Image Optimization API with AVIF (GHSA-2xp9-vwfh-vxw4), and a Windows-host RCE advisory. It also reports `sharp` <= 0.35.4-rc.0 as high (libvips and libheif CVEs).
-- Files: `package.json` (`"next": "16.3.0"` pinned exactly, `"sharp": "^0.34.4"`), `app/opengraph-image.js`, `app/project/[slug]/opengraph-image.js`, `app/booking/opengraph-image.js`, `lib/og-image.js` (these use `next/og`), `app/api/media/[...parts]/route.js` (runs `sharp` on bytes fetched from Notion)
-- Current mitigation: Vercel hosts the site, so the Windows advisory is not applicable. The other two are applicable to this app's own routes.
-- Recommendations: Upgrade `next` and `eslint-config-next` together to 16.3.8 or later (outside the pinned version, so a deliberate bump). Upgrade `sharp` to 0.35.5 or later, which is a breaking change, and re-test `optimize()` and `scripts/media.mjs`. Re-run `npm audit` afterwards.
-
-**Unauthenticated cache-bust when no webhook secret is set:**
-- Risk: In `app/api/revalidate/route.js` POST, if `NOTION_WEBHOOK_SECRET` is unset the only check is `!body?.type`. Any caller sending JSON with a `type` field passes and triggers `bustProjectsCache()`, which calls `revalidateTag`, `revalidatePath("/")`, `revalidatePath("/project", "layout")` and `revalidatePath("/api/media", "layout")`. Each bust forces Notion re-queries and re-renders, so repeated calls can exhaust the Notion rate limit. A 429 from Notion has already blanked the ring before (see `lib/notion/client.js` comments).
-- Files: `app/api/revalidate/route.js`
-- Current mitigation: Signature verification applies once the secret is set.
-- Recommendations: Fail closed when the secret is missing (401 for every request except the one-time verification handshake). Stop accepting the secret in the GET query string (`?secret=`): URLs end up in access logs and referrers. The handshake branch also writes the posted `verification_token` to the log with `console.info`; after setup, disable it.
+**Dependency advisories (resolved in Phase 3):**
+- `next` is 16.3.8 and `sharp` is ^0.35.5, which clear the advisories reported on 2026-10-02. `next/og` is no longer used and `sharp` is a devDependency used only by scripts. Re-run `npm audit` before each ship.
 
 **Open booking and draft endpoints with no rate limiting or bot control:**
 - Risk: `POST /api/book/draft` (`app/api/book/draft/route.js`) is unauthenticated. Each call with a name or email upserts a Notion page, and a first call (no `draft.id`) emails the owner through Resend with `replyTo` set to the attacker-supplied address. A script can flood the inbox, burn Resend quota and fill the bookings database. `POST /api/book` likewise accepts attachments up to 4 MB and emails the supplied address a "You're booked" message (`lib/mail/booking.js` `sendBookingEmails`), which allows using the site to send mail to arbitrary third parties. The optional research step (`lib/book/research.js`, Firecrawl plus Gemini or OpenAI) also spends paid API credit per submission.
@@ -60,60 +51,35 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 - Files: `lib/book/time.js`, `app/api/book/route.js`
 - Recommendations: Treat Notion as the single source of truth, or add a shared lock (KV).
 
-**Media proxy is open to any page id the integration can read:**
-- Risk: `app/api/media/[...parts]/route.js` accepts any 32-hex page id, and `cachedNotionMediaUrl` (`lib/notion/projects.js`) falls back to a live `pages.retrieve` when the id is not in the cached bundle. This spends Notion API budget on arbitrary ids and lets anyone probe pages shared with the integration, including the bookings database. The response sets `Access-Control-Allow-Origin: *`. The PDF branch (`pdfjs-dist`, `@napi-rs/canvas`) renders attacker-chosen pages with up to 48 pages at 1600px width, within a 30s `maxDuration`.
-- Files: `app/api/media/[...parts]/route.js`, `lib/notion/projects.js`, `lib/pdf.js`
-- Current mitigation: Only the `Cover`, `Image`, `Thumbnail` and `Gallery` properties or page cover are read (`fileUrlFor`). Unknown ids 404.
-- Recommendations: Resolve only ids that appear in the cached bundle. Drop the live `pages.retrieve` fallback or rate limit it. Restrict CORS to the site origin.
-
 **Secrets handling:**
 - `.env.local` exists locally (gitignored via `.env*`, with `!.env.example`). `.env.example` lists variable names only. No secrets were read or found in tracked files.
 
 ## Never-Executed New Code
 
 **Hand-rolled SigV4 for R2:**
-- Issue: `scripts/lib/r2.mjs` (140 lines) implements AWS Signature V4 by hand (`signedRequest`, `putObject`, `headObject`). It has never made a successful request against real R2 credentials. Risks: canonical-header and path-encoding edge cases, `x-amz-content-sha256` over a streamed body, `cache-control` being a signed header, region `auto` scope, and a `Buffer` body on `fetch` PUT.
+- Issue: `scripts/lib/r2.mjs` (140 lines) implements AWS Signature V4 by hand (`signedRequest`, `putObject`, `headObject`). It has uploaded the media and share cards but has no known-answer test. Risks: canonical-header and path-encoding edge cases, `x-amz-content-sha256` over a streamed body, `cache-control` being a signed header, region `auto` scope, and a `Buffer` body on `fetch` PUT.
 - Files: `scripts/lib/r2.mjs`, `scripts/media.mjs`
-- Impact: The first real run may fail with `SignatureDoesNotMatch`, or silently store wrong content types and cache headers.
+- Impact: A regression may fail with `SignatureDoesNotMatch`, or silently store wrong content types and cache headers.
 - Fix approach: Run `--probe` and one real upload against a scratch bucket, and read the object back (`headObject` then a public GET). Prefer `@aws-sdk/client-s3` or Cloudflare's S3 client rather than maintaining signing code. Add a known-answer test against AWS's published SigV4 vectors.
 
 **Higgsfield generation pipeline:**
 - Issue: `scripts/media.mjs`, `scripts/lib/higgsfield.mjs` and `scripts/lib/art-direction.mjs` generate paid media. The free Higgsfield plan cannot generate (see memory note), so generation has not been run end to end. The earlier Notion seed script was removed in Phase 1 and remains in git history.
 - Files: `scripts/media.mjs`, `scripts/lib/higgsfield.mjs`, `scripts/lib/art-direction.mjs`
-- Impact: Credit spend and writes to the live CMS with no safety net. The manifest gate is the only protection against repeat spend.
+- Impact: Credit spend and writes to the R2 bucket and manifest with no safety net. The manifest gate is the only protection against repeat spend.
 - Fix approach: Keep `--dry-run` and `--probe` as the default workflow.
 
-**`@higgsfield/client` is a devDependency but scripts import `sharp`:**
-- `scripts/media.mjs` imports `sharp`, which is a runtime dependency. This works only because both are installed. Dockerfile and Vercel builds do not use the scripts.
+**Scripts depend on devDependencies:**
+- `scripts/media.mjs` imports `sharp`, and the share renderer imports `fontkit` and reads `geist`. All are devDependencies, which is correct: no runtime code imports them. Dockerfile and Vercel builds do not use the scripts.
 
 ## Tech Debt
-
-**Native Node binaries block Cloudflare Workers and add build coupling:**
-- Issue: `sharp`, `@napi-rs/canvas`, `pdfjs-dist` and `unpdf` are native or Node-only. `serverExternalPackages` and a manual `outputFileTracingIncludes` block in `next.config.mjs` ship the `@napi-rs/canvas-linux-{x64,arm64}-{gnu,musl}` builds for `/api/media/**` and `/project/**`. The same list is duplicated for both globs.
-- Files: `next.config.mjs`, `lib/pdf.js`, `lib/notion/gallery-pdf.js`, `app/api/media/[...parts]/route.js`, `package.json`
-- Impact: The default stack for other products is Cloudflare, and this app cannot run on Workers as built. A Vercel trace regression drops the binaries and PDF pages 404 only in production (see commit `dc18b8b`). Memory cost: `byteCache` in `lib/pdf.js` holds up to 6 PDFs in each instance.
-- Fix approach: Move PDF rasterising and image optimisation to authoring time (convert PDFs to page images in R2 at publish), then serve static R2 URLs. That removes all four packages from the runtime and the tracing block. Until then, factor the shared glob list in `next.config.mjs` into one constant.
-
-**Media latency is slow by construction:**
-- Issue: Notion signed file URLs expire in about an hour. `app/api/media/[...parts]/route.js` runs with `cache: "no-store"` upstream, so each cache miss does: resolve the URL (`cachedNotionMediaUrl`, falling back to `pages.retrieve` on 403/404), fetch the file (20s timeout), render a PDF page if needed (`renderPdfPage`, 1600px), and `sharp` re-encode to WebP q80 at max 1600px. Only a versioned URL (`?v=`) gets `Cache-Control: public, max-age=31536000, immutable`. An unversioned request is `no-store`, and `HEAD` runs the whole pipeline too. `app/project/[slug]/page.js` additionally expands PDF galleries during render (`withExpandedPdfGallery`), downloading the PDF at page-build time.
-- Files: `app/api/media/[...parts]/route.js`, `lib/notion/projects.js`, `lib/pdf.js`, `lib/notion/gallery-pdf.js`, `lib/media.js`
-- Impact: Cold ring load depends on up to 18 sequential-ish media renders. The prior incident ("CHARGING 001" for 16 to 20 seconds, `docs/NEXT-SESSION-PROMPT.md`) came from this chain and from Notion 429s. `retry: false` and `timeoutMs: 4000` on the Notion client mean a blip becomes a hard failure instead of a retry.
-- Fix approach: Mirror media to R2 once (the pipeline in `scripts/` is the start) and use stable public URLs. Remove the proxy from the hot path.
-
-**Cache and polling layering is complex:**
-- `unstable_cache` in `lib/notion/projects.js` (`cms-stamp` revalidate 20, `cms-projects-v2` revalidate 60), `lib/notion/client.js` (`cachedDataSourceId`, 3600), page-level `revalidate = 60` in `app/page.js` and `app/project/[slug]/page.js`, `experimental.staleTimes` in `next.config.mjs`, a webhook bust (`app/api/revalidate/route.js`), and a 20s client poll (`components/CmsLive.jsx` calling `/api/cms-stamp`, which in turn queries Notion). Every open tab polls every 20s and each poll can hit Notion on a cold cache. The legacy Notion path is unreferenced by pages and removed in Phase 3; `/api/cms-stamp` answers a constant empty stamp.
-- Fix approach: Remove the poll once the webhook is verified, or move to a push channel. Keep the cache key version comment in `lib/notion/projects.js` current when the payload shape changes.
 
 **`Carousel.jsx` size:**
 - `components/Carousel.jsx` is 2,161 lines (`AGENTS.md` says ~1,400). The single-file shape is deliberate (about twenty shared closure variables), but it has grown by roughly 50% with project open, shared transitions and `homeRingContext`. See Fragile Areas.
 
-**`components/TwoPlaneMorph.jsx` is dead:**
-- 236 lines, imported nowhere (confirmed by grep across tracked files; only `AGENTS.md` mentions it). Safe to delete. It still pulls `three` and `gsap` into lint scope.
-
 **Fonts and images are unoptimised:**
 - Fonts: resolved in Phase 1. Geist and Geist Mono ship as variable woff2 under `public/fonts/`; removed files remain in git history.
 - Images: resolved in Phase 2. Covers are 1600 px WebP on R2 (26-208 KB each); the old `public/*.webp` art is removed and remains in git history.
-- Fix approach: Resize sources (or the proxy output for ring covers) to about 1024 x 683, convert fonts to `woff2`. `public/favicon.ico` and `public/logo.png` are byte-identical 512x512 PNGs (170,906 bytes each); the `.ico` is mislabelled. Replace with a real multi-size ico and a smaller logo.
+- Fix approach: `public/favicon.ico` and `public/logo.png` are byte-identical 512x512 PNGs (170,906 bytes each); the `.ico` is mislabelled. Replace with a real multi-size ico and a smaller logo.
 
 **Deprecated config assumption in Dockerfile:**
 - `Dockerfile` builds `output: "standalone"` only when `VERCEL !== "1"` (`next.config.mjs`). The Docker path is not exercised in CI (no CI exists) and `compose.yaml` has no env wiring, so the container has no Notion or Resend keys. README says Node 20+, Dockerfile uses `node:22-alpine`, and `package.json` has no `engines` field.
@@ -121,7 +87,7 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 ## Known Bugs and Gaps (AGENTS.md verified)
 
 **Unverified production state:**
-- `docs/NEXT-SESSION-PROMPT.md` records a user report (4 Sep 2026) of a 16 to 20s load on CHARGING 001, with fixes "local until deployed" and a to-do list of checks. Nothing in the repo shows these were confirmed in production. Verify on the live URL.
+- A user report (4 Sep 2026) of a 16 to 20s cold load on CHARGING 001 came from the Notion media proxy, now removed. Verify the cold load on the live URL after the next ship.
 
 **`prefers-reduced-motion` is not handled by the ring (AGENTS.md gap 4 is accurate for the ring):**
 - `components/Carousel.jsx` has no `prefers-reduced-motion` check (only `(pointer: coarse)` at line 120). The ~6s animated entry, goo and blur run for everyone. Reduced-motion is handled only for page transitions (`components/SharedTransitionProvider.jsx:43`, `components/project/ProjectPagerTransition.jsx:26`) and in CSS (`app/globals.css:366`, `:508`, `app/project/[slug]/page.module.css:926`, `app/booking/page.module.css:1058`). `components/SmoothScroll.jsx` has no reduced-motion branch either.
@@ -140,21 +106,20 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 
 ## AGENTS.md Staleness
 
-- Layout section lists only `app/page.js`, `layout.js`, `globals.css` and `components/Carousel.jsx`, `ring/`, `shaders/`. Missing: `lib/` (book, cms, notion, mail, project), `app/api/*`, `app/booking`, `app/project/[slug]`, `components/project/`, `components/book/`, `components/SharedTransitionProvider.jsx`, `components/HomeRing.jsx`, `components/homeRingContext.js`, `components/CmsLive.jsx`, `scripts/`, `.agents/`.
+- Layout section lists only `app/page.js`, `layout.js`, `globals.css` and `components/Carousel.jsx`, `ring/`, `shaders/`. Missing: `lib/` (book, notion, mail, project), `app/api/*`, `app/booking`, `app/project/[slug]`, `components/project/`, `components/book/`, `components/SharedTransitionProvider.jsx`, `components/HomeRing.jsx`, `components/homeRingContext.js`, `scripts/`, `.agents/`.
 - "`app/page.js` renders `<Carousel />`, nothing else" is stale: it fetches `getProjects()`, preloads covers, and renders `RegisterHome` and JSON-LD.
 - "`Carousel.jsx` is ~1400 lines" is stale (2,161).
 - "Commands" remains true.
 - "Project column is `pointer-events-none`" is stale (see keyboard item).
-- `docs/NEXT-SESSION-PROMPT.md` is a dated session handoff (September 2026) that duplicates and partly contradicts `AGENTS.md` ("Live Notion currently has 11 published covers"). Treat it as a log, not a spec.
 - `README.md` Quick start now says projects need no keys because content is in the repo; the Notion, Resend and R2 variables are listed in `.env.example`.
 
 ## Test Coverage Gaps
 
 **No tests at all:**
 - Resolved in part in Phase 1: `npm test` runs a Playwright smoke test (`tests/smoke.spec.mjs`, port 3100, desktop 1512 and phone 390). It is a control-session gate with `format:check`, `lint` and `build`. No git hook, no CI. Unit logic is still untested.
-- Files with the highest risk and best testability: `lib/book/time.js` (timezone maths, `slotStartMs` loops 4 iterations around DST edges, `wallDateTime` midnight roll-over), `lib/book/validate.js`, `lib/media.js` (`parseMediaSlot`), `lib/notion/projects.js` (`mapPage`, slug uniqueness, ordering, `MAX_PLANES` cap of 32), `lib/book/draft.js`, `scripts/lib/r2.mjs` (signing), `components/ring/utils.js` (`signedOffset`, `chase`).
+- Files with the highest risk and best testability: `lib/book/time.js` (timezone maths, `slotStartMs` loops 4 iterations around DST edges, `wallDateTime` midnight roll-over), `lib/book/validate.js`, `lib/book/draft.js`, `scripts/lib/r2.mjs` (signing), `components/ring/utils.js` (`signedOffset`, `chase`).
 - Risk: Booking logic (money-adjacent, customer-facing) can regress silently. A shader typo is invisible to `next build` because GLSL compiles at runtime (`components/shaders/planeShaders.js`, `textShaders.js`), so it ships clean and fails in the browser console.
-- Priority: High for `lib/book/*` and `scripts/lib/r2.mjs`. Medium for the Notion mapping. A single Playwright smoke test that loads `/` and fails on any `console.error` or a missing `canvas` would catch shader and context regressions.
+- Priority: High for `lib/book/*` and `scripts/lib/r2.mjs`. A single Playwright smoke test that loads `/` and fails on any `console.error` or a missing `canvas` would catch shader and context regressions.
 
 ## Fragile Areas
 
@@ -162,7 +127,7 @@ These are deliberate designs from `AGENTS.md`, not defects. Any change must pres
 
 **Packed `uScale` vec4:**
 - Files: `components/shaders/planeShaders.js`, `components/Carousel.jsx`
-- Why: `xy` is birth scale, `z` brightness, `w` atlas cell. GLSL ES charges a full vec4 row per array element, and the budget is 224 rows, so a separate `float[32]` would cost 32 more. `MAX_PLANES = 32` (`planeShaders.js:5`) is imported by `lib/notion/projects.js` and `lib/projects.js`, so the uniform budget caps CMS project count too.
+- Why: `xy` is birth scale, `z` brightness, `w` atlas cell. GLSL ES charges a full vec4 row per array element, and the budget is 224 rows, so a separate `float[32]` would cost 32 more. `MAX_PLANES = 32` (`planeShaders.js:5`) is imported by `lib/content.js` and `lib/projects.js`, so the uniform budget caps project count too.
 
 **One-frame-stale side-card focus:**
 - Files: `components/Carousel.jsx` (`focusPos`)
@@ -193,11 +158,11 @@ These are deliberate designs from `AGENTS.md`, not defects. Any change must pres
 
 **Load counter is the gate:**
 - Files: `components/Carousel.jsx`, `components/ring/atlas.js`
-- Why: The entry fires when the counter reads 100 (min of load and birth progress). The atlas never rejects: a missing file leaves a blank cell and counts as settled, so one bad path cannot strand the entry. A failsafe opens the ring if the facing cell is late (see `docs/NEXT-SESSION-PROMPT.md`).
+- Why: The entry fires when the counter reads 100 (min of load and birth progress). The atlas never rejects: a missing file leaves a blank cell and counts as settled, so one bad path cannot strand the entry. A failsafe opens the ring if the facing cell is late.
 
 **Ring depends on project count:**
 - Files: `components/ring/utils.js` (`radiusForCount`), `components/ring/params.js` (`ringRefCount: 18`), `frontTarget` in `components/Carousel.jsx`
-- Why: Radius scales with project count and the hub is moved so the front card stays centred. Adding or removing CMS rows changes the composition. Re-check at 11 and at 32.
+- Why: Radius scales with project count and the hub is moved so the front card stays centred. Adding or removing projects changes the composition. Re-check at 11 and at 32.
 
 **Font family names looked up by string:**
 - Files: `components/ring/params.js`, `components/ring/gui.js`, `app/globals.css`. A mismatch falls back to system sans with no error.
@@ -209,26 +174,17 @@ These are deliberate designs from `AGENTS.md`, not defects. Any change must pres
 - Files: `components/SharedTransitionProvider.jsx`, `components/project/ProjectPagerTransition.jsx`, `components/project/ProjectWarm.jsx`, `lib/project/warm.js`, `components/HomeRing.jsx`, `components/homeRingContext.js`
 - Why: Click to detail depends on a generation counter (`openGen`), refs mirrored from router state, and a persisted home ring (`RegisterHome` in `app/page.js` and `app/project/[slug]/page.js`). Navigation race conditions are easy to introduce. No tests cover any of it.
 
-**Notion-driven rendering with strict timeouts:**
-- Files: `lib/notion/client.js` (`timeoutMs: 4000`, `retry: false`), `lib/notion/projects.js` (`withTimeout` 4000 and 2500); both are on the legacy path removed in Phase 3.
-- Why: The timeouts exist because Notion 429 with `Retry-After` ~59s once parked the loader. Raising them or re-enabling retries brings that back. Projects no longer depend on Notion.
-
 ## Scaling Limits
 
 **Project count:**
-- Limit: `MAX_PLANES = 32` (uniform array size in `components/shaders/planeShaders.js`). `queryProjectPages` stops near `MAX_PLANES * 2` rows, and `fetchNotionProjectBundle` slices to 32. Atlas texture size grows with `ceil(sqrt(n))` cells of 512 px, so 32 projects makes a 3072 x 1364 canvas (6 x 6 grid of 512 x 341).
+- Limit: `MAX_PLANES = 32` (uniform array size in `components/shaders/planeShaders.js`). `indexProjects` caps the list at 32. Atlas texture size grows with `ceil(sqrt(n))` cells of 512 px, so 32 projects makes a 3072 x 1364 canvas (6 x 6 grid of 512 x 341).
 
 **Booking throughput:** Single-owner calendar with one-hour slots. Concurrency is in-memory (see Security). `maxDuration = 60` on `/api/book` with research running in `after()`.
 
 ## Dependencies at Risk
 
-**`next` pinned exactly at 16.3.0 with `experimental` flags:**
-- Risk: Critical advisories above. `experimental.staleTimes` and `optimizePackageImports` are experimental. `AGENTS.md` warns the Next.js version differs from training data; read `node_modules/next/dist/docs/` before changing routing, caching or `next/og` code.
-
-**`unstable_cache` (Notion layer):**
-- Risk: Name signals an unstable API. Used in `lib/notion/projects.js` and `lib/notion/client.js`. Plan a move to `use cache` when the project upgrades.
-
-**`sharp`, `@napi-rs/canvas`, `pdfjs-dist`, `unpdf`:** see Tech Debt (portability) and Security (advisories).
+**`next` pinned exactly at 16.3.8 with `experimental` flags:**
+- Risk: `experimental.staleTimes` and `optimizePackageImports` are experimental. `AGENTS.md` warns the Next.js version differs from training data; read `node_modules/next/dist/docs/` before changing routing, caching or `next/og` code.
 
 **`@notionhq/client` ^5.26.0 with `dataSources` API:** the code supports both database id and data source id in `lib/notion/client.js` (`dataSourceId`). A Notion API shape change now affects bookings only; projects are in the repo.
 
@@ -240,7 +196,7 @@ These are deliberate designs from `AGENTS.md`, not defects. Any change must pres
 
 **CI:** No workflow runs `npm run build`, `npm run lint` or `npm audit`. The only gate is Vercel's build.
 
-**Monitoring:** `@vercel/speed-insights` is the only telemetry. `compiler.removeConsole` strips all console output except `error` in production (`next.config.mjs`), so `console.warn` and `console.info` calls in `app/api/revalidate/route.js` never reach Vercel logs.
+**Monitoring:** `@vercel/speed-insights` is the only telemetry. `compiler.removeConsole` strips all console output except `error` in production (`next.config.mjs`), so `console.warn` and `console.info` calls never reach Vercel logs.
 
 ---
 

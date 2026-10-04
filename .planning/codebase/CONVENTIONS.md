@@ -8,8 +8,8 @@ Plain JavaScript (no TypeScript). `jsconfig.json` defines one alias, `@/*` -> `.
 
 **Files:**
 - React components: PascalCase `.jsx` (`components/Carousel.jsx`, `components/book/BookFlow.jsx`, `components/project/ProjectHero.jsx`).
-- Non-component modules: camelCase `.js` (`components/ring/splitText.js`, `components/homeRingContext.js`, `lib/og-image.js` is the one kebab-case exception, as are `lib/notion/gallery-pdf.js` and `scripts/lib/load-env.mjs`).
-- Next.js route files use framework names: `page.js`, `route.js`, `loading.js`, `not-found.js`, `opengraph-image.js` under `app/`. Note `app/` pages and `route.js` use `.js`, not `.jsx`, even when they return JSX.
+- Non-component modules: camelCase `.js` (`components/ring/splitText.js`, `components/homeRingContext.js`; `scripts/lib/load-env.mjs` is the one kebab-case exception).
+- Next.js route files use framework names: `page.js`, `route.js`, `loading.js`, `not-found.js` under `app/`. Note `app/` pages and `route.js` use `.js`, not `.jsx`, even when they return JSX.
 - CSS Modules sit beside the route and are named `page.module.css` (`app/booking/page.module.css`, `app/project/[slug]/page.module.css`) and are imported by components via `@/app/...`.
 - Scripts: `.mjs`, kebab-case (`scripts/media.mjs`, `scripts/check-content.mjs`); shared helpers in `scripts/lib/*.mjs`.
 
@@ -96,7 +96,7 @@ Add a family to all three together. `WEIGHTS` in `params.js` lists Light/Regular
 - API routes (`app/api/**/route.js`) export `runtime = "nodejs"` (and `dynamic = "force-dynamic"` where the response must not cache), parse input in a `try/catch` that returns a 400 JSON body, and wrap the work in a `try/catch` that logs with a bracketed tag and returns a plain-language JSON error with a 502 or 500. Example: `app/api/book/draft/route.js` uses a local `json(data, status)` helper and `console.error("[book/draft]", error)`.
 - Degrade, do not throw, when a booking integration is absent: check `isXConfigured()` from `lib/env.js` first. Project content is the exception: `lib/content.js` throws at build on a missing key or unknown media (`node scripts/check-content.mjs` is the sub-second gate), because no fallback list exists.
 - Best-effort side effects chain `.catch()` with a log (`sendDraftNotice(...).catch(error => console.error(...))`) so a mail failure cannot fail the request.
-- Intentionally swallowed errors use a bare `catch {}` with a comment saying what happens instead (`// Stay on the last good frame if Notion blips.` in `components/CmsLive.jsx`; `// The env var may already be a data source id.` in `lib/notion/client.js`).
+- Intentionally swallowed errors use a bare `catch {}` with a comment saying what happens instead (`// The env var may already be a data source id.` in `lib/notion/client.js`).
 - External calls carry timeouts: `withTimeout(promise, ms, label)` in `lib/notion/client.js`, `AbortSignal.timeout(...)` in `scripts/lib/r2.mjs`, Notion client `timeoutMs: 4000, retry: false`.
 - WebGL context creation failure is caught, logged `console.error("[ring] could not create a WebGL context:", err)`, `ring-lock` is removed from `<html>`, and the effect returns (`components/Carousel.jsx`).
 - Scripts fail fast: `console.error(...)` then `process.exit(1)` on missing env or bad flags (`scripts/lib/load-env.mjs` `requireEnv`).
@@ -106,8 +106,8 @@ Add a family to all three together. `WEIGHTS` in `params.js` lists Light/Regular
 **Framework:** `console` only, in server code and the browser.
 
 **Patterns:**
-- Prefix every message with a bracketed area tag: `[book/draft]`, `[media]`, `[projects]`, `[cms-stamp]`, `[ring]`, `[atlas]`, `[revalidate]`.
-- `console.error` for failures that matter, `console.warn` for degraded-but-served, `console.info` for operator instructions (`app/api/revalidate/route.js` prints the Notion verification token).
+- Prefix every message with a bracketed area tag: `[book/draft]`, `[ring]`, `[atlas]`, `[share]`.
+- `console.error` for failures that matter, `console.warn` for degraded-but-served, `console.info` for operator instructions.
 - Never log secrets or env values.
 - No `console.log` in app code.
 

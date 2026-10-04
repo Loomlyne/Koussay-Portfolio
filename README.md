@@ -80,10 +80,16 @@ once uploaded. `content/media.json` lists them and is written only by
 `scripts/media.mjs`:
 
 - `node scripts/media.mjs check` checks the manifest.
-- `node scripts/media.mjs import-live` imports existing live images.
 - `node scripts/media.mjs verify` checks the files on R2.
 - `node scripts/media.mjs generate --dry-run` shows what would be generated.
   Run it before any real `generate`, which costs credits.
+- `node scripts/media.mjs share --preview` renders the 1200x630 share cards to
+  `.media-probe/share/` only.
+- `node scripts/media.mjs share` renders the cards, uploads them to R2 and
+  records them in `content/media.json`. It skips unchanged cards unless
+  `--force` is passed. The build fails on a missing or stale card.
+- `node scripts/media.mjs share --booking` writes
+  `app/booking/opengraph-image.png`.
 
 `node scripts/check-content.mjs` checks the content in under a second.
 
