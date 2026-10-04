@@ -5,6 +5,7 @@ import {
   validateContent,
   resolveContent,
 } from "../lib/content-schema.mjs";
+import { homeLines, inputsHash, projectLines } from "../lib/share.mjs";
 
 const HOST = "https://media.koussay.online/projects";
 const entry = (slug, slot) => ({
@@ -39,25 +40,50 @@ const project = (slug, extra = {}) => ({
   ...extra,
 });
 
-const fixture = () => ({
-  projects: [
+const site = { name: "Site", description: "A site. Second sentence." };
+const SHA = { alpha: "a".repeat(64), beta: "b".repeat(64) };
+const og = (p) => ({
+  url: `${HOST}/${p.slug}/og-abcd1234.jpg`,
+  width: 1200,
+  height: 630,
+  inputs: inputsHash(SHA[p.slug], projectLines(p)),
+});
+
+const fixture = () => {
+  const projects = [
     project("alpha", {
       gallery: [{ media: "p01", alt: "a", kind: "identity", caption: null }],
     }),
     project("beta"),
-  ],
-  manifest: {
-    projects: {
-      alpha: {
-        cover: entry("alpha", "cover"),
-        gallery: { p01: entry("alpha", "p01") },
+  ];
+  return {
+    projects,
+    manifest: {
+      projects: {
+        alpha: {
+          cover: { ...entry("alpha", "cover"), sha256: SHA.alpha },
+          gallery: { p01: entry("alpha", "p01") },
+          og: og(projects[0]),
+        },
+        beta: {
+          cover: { ...entry("beta", "cover"), sha256: SHA.beta },
+          gallery: {},
+          og: og(projects[1]),
+        },
       },
-      beta: { cover: entry("beta", "cover"), gallery: {} },
+      site: {
+        home: {
+          url: `${HOST}/_site/og-home-abcd1234.jpg`,
+          width: 1200,
+          height: 630,
+          inputs: inputsHash(SHA.alpha, homeLines(site.name, site.description)),
+        },
+      },
     },
-  },
-});
+  };
+};
 
-const opts = { maxPlanes: 32 };
+const opts = { maxPlanes: 32, site };
 const msg = (fn) => {
   try {
     fn();
@@ -248,4 +274,57 @@ test("D-10: Phase 7 fields may stay empty", () => {
     testimonial: null,
   });
   assert.doesNotThrow(() => validateContent(projects, manifest, opts));
+});
+
+test("D-06: og is required, fresh and in the project's folder", () => {
+  const a = fixture();
+  delete a.manifest.projects.alpha.og;
+  assert.match(
+    msg(() => validateContent(a.projects, a.manifest, opts)),
+    /^\[content\] alpha\.og: missing$/m,
+  );
+  const b = fixture();
+  b.manifest.projects.alpha.og.inputs = "0".repeat(64);
+  assert.match(
+    msg(() => validateContent(b.projects, b.manifest, opts)),
+    /^\[content\] alpha\.og: stale, run: node scripts\/media\.mjs share --only=alpha$/m,
+  );
+  const c = fixture();
+  c.manifest.projects.alpha.og.url = og(c.projects[1]).url;
+  assert.match(
+    msg(() => validateContent(c.projects, c.manifest, opts)),
+    /^\[content\] alpha\.og: url not under /m,
+  );
+  const d = fixture();
+  d.projects[0].type = "Something else";
+  assert.match(
+    msg(() => validateContent(d.projects, d.manifest, opts)),
+    /^\[content\] alpha\.og: stale, run: node scripts\/media\.mjs share --only=alpha$/m,
+  );
+});
+
+test("D-06: site.home is required and fresh", () => {
+  const a = fixture();
+  delete a.manifest.site;
+  assert.match(
+    msg(() => validateContent(a.projects, a.manifest, opts)),
+    /^\[content\] site\.home: missing$/m,
+  );
+  const b = fixture();
+  b.manifest.projects.alpha.cover.sha256 = "c".repeat(64);
+  const m = msg(() => validateContent(b.projects, b.manifest, opts));
+  assert.match(
+    m,
+    /^\[content\] site\.home: stale, run: node scripts\/media\.mjs share --only=home$/m,
+  );
+});
+
+test("resolved projects carry og", () => {
+  const { projects, manifest } = fixture();
+  const out = resolveContent(projects, manifest, opts);
+  assert.deepEqual(out[0].og, {
+    url: manifest.projects.alpha.og.url,
+    width: 1200,
+    height: 630,
+  });
 });
