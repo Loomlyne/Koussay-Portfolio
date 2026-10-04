@@ -182,10 +182,10 @@ test("gallery items come from R2 through the optimizer", async ({ page }) => {
     .toBeGreaterThan(0);
 });
 
-test("project share images are real and not the logo", async ({
-  page,
-  request,
-}) => {
+test("project share images are real and not the logo", async ({ request }) => {
+  // Share images render on first request (R2 fetch + compositing), which is
+  // slow on a cold server under load; read the tag from HTML, not a browser.
+  test.setTimeout(300_000);
   const bodyOf = async (path) => {
     const res = await request.get(path);
     expect(res.status(), path).toBe(200);
@@ -194,13 +194,13 @@ test("project share images are real and not the logo", async ({
   };
   const booking = await bodyOf("/booking/opengraph-image");
   for (const slug of ORDER) {
-    await page.goto(`/project/${slug}`);
-    const content = await page
-      .locator('meta[property="og:image"]')
-      .first()
-      .getAttribute("content");
+    const html = await (await request.get(`/project/${slug}`)).text();
+    const content = html.match(
+      /<meta[^>]+property="og:image"[^>]+content="([^"]+)"/,
+    )?.[1];
+    expect(content, `${slug} og:image`).toBeTruthy();
     // Absolute production URL in the tag; request only its path locally.
-    const u = new URL(content);
+    const u = new URL(content.replaceAll("&amp;", "&"));
     expect(await bodyOf(u.pathname + u.search), slug).not.toBe(booking);
   }
 });
