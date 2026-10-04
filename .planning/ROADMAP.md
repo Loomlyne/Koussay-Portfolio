@@ -119,7 +119,7 @@ Plans:
 
 - [x] 02-01-PLAN.md — Live snapshot committed first (data, rendered strings, home and project HTML, llms.txt, sitemap, home and project screenshots)
 - [x] 02-02-PLAN.md — Cloudflare zone rule: ACAO * on media.koussay.online (Koussay approves the command)
-- [ ] 02-03-PLAN.md — HYG-08: Vercel Standard Protection read, old URL probed, Koussay confirms
+- [x] 02-03-PLAN.md — HYG-08: Vercel Standard Protection read, old URL probed, Koussay confirms
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -312,7 +312,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
-| 2. Projects served from the repo | 2/11 | In Progress|  |
+| 2. Projects served from the repo | 3/11 | In Progress|  |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |

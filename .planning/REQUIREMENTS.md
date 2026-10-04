@@ -80,7 +80,7 @@ Requirements for this milestone. Each maps to a roadmap phase.
 - [x] **HYG-05**: One formatting-only Prettier commit lands before any functional change; the tree then passes `prettier --check`, `npm run lint` and `npm run build` at every phase end
 - [x] **HYG-06**: `components/TwoPlaneMorph.jsx`, the root `shader` file, `scripts/seed-notion-projects.mjs` and the dead `lib/env.js` accessors are removed; `.agents/skills/` is gitignored with `skills-lock.json` kept
 - [ ] **HYG-07**: AGENTS.md matches the tree: layout, line counts, known gaps, the content and media model, and the smoke test
-- [ ] **HYG-08**: Vercel Deployment Protection is set so retired deployment URLs no longer serve removed files; Koussay checks it in one numbered step
+- [x] **HYG-08**: Vercel Deployment Protection is set so retired deployment URLs no longer serve removed files; Koussay checks it in one numbered step
 
 ### Platform (PLAT)
 
@@ -182,7 +182,7 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | HYG-05 | Phase 1 | Complete |
 | HYG-06 | Phase 1 | Complete |
 | HYG-07 | Phase 8 | Pending |
-| HYG-08 | Phase 2 | Pending |
+| HYG-08 | Phase 2 | Complete |
 | TEST-01 | Phase 1 | Complete |
 | TEST-02 | Phase 2 | Pending |
 | PLAT-01 | Phase 3.1 | Pending |
