@@ -1,16 +1,10 @@
-import { getProjects } from "@/lib/cms/projects";
+import { getProjects } from "@/lib/content";
 import { projectHref } from "@/lib/projects";
 import { BOOKING_PATH, SITE_URL } from "@/lib/site";
 
 export default async function sitemap() {
   const now = new Date();
-  let projects = [];
-
-  try {
-    projects = await getProjects();
-  } catch {
-    projects = [];
-  }
+  const projects = getProjects();
 
   return [
     {
@@ -27,7 +21,7 @@ export default async function sitemap() {
     },
     ...projects.map((project) => ({
       url: `${SITE_URL}${projectHref(project.slug)}`,
-      lastModified: project.updatedAt ? new Date(project.updatedAt) : now,
+      lastModified: new Date(project.updatedAt),
       changeFrequency: "monthly",
       priority: 0.8,
     })),

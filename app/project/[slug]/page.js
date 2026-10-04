@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { RegisterHome } from "@/components/HomeRing";
 import JsonLd from "@/components/JsonLd";
 import ProjectDetail from "@/components/project/ProjectDetail";
-import { getProjects } from "@/lib/cms/projects";
-import { withExpandedPdfGallery } from "@/lib/notion/gallery-pdf";
+import { getProjects } from "@/lib/content";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import {
   getProjectBySlug,
@@ -16,16 +15,10 @@ import {
 import { breadcrumbSchema, graph, projectSchema } from "@/lib/seo";
 
 export async function generateStaticParams() {
-  try {
-    const projects = await getProjects();
-    return getProjectStaticParams(projects);
-  } catch {
-    return [];
-  }
+  return getProjectStaticParams(getProjects());
 }
 
-export const dynamicParams = true;
-export const revalidate = 60;
+export const dynamicParams = false;
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -70,8 +63,7 @@ export default async function ProjectPage({ params }) {
 
   if (!project) notFound();
 
-  const detailed = await withExpandedPdfGallery(project);
-  const { previous, next } = getProjectNavigation(detailed, projects);
+  const { previous, next } = getProjectNavigation(project, projects);
 
   const crumbs = [
     { label: SITE_NAME, href: "/" },
@@ -86,8 +78,8 @@ export default async function ProjectPage({ params }) {
       />
       <RegisterHome projects={projects} />
       <ProjectDetail
-        project={detailed}
-        displayIndex={getProjectDisplayIndex(detailed, projects)}
+        project={project}
+        displayIndex={getProjectDisplayIndex(project, projects)}
         previous={previous}
         next={next}
       />

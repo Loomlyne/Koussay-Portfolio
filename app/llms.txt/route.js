@@ -1,4 +1,4 @@
-import { getProjects } from "@/lib/cms/projects";
+import { getProjects } from "@/lib/content";
 import { projectHref } from "@/lib/projects";
 import {
   BOOKING_PATH,
@@ -7,16 +7,8 @@ import {
   SITE_URL,
 } from "@/lib/site";
 
-export const revalidate = 60;
-
 export async function GET() {
-  let projects = [];
-
-  try {
-    projects = await getProjects();
-  } catch {
-    projects = [];
-  }
+  const projects = getProjects();
 
   const work = projects
     .map((project) => {

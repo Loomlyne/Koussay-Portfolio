@@ -29,7 +29,14 @@ export default function ProjectWarm({ current, previous, next }) {
         if (!src) return null;
         return (
           <span key={project.slug} className={styles.warmSlot}>
-            <Image src={src} alt="" fill sizes={HERO_IMAGE_SIZES} />
+            <Image
+              src={src}
+              alt=""
+              fill
+              unoptimized
+              crossOrigin="anonymous"
+              sizes={HERO_IMAGE_SIZES}
+            />
           </span>
         );
       })}

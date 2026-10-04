@@ -1,11 +1,9 @@
 import { RegisterHome } from "@/components/HomeRing";
 import JsonLd from "@/components/JsonLd";
-import { getProjects } from "@/lib/cms/projects";
+import { getProjects } from "@/lib/content";
 import { projectImageSrc } from "@/lib/projects";
 import { graph, projectListSchema } from "@/lib/seo";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
-
-export const revalidate = 60;
 
 export async function generateMetadata() {
   const title = `${SITE_NAME} — Identities and digital experiences`;

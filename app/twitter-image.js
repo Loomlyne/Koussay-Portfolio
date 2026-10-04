@@ -6,4 +6,3 @@ export {
 } from "./opengraph-image";
 
 export const runtime = "nodejs";
-export const revalidate = 60;

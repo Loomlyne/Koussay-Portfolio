@@ -141,7 +141,7 @@ test("every project page renders", async ({ page, request }) => {
         .soft(page.getByText(project.summary, { exact: true }), path)
         .toBeVisible();
       // The hero is eager and preloaded, so currentSrc is safe to read here.
-      const hero = page.locator("main header img").first();
+      const hero = page.locator(`main header img[src^="${R2}"]`).first();
       await expect
         .soft(async () => {
           const info = await hero.evaluate((img) => ({
@@ -217,7 +217,7 @@ test("warm round trip: deep link, back to the ring", async ({ page }) => {
   await expect
     .poll(() =>
       page
-        .locator("main header img")
+        .locator(`main header img[src^="${R2}"]`)
         .first()
         .evaluate((i) => i.naturalWidth),
     )

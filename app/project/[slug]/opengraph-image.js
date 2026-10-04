@@ -1,9 +1,8 @@
-import { getProjects } from "@/lib/cms/projects";
+import { getProjects } from "@/lib/content";
 import { ogImageResponse, OG_SIZE, OG_TYPE } from "@/lib/og-image";
 import { getProjectBySlug, shareImageAlt } from "@/lib/projects";
 
 export const runtime = "nodejs";
-export const revalidate = 60;
 export const size = OG_SIZE;
 export const contentType = OG_TYPE;
 

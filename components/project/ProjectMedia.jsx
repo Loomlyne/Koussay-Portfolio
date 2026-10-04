@@ -72,6 +72,7 @@ export default function ProjectMedia({ project, preload = false }) {
             alt={shareImageAlt(project)}
             fill
             preload={preload}
+            unoptimized
             crossOrigin="anonymous"
             sizes={HERO_IMAGE_SIZES}
             className={styles.mediaImage}
