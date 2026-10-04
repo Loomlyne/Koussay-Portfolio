@@ -191,27 +191,46 @@ test("gallery items come from R2 through the optimizer", async ({ page }) => {
     .toBeGreaterThan(0);
 });
 
-test("project share images are real and not the logo", async ({ request }) => {
-  // Share images render on first request (R2 fetch + compositing), which is
-  // slow on a cold server under load; read the tag from HTML, not a browser.
-  test.setTimeout(300_000);
-  const bodyOf = async (path) => {
-    const res = await request.get(path);
-    expect(res.status(), path).toBe(200);
-    expect(res.headers()["content-type"], path).toContain("image/png");
-    return (await res.body()).toString("base64");
+test("share images are static files", async ({ request }) => {
+  const meta = (html, name) => {
+    const tag = html
+      .match(/<meta\b[^>]*>/g)
+      ?.find((t) => new RegExp(`(property|name)="${name}"`).test(t));
+    return tag?.match(/content="([^"]*)"/)?.[1]?.replaceAll("&amp;", "&");
   };
-  const booking = await bodyOf("/booking/opengraph-image");
+  const fetchImage = async (url, type) => {
+    const res = await request.get(url);
+    expect(res.status(), url).toBe(200);
+    expect(res.headers()["content-type"], url).toContain(type);
+  };
+
   for (const slug of ORDER) {
     const html = await (await request.get(`/project/${slug}`)).text();
-    const content = html.match(
-      /<meta[^>]+property="og:image"[^>]+content="([^"]+)"/,
-    )?.[1];
-    expect(content, `${slug} og:image`).toBeTruthy();
-    // Absolute production URL in the tag; request only its path locally.
-    const u = new URL(content.replaceAll("&amp;", "&"));
-    expect(await bodyOf(u.pathname + u.search), slug).not.toBe(booking);
+    const og = meta(html, "og:image");
+    expect(og, `${slug} og:image`).toMatch(
+      new RegExp(
+        `^https://media\\.koussay\\.online/projects/${slug}/og-[0-9a-f]{8}\\.jpg$`,
+      ),
+    );
+    expect(meta(html, "og:image:width"), slug).toBe("1200");
+    expect(meta(html, "og:image:height"), slug).toBe("630");
+    expect(meta(html, "twitter:image"), slug).toBe(og);
+    await fetchImage(og, "image/jpeg");
   }
+
+  const home = await (await request.get("/")).text();
+  const homeOg = meta(home, "og:image");
+  expect(homeOg).toMatch(
+    /^https:\/\/media\.koussay\.online\/projects\/_site\/og-home-[0-9a-f]{8}\.jpg$/,
+  );
+  expect(meta(home, "twitter:image")).toBe(homeOg);
+  await fetchImage(homeOg, "image/jpeg");
+
+  const booking = await (await request.get("/booking")).text();
+  const bookingOg = new URL(meta(booking, "og:image"));
+  expect(bookingOg.pathname).toBe("/booking/opengraph-image.png");
+  expect(meta(booking, "twitter:image")).toBeTruthy();
+  await fetchImage(bookingOg.pathname + bookingOg.search, "image/png");
 });
 
 test("a placeholder slug is gone", async ({ request }) => {
