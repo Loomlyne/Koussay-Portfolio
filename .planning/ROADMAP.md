@@ -131,7 +131,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 02-06-PLAN.md — Smoke test for the cut-over (red), cross-origin on every cover loader, remotePatterns, compare-rendered script
+- [x] 02-06-PLAN.md — Smoke test for the cut-over (red), cross-origin on every cover loader, remotePatterns, compare-rendered script
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -312,7 +312,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
-| 2. Projects served from the repo | 5/11 | In Progress|  |
+| 2. Projects served from the repo | 6/11 | In Progress|  |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |
