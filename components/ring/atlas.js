@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { IMAGE_FILES } from "./projects";
 import { projectImageSrc } from "@/lib/projects";
 import { signedOffset } from "./utils";
 
@@ -48,7 +47,7 @@ const load = (src, priority, ms = 12000) =>
  * Neither rejects — a missing file leaves its cell blank and still counts as
  * settled, so one bad path cannot strand the entry.
  */
-export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
+export function buildAtlas(files, onProgress, options = {}) {
   const cellW = options.cell ?? 512;
   const cellH = Math.round(cellW / 1.5);
   const mipmaps = options.mipmaps !== false;

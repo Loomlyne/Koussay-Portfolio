@@ -1,4 +1,4 @@
-import { PROJECTS } from "./projects";
+import { MAX_PLANES } from "../shaders/planeShaders";
 
 export const EASES = [
   "power2.out",
@@ -74,7 +74,7 @@ export function defaultParams() {
 
     // -- geometry, all at the reference window ---------------------------
     planeSize: 90, // long edge in px; aspect locked at 1.5 : 1
-    count: PROJECTS.length, // one plane per project, so the deal comes out even
+    count: MAX_PLANES, // Carousel sets it to the project count before use
     // Radius is the circle for this many slots. Layout scales it with count
     // so adding a project grows the ring instead of packing the cards tighter.
     ringRefCount: 18,
@@ -84,7 +84,7 @@ export function defaultParams() {
     radius: 6, // corner
     textured: true, // off = flat silhouette, useful for reading the goo
     blend: 14, // px over which neighbouring art crossfades in the goo
-    imageOffset: 0, // rotates the whole deal; 0 lands the entry on PROJECTS[0]
+    imageOffset: 0, // rotates the whole deal; 0 lands the entry on the first project
 
     // -- loading ---------------------------------------------------------
     // The counter is the gate: the entry launches on the frame it reads 100.

@@ -210,6 +210,14 @@ test("a placeholder slug is gone", async ({ request }) => {
   expect(res.status()).toBe(404);
 });
 
+test("removed files are gone", async ({ request }) => {
+  for (const path of ["/1.webp", "/18.webp"]) {
+    expect((await request.get(path)).status(), path).toBe(404);
+  }
+  const stamp = await request.get("/api/cms-stamp");
+  expect(await stamp.json()).toEqual({ stamp: "" });
+});
+
 test("warm round trip: deep link, back to the ring", async ({ page }) => {
   test.setTimeout(240_000);
   const { errors, r2 } = await watch(page);

@@ -20,7 +20,6 @@ import { createMeta } from "./ring/meta";
 import { createSplitText } from "./ring/splitText";
 import { createTag, TAG_W, TAG_H } from "./ring/tag";
 import { defaultParams } from "./ring/params";
-import { PROJECTS as FALLBACK_PROJECTS } from "./ring/projects";
 import {
   getProjectNavigation,
   projectHref,
@@ -50,11 +49,11 @@ const blankTexture = () => {
 };
 
 export default function Carousel({
-  projects = FALLBACK_PROJECTS,
+  projects,
   active = true,
   resumeSlug = null,
 }) {
-  const ring = projects.length > 0 ? projects : FALLBACK_PROJECTS;
+  const ring = projects;
   const ringKey = ring.map((p) => `${p.slug ?? ""}:${p.file}`).join("|");
   const router = useRouter();
   const startTransition = useSharedTransition()?.start;

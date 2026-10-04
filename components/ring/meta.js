@@ -1,5 +1,4 @@
 import gsap from "gsap";
-import { PROJECTS as FALLBACK_PROJECTS } from "./projects";
 
 /**
  * The two lockups of type either side of the ring: [number . name] on the
@@ -139,7 +138,7 @@ function createGroup(side, groups, params, mode) {
  * refs: { groups, list, loader, cut, live } — DOM handed over from the
  * component. `groups` is the shape the JSX populates, one entry per side.
  */
-export function createMeta(refs, params, projects = FALLBACK_PROJECTS) {
+export function createMeta(refs, params, projects) {
   const { groups, list, loader, cut, live } = refs;
   const mode = { instant: false };
   const left = createGroup("left", groups, params, mode);
