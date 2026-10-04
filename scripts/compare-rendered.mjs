@@ -79,7 +79,7 @@ function resolveStreaming(input) {
   let html = input;
   const segments = new Map();
   for (;;) {
-    const seg = html.match(/<div hidden id="S:(\d+)">/);
+    const seg = html.match(/<div hidden id="S:([0-9a-f]+)">/);
     if (!seg) break;
     const end = divEnd(html, seg.index);
     if (end < 0) throw new Error(`unbalanced streamed segment S:${seg[1]}`);
@@ -115,6 +115,10 @@ function resolveStreaming(input) {
     throw new Error(
       `streamed segments without a boundary: ${[...segments.keys()]}`,
     );
+  }
+  // React writes ids in hex; a leftover hidden segment means one was missed.
+  if (/<div hidden id="S:/.test(html)) {
+    throw new Error("streamed segment left unresolved in the HTML");
   }
   return html.replace(/<script>\$R[CS]\([^<]*<\/script>/g, "");
 }
