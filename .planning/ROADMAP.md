@@ -16,10 +16,10 @@ Every phase leaves the live site deployable and no worse than before. Koussay si
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Baseline and licence hygiene** - Prettier-only commit first, a green smoke test, Geist for every face, licence notices correct, dead files gone (completed 2026-10-03)
-- [ ] **Phase 2: Projects served from the repo** - The live eight read from content modules with the full schema and build-time validation; placeholders gone; no visible change
+- [ ] **Phase 2: Projects served from the repo, media on R2** - The live eight read from content modules with the full schema and build-time validation; placeholders gone; no visible change
 - [ ] **Phase 3: Notion projects path removed** - Proxy, PDF renderer, CMS cache and runtime `sharp` deleted; OG images static; bookings proven still working
 - [ ] **Phase 3.1: Hosting on Cloudflare Workers** (INSERTED) - The site runs on Workers in Koussay's Cloudflare account; Vercel serves nothing
-- [ ] **Phase 4: R2 media delivery** - Media on `media.koussay.online` with immutable URLs and CORS; one script writes R2 and the manifest; ring proven safe on a warm cache
+- [x] **Phase 4: R2 media delivery** - Merged into Phase 2 (2026-10-04); DNS done 2026-10-03
 - [ ] **Phase 5: Case-study page that closes** - Facts strip, ordered narrative, honest image labels, Identity section, status chip, closing call to action with WhatsApp and `?from=` booking
 - [ ] **Phase 6: Ring accessibility and reduced motion** - Keyboard stepping, live region, real project list, focus handling, reduced motion, WebGL-failure fallback
 - [ ] **Phase 7: The eight: real content, art and ring at eight** - Interview-written copy, real screenshots, generated covers through the paid-run gate, slug swap, ring tuned at eight
@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - **Ring internals are preserved:** packed `uScale`, fan-order indices, one-frame-stale focus, snap-only-decelerates, `forceContextLoss`, the load-counter gate (see `AGENTS.md`). No phase changes them.
 - **Bookings code is off-limits** except the one validated `from` field in Phase 5. Any phase that touches `lib/notion/client.js` or `lib/book/*` re-runs a preview booking.
 - **Secrets stay in Koussay's terminal.** Every human step below is one numbered action, then wait.
-- **Parallelism:** Phases 5 and 6 need only Phase 2 and can be built in worktrees while Phases 3 and 4 run and DNS propagates. Phase 7 can ship per project because the count stays eight.
+- **Parallelism:** Phases 5 and 6 need only Phase 2 and can be built in worktrees while Phase 3 runs. Phase 7 can ship per project because the count stays eight.
 
 ## Phase Details
 
@@ -88,12 +88,13 @@ Plans:
 
 - [x] 01-06-PLAN.md — LICENSE, README, BREAKDOWN credit, AGENTS font facts, phase-end gate
 
-### Phase 2: Projects served from the repo
+### Phase 2: Projects served from the repo, media on R2
 
-**Goal**: The live eight projects are read from repo content modules carrying the full case-study schema, and no placeholder can render anywhere, with no visible change to visitors.
+**Goal**: The live eight projects are read from repo content modules carrying the full case-study schema, their images are served from Cloudflare R2 on `media.koussay.online`, and no placeholder can render anywhere, with no visible change to visitors. (Former Phase 4 folded in by Koussay, 2026-10-04.)
 **Mode:** mvp
 **Depends on**: Phase 1
-**Requirements**: CONT-02, CONT-06, CONT-08, HYG-08
+**Requirements**: CONT-02, CONT-06, CONT-08, HYG-08, MEDIA-02, MEDIA-03, MEDIA-04, MEDIA-06, TEST-02
+**Research**: yes (R2 edge header rule without `Vary: Origin`, atlas CORS, OG images from R2, snapshotting live pages)
 **Success Criteria** (what must be TRUE):
 
   1. The ring and every live `/project/<slug>` show the same cards and copy as before the cut-over, now served from `content/projects/*` and a manifest; Notion is not called for projects at build or request time.
@@ -101,6 +102,11 @@ Plans:
   3. The eighteen placeholder projects, `public/1..18.webp` and `public/404.webp` are absent from `git ls-files`; a placeholder slug returns a real 404 and no code path can fall back to a placeholder list.
   4. The sitemap lists exactly the live set with a per-project `lastModified`; `/project/[slug]` shows as statically generated in the build route table.
   5. An old Vercel deployment URL no longer serves `/1.webp` or the PP Neue Montreal file, checked by Koussay.
+
+  6. `curl -I` on a cover at `media.koussay.online` returns the image type, `Cache-Control: public, max-age=31536000, immutable` and `Access-Control-Allow-Origin: *`, with and without an `Origin` header, cold and warm. No production URL uses `r2.dev`.
+  7. Going home, then a project, then home on a warm cache leaves the ring rendering R2 covers with no `SecurityError`; gallery images load through `next/image` from the R2 host; ring stills and hero images load direct; share images still show each project's cover.
+  8. One script is the only writer of R2 and the media manifest; its check prints `public ok` on the custom domain, it skips recorded entries unless `--force`, and its verify confirms every manifest object.
+  9. The smoke test fails when `crossOrigin` is removed from the atlas and when a shader typo is introduced, and passes again once each is restored.
 
 **Koussay's steps**:
 
@@ -151,28 +157,13 @@ Plans:
 
 **Plans**: TBD
 
-### Phase 4: R2 media delivery
+### Phase 4: R2 media delivery (MERGED into Phase 2)
 
-**Goal**: Every project image is served from Cloudflare R2 on `media.koussay.online` with immutable, content-addressed URLs, and the ring renders those covers from a cold and a warm cache.
+**Goal**: Folded into Phase 2 on 2026-10-04 by Koussay's decision. MEDIA-01 (DNS on Cloudflare) completed 2026-10-03 outside a phase; MEDIA-02, 03, 04, 06 and TEST-02 moved to Phase 2. No work remains here.
 **Mode:** mvp
-**Depends on**: Phase 3; the DNS track started in Phase 1 (MEDIA-01) must be complete
-**Requirements**: MEDIA-01, MEDIA-02, MEDIA-03, MEDIA-04, MEDIA-06, TEST-02
-**Research**: yes (DNS migration with email records, R2 CORS and the missing `Vary: Origin` at the edge, Range through the custom domain, account pinning)
-**Success Criteria** (what must be TRUE):
-
-  1. `koussay.online` resolves through Cloudflare nameservers in Koussay's own account; the site loads and Resend still shows the domain verified and delivers booking emails after the switch.
-  2. `curl -I` on a cover at `media.koussay.online` returns `image/webp`, `Cache-Control: public, max-age=31536000, immutable` and `Access-Control-Allow-Origin: *`, with and without an `Origin` header, cold and warm; a `Range` request on an MP4 returns 206. No production URL uses `r2.dev`.
-  3. Going home, then a project, then home on a warm cache leaves the ring rendering R2 covers with no `SecurityError`; gallery images load through `next/image` from the R2 host and ring stills and hero posters load direct; `public/projects/` is gone.
-  4. `scripts/media.mjs` is the only writer of R2 and `content/media.json`: `check` prints `public ok` on the custom domain, `ingest` records provenance (request id, raw file) before upload and skips recorded entries unless `--force` is given, and `verify` confirms every manifest object.
-  5. The smoke test fails when `crossOrigin` is removed from the atlas and when a shader typo is introduced, and passes again once each is restored.
-
-**Koussay's steps**:
-
-  1. Complete the nameserver switch if the Phase 1 track has not finished.
-  2. Create the R2 bucket in his own account and an R2 API token scoped to it; paste the token into `.env.local` in his terminal.
-  3. Attach `media.koussay.online` to the bucket (or approve Claude doing it with the `cf` CLI under his login, `account_id` pinned).
-
-**Plans**: TBD
+**Depends on**: Phase 2
+**Requirements**: none (moved)
+**Plans**: none
 
 ### Phase 5: Case-study page that closes
 
@@ -225,7 +216,7 @@ Plans:
 
 **Goal**: The ring holds the eight real projects, each with an approved case study, real screenshots and labelled generated covers, and the ring is tuned for eight cards.
 **Mode:** mvp
-**Depends on**: Phase 4 (media goes straight to R2), Phase 5 (copy is written into the finished template)
+**Depends on**: Phase 2 (media on R2), Phase 5 (copy is written into the finished template)
 **Requirements**: CONT-01, CONT-03, CONT-04, CONT-05, CONT-07, PAGE-06, MEDIA-05, RING-01, RING-02
 **Research**: yes (Higgsfield 3:2 output size, accepted image-to-video input, model and cost; atlas cell size; ring tuning per band with real art)
 **Success Criteria** (what must be TRUE):
@@ -253,7 +244,7 @@ Plans:
 
 **Goal**: Each project page opens on a short, silent launch video that continues seamlessly from the ring card, and AGENTS.md describes the finished tree.
 **Mode:** mvp
-**Depends on**: Phase 4 (hosting), Phase 7 (final stills and copy)
+**Depends on**: Phase 2 (media hosting), Phase 7 (final stills and copy)
 **Requirements**: VID-01, VID-02, VID-03, VID-04, VID-05, HYG-07
 **Research**: yes (brag input path for Framer sites and for Payme, 3:2 render, iOS autoplay and Low Power Mode on a real device)
 **Success Criteria** (what must be TRUE):
@@ -285,7 +276,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | 2. Projects served from the repo | 0/TBD | Not started | - |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
-| 4. R2 media delivery | 0/TBD | Not started | - |
+| 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |
 | 5. Case-study page that closes | 0/TBD | Not started | - |
 | 6. Ring accessibility and reduced motion | 0/TBD | Not started | - |
 | 7. The eight: real content, art and ring at eight | 0/TBD | Not started | - |
