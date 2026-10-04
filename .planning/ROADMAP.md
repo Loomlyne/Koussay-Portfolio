@@ -190,7 +190,7 @@ All plans run sequentially in the main checkout (control session).
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 03-04-PLAN.md — Signed cards uploaded to R2 and recorded in the manifest; build fails on a missing or stale card
+- [x] 03-04-PLAN.md — Signed cards uploaded to R2 and recorded in the manifest; build fails on a missing or stale card
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -344,7 +344,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
 | 2. Projects served from the repo | 11/11 | Complete    | 2026-10-04 |
-| 3. Notion projects path removed | 3/7 | In Progress|  |
+| 3. Notion projects path removed | 4/7 | In Progress|  |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |
 | 5. Case-study page that closes | 0/TBD | Not started | - |
