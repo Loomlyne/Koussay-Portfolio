@@ -216,7 +216,7 @@ All plans run sequentially in the main checkout (control session).
   1. `koussay.online` and `www` resolve to a Worker in Koussay's account (`4afee478…`, `cf` profile `koussay`); a response header or `cf-ray` proves Cloudflare served the HTML, not Vercel.
   2. Every route the smoke test covers (home, every project, booking, desktop and phone) passes against the Workers build and against production after the switch.
   3. A booking made on the Workers preview creates the Notion row, shows in Notion Calendar, and sends both Resend emails; blocked time still hides its slots.
-  4. Secrets live as Worker secrets set by Koussay in his terminal; no secret is in the repo, the Worker config or a log.
+  4. Secrets live as Worker secrets set by Koussay in his terminal, including `NOTION_CALENDAR_DATABASE_ID` (missing on Vercel Production since before Phase 3, so live blocked time starts working here); no secret is in the repo, the Worker config or a log.
   5. After a week of clean running on Workers, the Vercel project is removed and no Vercel deployment URL serves the site.
 
 **Koussay's steps**:
