@@ -118,9 +118,11 @@ test("renderCard makes a 1200x630 JPEG under budget", async () => {
   for (const c of px) assert.ok(Math.abs(c - 128) <= 4, `channel ${c}`);
 
   const mean = async (left, width) => {
-    const s = await sharp(out)
+    const band = await sharp(out)
       .extract({ left, top: 470, width, height: 36 })
-      .stats();
+      .png()
+      .toBuffer();
+    const s = await sharp(band).stats();
     return s.channels[0].mean;
   };
   assert.ok((await mean(64, 236)) > (await mean(900, 236)));
