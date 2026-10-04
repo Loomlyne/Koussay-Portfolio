@@ -171,7 +171,38 @@ Plans:
   1. Make one test booking on the preview URL and confirm the Notion row and both emails.
   2. Remove the two dead Vercel env vars and delete the Notion webhook subscription (one numbered step).
 
-**Plans**: TBD
+**Plans**: 7 plans
+
+Plans:
+All plans run sequentially in the main checkout (control session).
+
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Notion projects runtime removed (media proxy, PDF, cms-stamp, webhook, CmsLive, unstable_cache, env accessors, next.config keys); routes 404
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02-PLAN.md — Package gate for geist and fontkit (Koussay confirms), Geist share-card renderer with tests
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-03-PLAN.md — share --preview renders the D-07 set; Koussay signs the pictures, then picks each label (share-only)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 03-04-PLAN.md — Signed cards uploaded to R2 and recorded in the manifest; build fails on a missing or stale card
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 03-05-PLAN.md — Page metadata from R2 cards, static booking PNG, request-time sharp and PDF packages removed, smoke test
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 03-06-PLAN.md — CLAUDE.md, README and codebase docs match the tree; phase-end gate on one recorded commit
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 03-07-PLAN.md — Booking proof on localhost:3100 with real keys (D-08) and a Notion calendar block (D-10), Koussay deletes the TEST row (D-09), criterion 4 pending post-ship
 
 ### Phase 3.1: Hosting on Cloudflare Workers (INSERTED)
 

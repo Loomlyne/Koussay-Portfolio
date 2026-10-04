@@ -434,19 +434,22 @@ test("share images are static R2 files", async ({ request }) => {
 | A5 | Koussay's `.env.local` holds the real booking keys (not read, per the instruction; Phase 1 memory said it had none) | Booking Proof | D-08 needs them; if absent Koussay supplies them in his terminal as one numbered step |
 | A6 | LinkedIn/WhatsApp/X preview caches expire in days | Pitfall 2 | None for correctness |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`origin.from` provenance strings in `content/media.json`**
    - Known: 37 values contain `koussay.online/api/media/...`; the grep in success criterion 1 will match them; the data is dead provenance.
    - Unclear: whether Koussay reads "grep clean" literally.
    - Recommendation: rewrite them to `notion-snapshot:<pageId>/<slot>` through the script's writer in the same plan as `share`; state this in the plan so it is visible and not a silent edit of a script-owned file.
+   - RESOLVED: Plan 03-04 Task 1 step 5 rewrites them through the script's writer.
 
 2. **Are the booking keys in `.env.local`?**
    - Known: Phase 1 memory says the main checkout had no Notion keys; D-08 says real keys come from `.env.local`.
    - Unclear: current state.
    - Recommendation: first task of the proof plan checks presence by name as booleans only (no values printed). If missing, one numbered terminal step for Koussay.
+   - RESOLVED: Plan 03-07 Task 1 checks presence by name as booleans (local and Vercel Production) before any proof.
 
 3. **Where does the home card's cover come from after Phase 7?** ORDER[0] is `pixenhouse` today and Phase 7 swaps slugs; the `inputs` hash makes the build fail until `share` is re-run, which is the intended behaviour. No action needed now; note it in the Phase 7 hand-off.
+   - RESOLVED: no action; the build failure on a changed ORDER[0] is the intended behaviour.
 
 ## Environment Availability
 
