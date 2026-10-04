@@ -147,7 +147,7 @@ Plans:
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
-- [ ] 02-10-PLAN.md — LICENSE media wording (D-15), README, AGENTS.md, CLAUDE.md and codebase docs
+- [x] 02-10-PLAN.md — LICENSE media wording (D-15), README, AGENTS.md, CLAUDE.md and codebase docs
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
@@ -312,7 +312,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
-| 2. Projects served from the repo | 9/11 | In Progress|  |
+| 2. Projects served from the repo | 10/11 | In Progress|  |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |
