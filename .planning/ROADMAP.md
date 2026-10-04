@@ -143,7 +143,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 02-09-PLAN.md — 404 in Geist text: before/after, Koussay signs, then 404.webp removed
+- [x] 02-09-PLAN.md — 404 in Geist text: before/after, Koussay signs, then 404.webp removed
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
@@ -312,7 +312,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
-| 2. Projects served from the repo | 8/11 | In Progress|  |
+| 2. Projects served from the repo | 9/11 | In Progress|  |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |

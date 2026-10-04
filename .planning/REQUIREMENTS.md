@@ -16,7 +16,7 @@ Requirements for this milestone. Each maps to a roadmap phase.
 - [ ] **CONT-05**: Branding shown in any Identity section is credited to its author; where Khadija made it, the credit names her
 - [x] **CONT-06**: `getProjects()` resolves synchronously from the content modules and media manifest; a broken media reference fails `npm run build`
 - [ ] **CONT-07**: Unknown project slugs return a real 404 (`dynamicParams = false`); the three retired slugs 404
-- [ ] **CONT-08**: The eighteen placeholder projects, their Behance images and `public/404.webp` are removed from the tree, and no fallback can render them
+- [x] **CONT-08**: The eighteen placeholder projects, their Behance images and `public/404.webp` are removed from the tree, and no fallback can render them
 
 ### Case-study page (PAGE)
 
@@ -139,7 +139,7 @@ Every v1 requirement maps to exactly one phase in `.planning/ROADMAP.md`.
 | CONT-05 | Phase 7 | Pending |
 | CONT-06 | Phase 2 | Complete |
 | CONT-07 | Phase 7 | Pending |
-| CONT-08 | Phase 2 | Pending |
+| CONT-08 | Phase 2 | Complete |
 | PAGE-01 | Phase 5 | Pending |
 | PAGE-02 | Phase 5 | Pending |
 | PAGE-03 | Phase 5 | Pending |
