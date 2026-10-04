@@ -43,8 +43,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local output from scripts/generate-project-media.mjs --probe
+# local output from scripts/media.mjs generate --probe
 .media-probe/
+
+# raw bytes and provenance from scripts/media.mjs, local only
+/media-work/
 
 # playwright
 /playwright-report/

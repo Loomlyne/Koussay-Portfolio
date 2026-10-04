@@ -138,3 +138,15 @@ export async function headObject(config, key) {
   if (!response.ok) throw new Error(`r2 head ${key} ${response.status}`);
   return { size: Number(response.headers.get("content-length") || 0) };
 }
+
+export async function deleteObject(config, key) {
+  const { url, headers } = signedRequest(config, { method: "DELETE", key });
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers,
+    signal: AbortSignal.timeout(30000),
+  });
+  if (![200, 204, 404].includes(response.status)) {
+    throw new Error(`r2 delete ${key} ${response.status}`);
+  }
+}

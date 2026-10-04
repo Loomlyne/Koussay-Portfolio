@@ -12,3 +12,6 @@ test-results/
 # Local, generated Obsidian board (never committed)
 .obsidian/
 Board/
+
+# scripts/media.mjs is the only writer of this manifest
+content/media.json
