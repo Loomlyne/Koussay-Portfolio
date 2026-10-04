@@ -51,8 +51,8 @@ export async function generateMetadata({ params }) {
       images: [
         {
           url: project.og.url,
-          width: 1200,
-          height: 630,
+          width: project.og.width,
+          height: project.og.height,
           alt: shareImageAlt(project),
         },
       ],

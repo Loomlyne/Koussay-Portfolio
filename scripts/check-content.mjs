@@ -29,7 +29,7 @@ try {
     site: { name: SITE_NAME, description: SITE_DESCRIPTION },
   });
   const media = Object.values(manifest.projects).reduce(
-    (n, p) => n + 1 + Object.keys(p.gallery).length,
+    (n, p) => n + 1 + Object.keys(p.gallery ?? {}).length,
     0,
   );
   console.log(

@@ -519,11 +519,22 @@ async function fetchCover(slug, cover) {
 
 const esc = (text) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
+/** A mistyped --only would otherwise exit 0 having done nothing. */
+function checkOnly(order) {
+  const known = new Set([...order, "home"]);
+  const unknown = only.filter((slug) => !known.has(slug));
+  if (unknown.length) {
+    console.error(`[media] --only: unknown slug ${unknown.join(", ")}`);
+    process.exit(1);
+  }
+}
+
 /** Render and publish the signed og cards; skip any whose inputs are unchanged. */
 async function shareUpload() {
   const { PROJECTS_IN_ORDER, ORDER } = await import(
     pathToFileURL(join(root, "content", "projects", "index.mjs")).href
   );
+  checkOnly(ORDER);
   const manifest = readManifest();
   let failed = 0;
   const targets = PROJECTS_IN_ORDER.filter(
@@ -652,6 +663,7 @@ async function share() {
       process.exit(1);
     }
   }
+  checkOnly(ORDER);
   const manifest = readManifest();
   const covers = new Map();
   const coverOf = async (slug) => {
