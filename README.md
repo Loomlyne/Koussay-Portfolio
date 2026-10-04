@@ -43,8 +43,7 @@ Open <http://localhost:3000>. Restart the dev server after you change
 
 Projects are read from `content/projects` and their images come from
 media.koussay.online, so the ring needs no keys. Without the Notion booking
-keys, `/api/book` returns 503. `NOTION_PROJECTS_DATABASE_ID` and
-`NOTION_WEBHOOK_SECRET` only serve the legacy media proxy until it is removed.
+keys, `/api/book` returns 503.
 
 ### Environment variables
 
@@ -53,9 +52,7 @@ Names and purposes only. Put the values in `.env.local`, never in git.
 | Variable                                                                 | Group         | Purpose                                                         |
 | ------------------------------------------------------------------------ | ------------- | --------------------------------------------------------------- |
 | `NOTION_TOKEN`                                                           | App           | Notion integration token                                        |
-| `NOTION_PROJECTS_DATABASE_ID`                                            | App           | Projects database, the CMS for the ring and case studies        |
 | `NOTION_BOOKINGS_DATABASE_ID`                                            | App           | Bookings database, one timed event per booking                  |
-| `NOTION_WEBHOOK_SECRET`                                                  | App           | Verification token for the `/api/revalidate` webhook            |
 | `RESEND_API_KEY`                                                         | App           | Resend key for booking email                                    |
 | `RESEND_FROM`                                                            | App           | Sender, on a domain verified in Resend                          |
 | `BOOKING_NOTIFY_EMAIL`                                                   | App           | Inbox for new-booking alerts                                    |

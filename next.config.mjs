@@ -44,36 +44,10 @@ const nextConfig = {
       },
     ],
     localPatterns: [
-      // Notion covers are versioned (`?v=`) so CMS edits bust the cache.
-      // Next 16 blocks query strings on local images unless listed here.
-      {
-        pathname: "/api/media/**",
-      },
       {
         pathname: "/**",
         search: "",
       },
-    ],
-  },
-  serverExternalPackages: ["unpdf", "pdfjs-dist", "@napi-rs/canvas"],
-  outputFileTracingIncludes: {
-    "/api/media/**": [
-      "./node_modules/@napi-rs/canvas/**",
-      "./node_modules/@napi-rs/canvas-linux-x64-gnu/**",
-      "./node_modules/@napi-rs/canvas-linux-x64-musl/**",
-      "./node_modules/@napi-rs/canvas-linux-arm64-gnu/**",
-      "./node_modules/@napi-rs/canvas-linux-arm64-musl/**",
-      "./node_modules/pdfjs-dist/**",
-      "./node_modules/unpdf/**",
-    ],
-    "/project/**": [
-      "./node_modules/@napi-rs/canvas/**",
-      "./node_modules/@napi-rs/canvas-linux-x64-gnu/**",
-      "./node_modules/@napi-rs/canvas-linux-x64-musl/**",
-      "./node_modules/@napi-rs/canvas-linux-arm64-gnu/**",
-      "./node_modules/@napi-rs/canvas-linux-arm64-musl/**",
-      "./node_modules/pdfjs-dist/**",
-      "./node_modules/unpdf/**",
     ],
   },
 };

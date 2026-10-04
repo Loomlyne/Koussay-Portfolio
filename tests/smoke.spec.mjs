@@ -223,8 +223,12 @@ test("removed files are gone", async ({ request }) => {
   for (const path of ["/1.webp", "/18.webp", "/404.webp"]) {
     expect((await request.get(path)).status(), path).toBe(404);
   }
-  const stamp = await request.get("/api/cms-stamp");
-  expect(await stamp.json()).toEqual({ stamp: "" });
+  for (const path of ["/api/cms-stamp", "/api/revalidate", "/api/media/abc"]) {
+    const res = await request.get(path);
+    expect(res.status(), path).toBe(404);
+    expect(res.url().endsWith(path), `${path} must not redirect`).toBe(true);
+  }
+  expect((await request.post("/api/revalidate")).status()).toBe(404);
 });
 
 test("warm round trip: deep link, back to the ring", async ({ page }) => {
