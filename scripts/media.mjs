@@ -175,10 +175,14 @@ async function getPublic(url, origin) {
 }
 
 /** Header and body checks shared by import-live and verify. Returns problems. */
-function checkPublic({ response, body }, expectedSha) {
+function checkPublic(
+  { response, body },
+  expectedSha,
+  contentType = "image/webp",
+) {
   const problems = [];
   if (response.status !== 200) problems.push(`status ${response.status}`);
-  if (response.headers.get("content-type") !== "image/webp") {
+  if (response.headers.get("content-type") !== contentType) {
     problems.push(`content-type ${response.headers.get("content-type")}`);
   }
   if (response.headers.get("cache-control") !== IMMUTABLE) {
@@ -488,9 +492,12 @@ async function generateMedia() {
           if ((await headObject(r2, key))?.size !== buffer.length) {
             throw new Error("head size mismatch");
           }
+          const coverUrl = publicUrl(r2, key);
+          const coverProblems = checkPublic(await getPublic(coverUrl), hash);
+          if (coverProblems.length) throw new Error(coverProblems.join(", "));
           record.cover = {
             key,
-            url: publicUrl(r2, key),
+            url: coverUrl,
             type: "image/webp",
             width: COVER.width,
             height: COVER.height,
@@ -536,9 +543,19 @@ async function generateMedia() {
           await putObject(r2, key, bytes, "video/mp4", {
             cacheControl: IMMUTABLE,
           });
+          if ((await headObject(r2, key))?.size !== bytes.length) {
+            throw new Error("loop head size mismatch");
+          }
+          const loopUrl = publicUrl(r2, key);
+          const loopProblems = checkPublic(
+            await getPublic(loopUrl),
+            hash,
+            "video/mp4",
+          );
+          if (loopProblems.length) throw new Error(loopProblems.join(", "));
           record.loop = {
             key,
-            url: publicUrl(r2, key),
+            url: loopUrl,
             type: "video/mp4",
             bytes: bytes.length,
             sha256: hash,
