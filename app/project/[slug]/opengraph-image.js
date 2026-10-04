@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+
 import { getProjects } from "@/lib/content";
 import { ogImageResponse, OG_SIZE, OG_TYPE } from "@/lib/og-image";
 import { getProjectBySlug, shareImageAlt } from "@/lib/projects";
@@ -24,5 +26,8 @@ export async function generateImageMetadata({ params }) {
 export default async function Image({ params }) {
   const { slug } = await params;
   const projects = await getProjects();
-  return ogImageResponse(getProjectBySlug(slug, projects));
+  const project = getProjectBySlug(slug, projects);
+  // D-07: an unknown slug is a 404, never the site logo with a 200.
+  if (!project) notFound();
+  return ogImageResponse(project);
 }
