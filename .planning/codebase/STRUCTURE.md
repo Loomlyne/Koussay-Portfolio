@@ -38,12 +38,13 @@ Koussay-Portfolio/
 │   ├── CmsLive.jsx               # Stamp poll -> router.refresh
 │   ├── BackToWorks.jsx, BrandMark.jsx, Breadcrumbs.jsx, ChargingMark.jsx, JsonLd.jsx
 │   ├── TwoPlaneMorph.jsx         # Dead experiment, imports nothing live (see AGENTS.md)
-│   ├── ring/                     # Ring modules: params, atlas, meta, splitText, tag, gui, utils, projects
+│   ├── ring/                     # Ring modules: params, atlas, meta, splitText, tag, gui, utils
 │   ├── shaders/                  # planeShaders.js (ring SDF + MAX_PLANES), textShaders.js
 │   ├── project/                  # Detail page UI: Detail, Hero, Gallery, Media, Sections, Pager(+Transition), Tools, Testimonial, Warm, ScrollTop, NotFound
 │   └── book/                     # Booking UI: BookFlow, BookCalendar, BookTimePicker, BookSelect, BookProgress
 ├── lib/                          # Server-and-shared logic (no React components)
-│   ├── cms/                      # projects.js (getProjects), bust.js
+│   ├── content.js, content-schema.mjs  # getProjects() (sync), schema join; throws at build on bad content
+│   ├── cms/                      # bust.js (legacy, removed in Phase 3)
 │   ├── notion/                   # client.js, projects.js, props.js, gallery-pdf.js, bookings.js
 │   ├── project/warm.js           # Client-side prefetch + image decode retention
 │   ├── book/                     # config, confirmation, draft, research, steps, time, validate
@@ -54,9 +55,11 @@ Koussay-Portfolio/
 │   ├── projects.js               # Project helpers (slug, neighbours, alt text, indexProjects)
 │   ├── seo.js, site.js, og-image.js
 ├── scripts/                      # Authoring-time CLIs (never imported by app/)
-│   ├── generate-project-media.mjs    # Higgsfield -> sharp -> R2, manifest-gated
+│   ├── media.mjs                 # check | import-live | verify | generate; only writer of content/media.json and R2 projects/
+│   ├── check-content.mjs         # sub-second content gate
 │   └── lib/ (art-direction.mjs, higgsfield.mjs, load-env.mjs, r2.mjs)
-├── public/                       # 1-18.webp placeholder art, 404.webp, fonts, logo.png, favicon.ico, svg
+├── content/                      # projects/<slug>.mjs + index.mjs (ORDER = ring order), media.json (machine-written)
+├── public/                       # fonts, logo.png, favicon.ico, svg (placeholder art and 404.webp removed; 404 mark is live Geist text)
 ├── docs/                         # Screenshots (carousel/entry/hover.png), NEXT-SESSION-PROMPT.md (historical)
 ├── .agents/skills/               # Higgsfield agent skills (tooling, not app code)
 ├── .planning/codebase/           # These map documents
@@ -81,20 +84,19 @@ Koussay-Portfolio/
 - Purpose: Everything rendered in the browser, including the WebGL ring.
 - Contains: `.jsx` components, `.js` helpers/contexts, GLSL in `.js` template strings.
 - Key files: `components/Carousel.jsx`, `components/HomeRing.jsx`, `components/ring/params.js`, `components/shaders/planeShaders.js`.
-- `components/ring/projects.js` doubles as the placeholder content fallback consumed by `lib/` and `scripts/`.
 
 **`lib/`:**
 - Purpose: Data access, caching, SEO, media, booking logic.
 - Contains: plain `.js` modules. Server-only by convention (uses `node:crypto`, `sharp`, Notion client). Exceptions that run in the browser: `lib/projects.js`, `lib/project/warm.js`, `lib/media.js`.
-- Key files: `lib/cms/projects.js`, `lib/notion/projects.js`, `lib/env.js`.
+- Key files: `lib/content.js`, `lib/content-schema.mjs`, `lib/env.js`. `lib/notion/projects.js`, `lib/notion/gallery-pdf.js`, `lib/pdf.js`, `lib/media.js` and `lib/cms/bust.js` are unreferenced by pages and removed in Phase 3.
 
 **`scripts/`:**
 - Purpose: Manual authoring-time tooling run with `node`.
 - Contains: ESM `.mjs`. Own env loader, own R2 SigV4 signer. Uses `@higgsfield/client` (a devDependency).
-- Generated at runtime: `scripts/media-manifest.json` (not yet present, not gitignored; commit it once created because it is the skip-gate) and `.media-probe/` (gitignored).
+- Generated: `content/media.json` (committed, written only by `scripts/media.mjs`) and `.media-probe/` (gitignored).
 
 **`public/`:**
-- Purpose: Static assets. `1.webp` to `18.webp` are the placeholder ring art (third-party, flagged in README/LICENSE); fonts are Geist woff2 under `public/fonts` with `OFL.txt`.
+- Purpose: Static assets. Fonts are Geist woff2 under `public/fonts` with `OFL.txt`. The old placeholder art is removed and remains in git history.
 
 ## Key File Locations
 
@@ -103,7 +105,7 @@ Koussay-Portfolio/
 - `app/page.js`: Ring route.
 - `app/project/[slug]/page.js`: Detail route.
 - `components/Carousel.jsx`: Ring component.
-- `scripts/generate-project-media.mjs`: Media generation CLI.
+- `scripts/media.mjs`: Media CLI.
 
 **Configuration:**
 - `next.config.mjs`: Redirects (`/work/:slug`, `/book`), `images.localPatterns`, `serverExternalPackages`, `outputFileTracingIncludes`, conditional standalone output, `staleTimes`.
@@ -113,11 +115,11 @@ Koussay-Portfolio/
 - `lib/site.js`: Site name, URL (`https://koussay.online`), description, booking path.
 
 **Core Logic:**
-- `lib/cms/projects.js`: Content fallback chain.
+- `lib/content.js`: Synchronous project resolver, no fallback.
 - `lib/notion/projects.js`: Notion query, mapping, caches, media URL resolution.
 - `app/api/media/[...parts]/route.js`: Media proxy.
 - `components/ring/params.js`: All ring tunables.
-- `components/ring/projects.js`: 18 placeholder projects in ring order.
+- `content/projects/index.mjs`: `ORDER`, the ring order.
 
 **Testing:**
 - `tests/smoke.spec.mjs` and `tests/screens.spec.mjs` (Playwright, `npm test`, port 3100). Gate: `format:check`, `lint`, `build`, `test` (see `AGENTS.md`).
@@ -128,7 +130,7 @@ Koussay-Portfolio/
 - React components: PascalCase `.jsx` (`components/HomeRing.jsx`, `components/project/ProjectHero.jsx`).
 - Non-component modules: lowercase or camelCase `.js` (`lib/pdf.js`, `components/ring/splitText.js`, `components/homeRingContext.js`).
 - Next special files lowercase (`page.js`, `route.js`, `loading.js`, `not-found.js`, `opengraph-image.js`).
-- Scripts: kebab-case `.mjs` (`scripts/generate-project-media.mjs`).
+- Scripts: kebab-case `.mjs` (`scripts/media.mjs`).
 - CSS modules named `page.module.css` next to the route.
 
 **Directories:**
@@ -144,7 +146,7 @@ Koussay-Portfolio/
 
 **New project/content field from Notion:**
 - Map it in `mapPage` in `lib/notion/projects.js` (property helpers in `lib/notion/props.js`), consume in `components/project/*`. If the shape of the cached bundle changes, bump the key `cms-projects-v2` in `getCachedProjectBundle`.
-- Add the same field to the placeholder rows in `components/ring/projects.js` so the fallback stays shape-compatible.
+- Add the same field to the schema in `lib/content-schema.mjs` and to every module in `content/projects/`; `node scripts/check-content.mjs` fails until all eight carry it.
 
 **New route/page:**
 - `app/<segment>/page.js` as a server component; metadata via `generateMetadata`; JSON-LD via `lib/seo.js`; add to `app/sitemap.js` and `app/llms.txt/route.js` if public.

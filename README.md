@@ -23,7 +23,7 @@ built.
 - Next.js 16 (App Router) and React 19
 - three.js for the ring, GSAP for the entry animation, Lenis for smooth scroll
 - Tailwind v4
-- Notion for projects and bookings, Resend for email
+- Repo content modules for projects, Notion for bookings, Resend for email
 - Geist and Geist Mono, self-hosted as woff2 under the SIL Open Font Licence
 
 ## Quick start
@@ -41,8 +41,10 @@ npm run dev
 Open <http://localhost:3000>. Restart the dev server after you change
 `.env.local`.
 
-With no Notion keys, the site shows 18 placeholder projects. With no booking
-keys, `/api/book` returns 503.
+Projects are read from `content/projects` and their images come from
+media.koussay.online, so the ring needs no keys. Without the Notion booking
+keys, `/api/book` returns 503. `NOTION_PROJECTS_DATABASE_ID` and
+`NOTION_WEBHOOK_SECRET` only serve the legacy media proxy until it is removed.
 
 ### Environment variables
 
@@ -69,6 +71,24 @@ Names and purposes only. Put the values in `.env.local`, never in git.
 | `HIGGSFIELD_IMAGE_PARAMS`, `HIGGSFIELD_VIDEO_PARAMS`                     | Scripts only  | JSON overrides for generation settings                          |
 | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | Scripts only  | Cloudflare R2 upload credentials                                |
 | `R2_PUBLIC_BASE`                                                         | Scripts only  | Public domain of the R2 bucket                                  |
+
+## Content
+
+Project text lives in `content/projects/<slug>.mjs`, one module per project.
+`content/projects/index.mjs` holds `ORDER`, which is the ring order. Project
+text and media change only through this repo.
+
+Images live on Cloudflare R2 at https://media.koussay.online and never change
+once uploaded. `content/media.json` lists them and is written only by
+`scripts/media.mjs`:
+
+- `node scripts/media.mjs check` checks the manifest.
+- `node scripts/media.mjs import-live` imports existing live images.
+- `node scripts/media.mjs verify` checks the files on R2.
+- `node scripts/media.mjs generate --dry-run` shows what would be generated.
+  Run it before any real `generate`, which costs credits.
+
+`node scripts/check-content.mjs` checks the content in under a second.
 
 ## Commands
 
@@ -118,11 +138,11 @@ Yousuf's line. It does not cover anything in `public/`.
 Fonts are Geist and Geist Mono under the SIL Open Font Licence 1.1, in
 `public/fonts` with `OFL.txt`.
 
-The project images still in `public/` are placeholder art by other designers,
-collected from Behance. They are not Koussay's work, and they are being
-replaced. If you made one of them and want credit or removal, open an issue.
+Project media is not MIT. Images and videos served from media.koussay.online
+belong to Koussay or to the clients named on each project page. See
+[LICENSE](LICENSE).
 
-Files removed from the tree, including earlier fonts and placeholder art,
+Files removed from the tree, including earlier fonts and old placeholder art,
 remain in this repository's git history.
 
 ## Contributing

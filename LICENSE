@@ -32,19 +32,9 @@ The contents of `public/` are NOT covered by it:
     https://github.com/vercel/geist-font. The licence text is in
     `public/fonts/OFL.txt`.
 
-  - Project imagery (`public/*.webp`) is not mine. It was collected
-    from Behance, more or less at random, purely so there was real work to
-    build and judge the layout against. I claim no ownership of any of it, no
-    licence over it is granted by the terms above, and its use here is not an
-    endorsement of reusing it. Anyone forking this should replace it with
-    their own work.
-
-    If you made one of these pieces and would like to be credited, or would
-    like it taken down, please open an issue on the repository and I will
-    sort it out.
-
-    The project names, disciplines and years shown alongside the images are
-    invented placeholders and are not claims about who made what.
+Project images and videos served from media.koussay.online belong to Koussay
+Zayani or to the clients named on each project page. They are not covered by
+the MIT licence and may not be reused.
 
 Third-party code included in this repository:
 

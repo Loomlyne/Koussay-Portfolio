@@ -60,7 +60,6 @@ Not applicable. There is no suite organisation, setup, teardown or assertion pat
 
 **Patterns:** None. Code that would need mocking has no injection seams today:
 - `lib/notion/client.js` holds a module-level singleton `client` and reads `process.env` through `lib/env.js`.
-- `lib/cms/projects.js` holds module-level `lastGood` state and wraps its function in React `cache()`.
 - `components/Carousel.jsx` constructs `THREE.WebGLRenderer`, GSAP timelines and DOM listeners inside one `useEffect`.
 
 **What to Mock (if tests are added):**
@@ -68,11 +67,11 @@ Not applicable. There is no suite organisation, setup, teardown or assertion pat
 - `next/cache` (`unstable_cache`, `revalidateTag`, `revalidatePath`).
 
 **What NOT to Mock:**
-- Pure modules: `components/ring/utils.js`, `lib/book/validate.js`, `lib/book/time.js`, `lib/notion/props.js`, `lib/media.js`, `lib/projects.js`.
+- Pure modules: `components/ring/utils.js`, `lib/book/validate.js`, `lib/book/time.js`, `lib/content-schema.mjs`, `lib/projects.js`.
 
 ## Fixtures and Factories
 
-**Test Data:** None. The nearest thing is the eighteen-project placeholder dataset `PROJECTS` in `components/ring/projects.js`, which doubles as the production fallback when Notion is unconfigured or failing (`lib/cms/projects.js`). It makes the app runnable with no credentials, which is the closest this repo has to a fixture-based smoke test: run `npm run dev` with no `.env.local` and the site should still render.
+**Test Data:** Project content is the repo's own `content/projects` (eight projects). `node scripts/check-content.mjs` validates it in under a second and `scripts/content-schema.test.mjs` covers the schema. `npm test` needs network because covers load from media.koussay.online.
 
 **Location:** `.env.example` documents the variables; `.env.local` exists locally and is gitignored (never read or quote it).
 
@@ -90,7 +89,7 @@ Not applicable. There is no suite organisation, setup, teardown or assertion pat
 
 **E2E Tests:** Not used.
 
-**Script smoke checks (manual, not tests):** `scripts/generate-project-media.mjs` has operator flags that act as ad hoc verification of external credentials: `--check` (PUT a throwaway object and read it back to prove R2 credentials and bucket), `--probe` (one image to `.media-probe/`, no R2), `--dry-run` (plan only). These exercise real services and are not repeatable assertions.
+**Script smoke checks (manual, not tests):** `scripts/media.mjs` has operator commands (`check`, `verify`, `generate --dry-run`) that verify the manifest and R2 objects. They exercise real services and are not repeatable assertions.
 
 ## Areas Most Exposed By Having No Tests
 
@@ -106,13 +105,13 @@ Ordered by blast radius if broken silently.
 - Risk: regressions show up only on real devices; desktop mouse testing will pass while swipes read as taps.
 - Priority: High.
 
-**3. Notion fallback precedence (`lib/cms/projects.js`, `lib/notion/projects.js`)**
-- What is not tested: order Notion bundle -> per-instance `lastGood` -> local `PROJECTS` fallback; that the 18 placeholders are never stored inside `unstable_cache`; React `cache()` wrapping; `getCachedProjectBundle` error behaviour; slug generation and uniqueness (`slugify`, `uniqueSlug`) and media path/version building (`mediaPath`).
-- Risk: a regression silently replaces the live project set with placeholder content in production, which is exactly the bug the in-code comment describes. Also `app/api/cms-stamp/route.js` and `components/CmsLive.jsx` polling logic (20s interval, stamp compare, `router.refresh()`), where rate-limit behaviour against Notion has already caused an incident.
+**3. Legacy Notion path (`lib/notion/projects.js`, unreferenced by pages, removed in Phase 3)**
+- What is not tested: slug generation and uniqueness (`slugify`, `uniqueSlug`) and media path/version building (`mediaPath`). The old fallback precedence is resolved in Phase 2 and its files remain in git history.
+- Risk: low while the path stays unreferenced; it goes away in Phase 3. `app/api/cms-stamp/route.js` answers a constant empty stamp.
 - Priority: High.
 
 **4. R2 SigV4 signing (`scripts/lib/r2.mjs`)**
-- What is not tested: canonical request construction, header sorting and lower-casing, `uriEncode` handling of `!'()*`, scope/date derivation, signing-key chain, `Authorization` header format. This file has never been executed against a real bucket in the repo's history to prove it; `scripts/generate-project-media.mjs --check` is the only intended verification and needs live credentials.
+- What is not tested: canonical request construction, header sorting and lower-casing, `uriEncode` handling of `!'()*`, scope/date derivation, signing-key chain, `Authorization` header format. `scripts/media.mjs verify` is the intended check against the real bucket.
 - Risk: a signing bug returns 403 from R2 on every upload and is indistinguishable from bad credentials. The function is deterministic given a fixed date, so it is a good unit-test candidate against AWS's published SigV4 test vectors (inject the clock into `signedRequest`, which currently calls `new Date()` directly).
 - Priority: High for the script's purpose; low for the live site, which reads R2 through a public base URL only.
 

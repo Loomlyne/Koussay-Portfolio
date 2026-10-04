@@ -10,7 +10,7 @@
 
 **Secondary:**
 - CSS - Tailwind v4 via `@import "tailwindcss"` in `app/globals.css`, plus CSS Modules (`app/booking/page.module.css`, `app/project/[slug]/page.module.css`).
-- Node `.mjs` scripts - authoring-time tooling only: `scripts/generate-project-media.mjs`, `scripts/lib/*.mjs`.
+- Node `.mjs` scripts - authoring-time tooling only: `scripts/media.mjs` (the only writer of `content/media.json` and R2 objects under `projects/`), `scripts/check-content.mjs`, `scripts/lib/*.mjs`.
 
 ## Runtime
 
@@ -47,7 +47,7 @@
 - `@vercel/speed-insights` 2.0 - `<SpeedInsights />` in `app/layout.js`.
 
 **Native Node binaries - cannot run on Cloudflare Workers:**
-- `sharp` ^0.34.4 (installed 0.34.5) - libvips image resize/WebP in `app/api/media/[...parts]/route.js`, `lib/og-image.js`, and `scripts/generate-project-media.mjs`.
+- `sharp` ^0.34.4 (installed 0.34.5) - libvips image resize/WebP in `lib/og-image.js` and `scripts/media.mjs`, plus the legacy `app/api/media/[...parts]/route.js` (unreferenced by pages, removed in Phase 3).
 - `@napi-rs/canvas` ^1.0.9 - Skia canvas used as the PDF rasteriser backend (`lib/pdf.js`, `canvasImport: () => import("@napi-rs/canvas")`).
 - `pdfjs-dist` ^6.3.289 - PDF parsing, loaded from `pdfjs-dist/legacy/build/pdf.mjs` (`lib/pdf.js`).
 - `unpdf` ^1.8.1 - wrapper over pdfjs (`getDocumentProxy`, `renderPageAsImage`) in `lib/pdf.js`.
@@ -67,7 +67,7 @@ These four are load-bearing for any hosting decision. They need a real Node runt
 - All app env var accessors live in `lib/env.js` (each trims and returns a string or default; `isXConfigured()` helpers gate features). Read env through these functions, never `process.env` directly in app code.
 - `.env.example` documents every key. There is no `.env.local` in git (`.gitignore` ignores `.env*` except `.env.example`). A local `.env.local` exists on developer machines only; never read or quote it.
 - Scripts do not use `lib/env.js`. They use `loadEnv()` in `scripts/lib/load-env.mjs` (hand-rolled `.env.local` then `.env` parser, real env wins).
-- Degradation: with no Notion keys the app serves the 18 local placeholder projects from `components/ring/projects.js` (`lib/cms/projects.js`). With no booking keys `/api/book` returns 503.
+- Content: projects are read from `content/projects/<slug>.mjs` (one module per project, full schema) and `content/projects/index.mjs` (`ORDER` is ring order; slug is identity) through `lib/content.js` `getProjects()`, which is synchronous and needs no keys. Images are on Cloudflare R2 at https://media.koussay.online and listed in `content/media.json`. No fallback list exists. With no booking keys `/api/book` returns 503. `npm test` needs network because covers load from media.koussay.online.
 - Mismatch to know: `lib/env.js` exposes `higgsfieldKeyId()` / `higgsfieldKeySecret()` reading `HIGGSFIELD_API_KEY_ID` / `HIGGSFIELD_API_KEY_SECRET`, but `.env.example` documents `HF_CREDENTIALS` (the script-side convention in `scripts/lib/higgsfield.mjs`, which accepts either form). The `lib/env.js` Higgsfield and R2 accessors (`isHiggsfieldConfigured`, `r2PublicBase`, `isR2Configured`) are not called anywhere in `app/`, `lib/` or `components/` yet.
 
 **Build:**

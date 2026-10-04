@@ -2,26 +2,20 @@
 
 **Analysis Date:** 2026-10-02
 
-Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.online` on Vercel. Content comes from a Notion CMS; the 18 local placeholder projects are the fallback.
+Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.online` on Vercel. Projects are read from `content/projects` and images from media.koussay.online; the placeholder fallback is resolved in Phase 2.
 
 `AGENTS.md` describes the original single-page carousel. The repo has since grown a Notion CMS, project detail pages, a booking flow and API routes (`lib/`, `app/api/`, `app/project/`, `app/booking/`, `components/project/`, `components/book/`). `AGENTS.md` does not cover any of this. See "AGENTS.md Staleness".
 
 ## Licensing and Provenance (highest priority)
 
 **Unlicensed third-party artwork in a public repo:**
-- Issue: The 18 images `public/1.webp` to `public/18.webp` (plus `public/404.webp`) are other people's work, collected from Behance, with no licence and no credit. `README.md` (section "About the artwork", ~line 244) and `LICENSE` disclose this and invite takedown requests. The disclosure does not grant any rights.
-- Files: `public/1.webp` to `public/18.webp`, `public/404.webp`, `components/ring/projects.js`, `README.md`, `LICENSE`
-- Impact: Copyright exposure on a public GitHub repo and on a live commercial site. These files are served by Vercel from `public/` and are the ring content whenever Notion is unconfigured or fails. `lib/cms/projects.js` returns `FALLBACK` on a cold Notion failure with no `lastGood`, so the live ring can show the Behance art. Every image is also in git history (first added in commit `a438cfb`) and is not removable by deleting the files.
-- Fix approach: Replace the images with owned work, or with generated media once the Higgsfield to R2 pipeline works (`scripts/generate-project-media.mjs`). Remove `public/*.webp` from the tree and, if takedown risk matters, rewrite history. Make the production fallback an owned neutral set, or fail closed (empty ring and error state) instead of showing the placeholders. Keep the `README.md` and `LICENSE` notices until the files are gone, per `AGENTS.md`.
+- Resolved in Phase 2: the placeholder art, `404.webp` and the fallback data are removed and remain in git history. LICENSE now states who owns the media served from media.koussay.online.
 
 **Commercial font bundled and served in production:**
 - Resolved in Phase 1: every face is now Geist or Geist Mono under OFL 1.1. The commercial face and the Satoshi files were removed, and removed files remain in git history.
 
 **Invented project metadata:**
-- Issue: Every `type` and `year` in `components/ring/projects.js` is invented. Names marked `// *` are guesses. `detail` copy is built by `prototypeDetail(...)` and is "placeholder copy only". `TODO` at `components/ring/projects.js:6` records this.
-- Files: `components/ring/projects.js` (469 lines), consumed by `lib/projects.js` (`PROJECTS`, `IMAGE_FILES`) and `lib/cms/projects.js` (`FALLBACK`)
-- Impact: If the fallback ever renders in production, invented dates and disciplines are attributed to someone else's art, next to the author's name and JSON-LD (`lib/seo.js` `projectListSchema`). `shareImageAlt` in `lib/projects.js` writes "X cover. Type (Year) by Koussay Zayani." for these rows, so placeholder art is credited to Koussay in alt text, OG tags and structured data.
-- Fix approach: Remove the fallback data. See the first item above.
+- Resolved in Phase 2: the invented `type` and `year` rows are removed with the placeholder list and remain in git history.
 
 **MIT licence copyright holder and remote are not the site owner:**
 - Issue: `LICENSE` names "Yousuf Soomro" as copyright holder. The first commits are authored by `Yousuf-developer`. `origin` is `https://github.com/Loomlyne/Koussay-Portfolio`. The code is a fork or adaptation of another developer's carousel, now deployed as Koussay's commercial portfolio.
@@ -47,7 +41,7 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 - Risk: `npm audit --omit=dev` (run 2026-10-02) reports `next` 16.0.0 to 16.3.5 as critical: RCE in `next/og` ImageResponse (GHSA-vcvr-r3jv-pc5j), RCE in the Image Optimization API with AVIF (GHSA-2xp9-vwfh-vxw4), and a Windows-host RCE advisory. It also reports `sharp` <= 0.35.4-rc.0 as high (libvips and libheif CVEs).
 - Files: `package.json` (`"next": "16.3.0"` pinned exactly, `"sharp": "^0.34.4"`), `app/opengraph-image.js`, `app/project/[slug]/opengraph-image.js`, `app/booking/opengraph-image.js`, `lib/og-image.js` (these use `next/og`), `app/api/media/[...parts]/route.js` (runs `sharp` on bytes fetched from Notion)
 - Current mitigation: Vercel hosts the site, so the Windows advisory is not applicable. The other two are applicable to this app's own routes.
-- Recommendations: Upgrade `next` and `eslint-config-next` together to 16.3.8 or later (outside the pinned version, so a deliberate bump). Upgrade `sharp` to 0.35.5 or later, which is a breaking change, and re-test `optimize()` and `scripts/generate-project-media.mjs`. Re-run `npm audit` afterwards.
+- Recommendations: Upgrade `next` and `eslint-config-next` together to 16.3.8 or later (outside the pinned version, so a deliberate bump). Upgrade `sharp` to 0.35.5 or later, which is a breaking change, and re-test `optimize()` and `scripts/media.mjs`. Re-run `npm audit` afterwards.
 
 **Unauthenticated cache-bust when no webhook secret is set:**
 - Risk: In `app/api/revalidate/route.js` POST, if `NOTION_WEBHOOK_SECRET` is unset the only check is `!body?.type`. Any caller sending JSON with a `type` field passes and triggers `bustProjectsCache()`, which calls `revalidateTag`, `revalidatePath("/")`, `revalidatePath("/project", "layout")` and `revalidatePath("/api/media", "layout")`. Each bust forces Notion re-queries and re-renders, so repeated calls can exhaust the Notion rate limit. A 429 from Notion has already blanked the ring before (see `lib/notion/client.js` comments).
@@ -79,18 +73,18 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 
 **Hand-rolled SigV4 for R2:**
 - Issue: `scripts/lib/r2.mjs` (140 lines) implements AWS Signature V4 by hand (`signedRequest`, `putObject`, `headObject`). It has never made a successful request against real R2 credentials. Risks: canonical-header and path-encoding edge cases, `x-amz-content-sha256` over a streamed body, `cache-control` being a signed header, region `auto` scope, and a `Buffer` body on `fetch` PUT.
-- Files: `scripts/lib/r2.mjs`, `scripts/generate-project-media.mjs`
+- Files: `scripts/lib/r2.mjs`, `scripts/media.mjs`
 - Impact: The first real run may fail with `SignatureDoesNotMatch`, or silently store wrong content types and cache headers.
 - Fix approach: Run `--probe` and one real upload against a scratch bucket, and read the object back (`headObject` then a public GET). Prefer `@aws-sdk/client-s3` or Cloudflare's S3 client rather than maintaining signing code. Add a known-answer test against AWS's published SigV4 vectors.
 
 **Higgsfield generation pipeline:**
-- Issue: `scripts/generate-project-media.mjs` (376 lines), `scripts/lib/higgsfield.mjs` and `scripts/lib/art-direction.mjs` were added in the latest commits (`b427f41`, `3449e2f`, `e385e65`). The free Higgsfield plan cannot generate (see memory note), so generation has not been run end to end. The earlier Notion seed script was removed in Phase 1 and remains in git history.
-- Files: `scripts/generate-project-media.mjs`, `scripts/lib/higgsfield.mjs`, `scripts/lib/art-direction.mjs`
+- Issue: `scripts/media.mjs`, `scripts/lib/higgsfield.mjs` and `scripts/lib/art-direction.mjs` generate paid media. The free Higgsfield plan cannot generate (see memory note), so generation has not been run end to end. The earlier Notion seed script was removed in Phase 1 and remains in git history.
+- Files: `scripts/media.mjs`, `scripts/lib/higgsfield.mjs`, `scripts/lib/art-direction.mjs`
 - Impact: Credit spend and writes to the live CMS with no safety net. The manifest gate is the only protection against repeat spend.
 - Fix approach: Keep `--dry-run` and `--probe` as the default workflow.
 
 **`@higgsfield/client` is a devDependency but scripts import `sharp`:**
-- `scripts/generate-project-media.mjs` imports `sharp`, which is a runtime dependency. This works only because both are installed. Dockerfile and Vercel builds do not use the scripts.
+- `scripts/media.mjs` imports `sharp`, which is a runtime dependency. This works only because both are installed. Dockerfile and Vercel builds do not use the scripts.
 
 ## Tech Debt
 
@@ -107,7 +101,7 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 - Fix approach: Mirror media to R2 once (the pipeline in `scripts/` is the start) and use stable public URLs. Remove the proxy from the hot path.
 
 **Cache and polling layering is complex:**
-- `unstable_cache` in `lib/notion/projects.js` (`cms-stamp` revalidate 20, `cms-projects-v2` revalidate 60), `lib/notion/client.js` (`cachedDataSourceId`, 3600), page-level `revalidate = 60` in `app/page.js` and `app/project/[slug]/page.js`, `experimental.staleTimes` in `next.config.mjs`, a webhook bust (`app/api/revalidate/route.js`), and a 20s client poll (`components/CmsLive.jsx` calling `/api/cms-stamp`, which in turn queries Notion). Every open tab polls every 20s and each poll can hit Notion on a cold cache. `getProjects` in `lib/cms/projects.js` keeps a per-instance `lastGood`, so instances can disagree during an outage.
+- `unstable_cache` in `lib/notion/projects.js` (`cms-stamp` revalidate 20, `cms-projects-v2` revalidate 60), `lib/notion/client.js` (`cachedDataSourceId`, 3600), page-level `revalidate = 60` in `app/page.js` and `app/project/[slug]/page.js`, `experimental.staleTimes` in `next.config.mjs`, a webhook bust (`app/api/revalidate/route.js`), and a 20s client poll (`components/CmsLive.jsx` calling `/api/cms-stamp`, which in turn queries Notion). Every open tab polls every 20s and each poll can hit Notion on a cold cache. The legacy Notion path is unreferenced by pages and removed in Phase 3; `/api/cms-stamp` answers a constant empty stamp.
 - Fix approach: Remove the poll once the webhook is verified, or move to a push channel. Keep the cache key version comment in `lib/notion/projects.js` current when the payload shape changes.
 
 **`Carousel.jsx` size:**
@@ -118,7 +112,7 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 
 **Fonts and images are unoptimised:**
 - Fonts: resolved in Phase 1. Geist and Geist Mono ship as variable woff2 under `public/fonts/`; removed files remain in git history.
-- Images: `public/` is 3.6 MB (3,699,985 bytes tracked). `public/1.webp` is 688,026 bytes and `public/10.webp` is 559,944. `components/ring/atlas.js` draws each into a 512 x 341 cell (`cellW = 512`, `cellH = cellW / 1.5`), so resolution beyond that is never shown. The ring is served from `public/` only in the fallback case; in the Notion case, covers pass through `/api/media/` and are capped at 1600px, which is still about 3x larger than the atlas needs.
+- Images: resolved in Phase 2. Covers are 1600 px WebP on R2 (26-208 KB each); the old `public/*.webp` art is removed and remains in git history.
 - Fix approach: Resize sources (or the proxy output for ring covers) to about 1024 x 683, convert fonts to `woff2`. `public/favicon.ico` and `public/logo.png` are byte-identical 512x512 PNGs (170,906 bytes each); the `.ico` is mislabelled. Replace with a real multi-size ico and a smaller logo.
 
 **Deprecated config assumption in Dockerfile:**
@@ -140,8 +134,8 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 **Everything else in "Known gaps" re-checked:**
 - Gap 1 (click opens nothing): STALE. `openForPlane` at `components/Carousel.jsx:~776-830` pushes `/project/${project.slug}` through `routerRef.current.push` after the shared transition. Detail routes exist at `app/project/[slug]/page.js`.
 - Gap 2 (fonts ~340 KB): accurate, 341,656 bytes.
-- Gap 3 (art oversized): accurate. 3.3 MB across the 18 `public/N.webp` files plus 404.webp; `public/` total is 3.6 MB.
-- Gap 6 (placeholder data): partly stale. Live content is Notion (the note in `docs/NEXT-SESSION-PROMPT.md` says 11 published covers). The placeholders are now only the fallback in `lib/cms/projects.js`, but that fallback is reachable in production. See Licensing.
+- Gap 3 (art oversized): resolved in Phase 2; covers are 1600 px WebP on R2 and the old files remain in git history.
+- Gap 6 (placeholder data): resolved in Phase 2; the fallback and its data are removed and remain in git history.
 - Gap 7 (phone widths approximate): not re-verified; needs a device check.
 
 ## AGENTS.md Staleness
@@ -152,7 +146,7 @@ Scope: full repo. Next.js 16.3.0 WebGL portfolio, live at `https://koussay.onlin
 - "Commands" remains true.
 - "Project column is `pointer-events-none`" is stale (see keyboard item).
 - `docs/NEXT-SESSION-PROMPT.md` is a dated session handoff (September 2026) that duplicates and partly contradicts `AGENTS.md` ("Live Notion currently has 11 published covers"). Treat it as a log, not a spec.
-- `README.md` Quick start tells readers to run with no env, which works only through the placeholder fallback. It does not mention the Notion, Resend or R2 variables listed in `.env.example`.
+- `README.md` Quick start now says projects need no keys because content is in the repo; the Notion, Resend and R2 variables are listed in `.env.example`.
 
 ## Test Coverage Gaps
 
@@ -182,8 +176,8 @@ These are deliberate designs from `AGENTS.md`, not defects. Any change must pres
 - Files: `components/Carousel.jsx`, `components/ring/utils.js` (`signedOffset`)
 - Why: Consecutive plane indices sit on opposite sides of the ring. Dealing by index makes the project column step two names per slot. The negation is because forward turns walk the front slot backwards. The same ordering feeds `openForPlane` (`ring[cellOf(signedOffset(plane))]`), so a click opens the project the card shows.
 
-**`PROJECTS` order is ring order:**
-- Files: `components/ring/projects.js`, and for CMS data the `Order` / `Ring` number property read in `lib/notion/projects.js` (`order`). Reordering is the only way to change sequence; do not use `imageOffset`.
+**`ORDER` in `content/projects/index.mjs` is ring order:**
+- Files: `content/projects/index.mjs`. Reordering `ORDER` is the only way to change sequence; do not use `imageOffset`.
 
 **Three-row meta morph:**
 - Files: `components/ring/meta.js`, labels rendered in `components/Carousel.jsx` (~line 2030 on)
@@ -216,8 +210,8 @@ These are deliberate designs from `AGENTS.md`, not defects. Any change must pres
 - Why: Click to detail depends on a generation counter (`openGen`), refs mirrored from router state, and a persisted home ring (`RegisterHome` in `app/page.js` and `app/project/[slug]/page.js`). Navigation race conditions are easy to introduce. No tests cover any of it.
 
 **Notion-driven rendering with strict timeouts:**
-- Files: `lib/notion/client.js` (`timeoutMs: 4000`, `retry: false`), `lib/notion/projects.js` (`withTimeout` 4000 and 2500), `lib/cms/projects.js`
-- Why: The timeouts exist because Notion 429 with `Retry-After` ~59s once parked the loader. Raising them or re-enabling retries brings that back. `getProjects` must not cache the fallback list (comment in `lib/cms/projects.js`).
+- Files: `lib/notion/client.js` (`timeoutMs: 4000`, `retry: false`), `lib/notion/projects.js` (`withTimeout` 4000 and 2500); both are on the legacy path removed in Phase 3.
+- Why: The timeouts exist because Notion 429 with `Retry-After` ~59s once parked the loader. Raising them or re-enabling retries brings that back. Projects no longer depend on Notion.
 
 ## Scaling Limits
 
@@ -236,17 +230,17 @@ These are deliberate designs from `AGENTS.md`, not defects. Any change must pres
 
 **`sharp`, `@napi-rs/canvas`, `pdfjs-dist`, `unpdf`:** see Tech Debt (portability) and Security (advisories).
 
-**`@notionhq/client` ^5.26.0 with `dataSources` API:** the code supports both database id and data source id in `lib/notion/client.js` (`dataSourceId`). A Notion API shape change breaks the whole CMS path, with only the 18 placeholder fallback behind it.
+**`@notionhq/client` ^5.26.0 with `dataSources` API:** the code supports both database id and data source id in `lib/notion/client.js` (`dataSourceId`). A Notion API shape change now affects bookings only; projects are in the repo.
 
 **`three` ^0.185.1 and `gsap`:** `three` is imported as `import * as THREE` in `components/ring/atlas.js`; verify tree-shaking if bundle size matters.
 
 ## Missing Critical Features
 
-**Fail-closed CMS fallback:** Production should not render placeholders on a Notion outage. Today it can.
+**Fail-closed project content:** resolved in Phase 2. `lib/content.js` throws at build on bad content and no placeholder list exists; the removed files remain in git history.
 
 **CI:** No workflow runs `npm run build`, `npm run lint` or `npm audit`. The only gate is Vercel's build.
 
-**Monitoring:** `@vercel/speed-insights` is the only telemetry. `compiler.removeConsole` strips all console output except `error` in production (`next.config.mjs`), so `console.warn` and `console.info` calls in `lib/cms/projects.js` and `app/api/revalidate/route.js` never reach Vercel logs. The Notion-failure warning in `getProjects` is therefore invisible in production.
+**Monitoring:** `@vercel/speed-insights` is the only telemetry. `compiler.removeConsole` strips all console output except `error` in production (`next.config.mjs`), so `console.warn` and `console.info` calls in `app/api/revalidate/route.js` never reach Vercel logs.
 
 ---
 

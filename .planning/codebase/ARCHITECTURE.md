@@ -27,8 +27,8 @@ Two corrections to `AGENTS.md`:
                 └─────────┬─────────┘
                           ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│ Content resolution  `lib/cms/projects.js` getProjects()               │
-│  React cache() -> Notion bundle -> lastGood -> 18 placeholders        │
+│ Content resolution  `lib/content.js` getProjects()                    │
+│  content/projects + content/media.json, resolved at build, no fallback │
 └───────────────┬──────────────────────────────────────────────────────┘
                 ▼
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -42,8 +42,8 @@ Two corrections to `AGENTS.md`:
 └──────────────────────────────────────────────────────────────────────┘
 
 Authoring time only (not imported by app/):
- `scripts/generate-project-media.mjs` + `scripts/lib/*`
-   components/ring/projects.js -> Higgsfield -> sharp -> Cloudflare R2
+ `scripts/media.mjs` + `scripts/lib/*`
+   content/projects/*.mjs -> Higgsfield
 ```
 
 ## Component Responsibilities
@@ -61,7 +61,7 @@ Authoring time only (not imported by app/):
 | ProjectPagerProvider | Prev/next slide transition between project pages | `components/project/ProjectPagerTransition.jsx` |
 | SmoothScroll | Lenis smooth scroll wrapper | `components/SmoothScroll.jsx` |
 | CmsLive | Polls stamp; `router.refresh()` when Notion changed | `components/CmsLive.jsx` |
-| getProjects | Single content entry point with fallback chain | `lib/cms/projects.js` |
+| getProjects | Single content entry point, synchronous, throws at build on bad content | `lib/content.js`, `lib/content-schema.mjs` |
 | Notion project adapter | Query DB, map pages, slug/version/media map, caches | `lib/notion/projects.js` |
 | bustProjectsCache | Tag + path invalidation | `lib/cms/bust.js` |
 | Project helpers | Pure list/slug/neighbour/alt-text helpers, `indexProjects` | `lib/projects.js` |
@@ -73,7 +73,7 @@ Authoring time only (not imported by app/):
 | OG image | sharp-composited 1200x630 from cover | `lib/og-image.js` |
 | Booking | Notion calendar booking, Resend email, optional AI research | `lib/book/*`, `lib/notion/bookings.js`, `lib/mail/booking.js`, `app/api/book/*` |
 | Env accessors | Trimmed env getters and `is*Configured()` predicates | `lib/env.js` |
-| Media generation | Authoring CLI: Higgsfield -> R2 | `scripts/generate-project-media.mjs`, `scripts/lib/*` |
+| Media | Authoring CLI: check, import-live, verify, generate; only writer of `content/media.json` | `scripts/media.mjs`, `scripts/lib/*` |
 
 ## Pattern Overview
 
@@ -83,7 +83,7 @@ Authoring time only (not imported by app/):
 - The ring is mounted once in the root layout tree (`HomeRingProvider`) and survives navigation. On `/project/*` it is parked (`home-ring--parked`) rather than unmounted, so returning to `/` does not re-run the entry or rebuild the atlas.
 - Server pages are thin: they call `getProjects()` and pass data down. `RegisterHome` is the bridge that lets a server page feed the persistent client ring (`setProjects`, deduped by `ringKey`).
 - All Notion access is time-boxed and rate-limit-aware (4s timeout, `retry: false`, cached data source id, cached stamp).
-- Placeholder content is a permanent safety net, never a cache entry.
+- Project content is repo modules resolved at build; there is no placeholder fallback and no content cache.
 - Plain JavaScript (JSX), no TypeScript, one Playwright smoke test. Import alias `@/*` -> repo root (`jsconfig.json`).
 
 ## Layers
@@ -97,12 +97,12 @@ Authoring time only (not imported by app/):
 **Routes (server):**
 - Purpose: Data fetching, metadata, JSON-LD, then render client components.
 - Location: `app/page.js`, `app/project/[slug]/page.js`, `app/booking/page.js`, `app/sitemap.js`, `app/robots.js`, `app/llms.txt/route.js`, `app/**/opengraph-image.js`, `app/**/twitter-image.js`
-- Depends on: `lib/cms/projects.js`, `lib/seo.js`, `lib/notion/gallery-pdf.js`
+- Depends on: `lib/content.js`, `lib/seo.js`
 
 **Content (server):**
-- Purpose: Resolve "the list of projects" from Notion or fallback.
-- Location: `lib/cms/projects.js`, `lib/cms/bust.js`, `lib/notion/projects.js`, `lib/notion/client.js`, `lib/notion/props.js`
-- Depends on: `@notionhq/client`, `next/cache`, `lib/env.js`, `components/ring/projects.js` (fallback data), `components/shaders/planeShaders.js` (`MAX_PLANES`)
+- Purpose: Resolve "the list of projects" from `content/projects` joined with `content/media.json`. The Notion project files listed here are unreferenced by pages and removed in Phase 3.
+- Location: `lib/content.js`, `lib/content-schema.mjs`, `content/projects/`, `content/media.json`, `lib/cms/bust.js` (legacy), `lib/notion/projects.js` (legacy)
+- Depends on: `content/projects/index.mjs`, `content/media.json`, `lib/projects.js`, `components/shaders/planeShaders.js` (`MAX_PLANES`)
 
 **Media (server):**
 - Purpose: Turn a Notion file reference into a deliverable image.
@@ -119,25 +119,11 @@ Authoring time only (not imported by app/):
 
 ## Data Flow
 
-### Content resolution precedence (`getProjects`, `lib/cms/projects.js`)
+### Content resolution (`getProjects`, `lib/content.js`)
 
-`getProjects` is wrapped in React `cache()` (deduplicates within one request/render pass only). Module-level state: `FALLBACK = indexProjects(PROJECTS from components/ring/projects.js)` and `let lastGood = null`. Resolution, in order:
+`lib/content.js` joins the project modules in `content/projects/` (ordered by `ORDER` in `content/projects/index.mjs`) with `content/media.json` through `lib/content-schema.mjs`, runs `indexProjects` (caps at `MAX_PLANES`, stamps `index`) and exposes a synchronous `getProjects()` and `getProject(slug)`. Resolution happens at module evaluation, so a missing key or unknown media throws at build and names the slug and field. `node scripts/check-content.mjs` is the sub-second gate. No fallback list exists. The Notion path below is unreferenced by pages and removed in Phase 3; `/api/cms-stamp` answers a constant empty stamp.
 
-1. **Notion not configured** (`isNotionProjectsConfigured()` false: `NOTION_TOKEN` or `NOTION_PROJECTS_DATABASE_ID` missing) -> return `FALLBACK` (the 18 placeholders). This is the local-dev default without `.env.local`.
-2. **Notion bundle succeeds** -> `getCachedProjectBundle()` (`unstable_cache`, key `["cms-projects-v2"]`, tag `projects`, `revalidate: 60`). Run through `indexProjects` (caps at `MAX_PLANES`, stamps `index`, defaults `liveUrl` to `null`), assign to `lastGood`, return.
-3. **Notion bundle throws** (timeout, 429, or empty result: `loadProjectBundle` throws `"Notion returned no published covers"` when zero projects map) -> `console.warn`, then:
-   - `lastGood` if set (per serverless instance, in-memory only), else
-   - `FALLBACK` (request-only).
-
-Hard rules, from comments in `lib/cms/projects.js`:
-- Never return the 18 placeholders from inside `unstable_cache`. Failure must throw so nothing is stored; a cached placeholder list replaced the live set once.
-- `lastGood` is per instance. It is not shared across lambdas and is lost on cold start.
-- A cold miss must not be stored as the project list.
-- The cache key carries a version (`v2`) because the payload shape is `{ projects, media, stamp }`; bump it if the shape changes (an old bare-array hit looks like "Notion empty").
-
-Fallback projects have no `id` and use local `public/*.webp` files (`file: "10.webp"`), so the media proxy and Notion cover paths in `lib/og-image.js` are skipped for them (`readLocalCover` reads `public/`).
-
-Notion mapping (`mapPage` in `lib/notion/projects.js`):
+Legacy Notion mapping (`mapPage` in `lib/notion/projects.js`, unreferenced by pages, removed in Phase 3):
 - Rows without a title, with `Published` unchecked, or with no cover are dropped.
 - Sorted by `Order`/`Ring` number then name, sliced to `MAX_PLANES`.
 - Slug: `Slug` property or title, slugified, deduped with `-2`, `-3` suffixes (`uniqueSlug`).
@@ -190,13 +176,13 @@ The function-running cost is paid once per version; the versioned `Cache-Control
 
 `app/booking/page.js` renders client `BookFlow`. `POST /api/book` (`app/api/book/route.js`, `maxDuration = 60`) validates (`lib/book/validate.js`), claims a slot (`lib/book/time.js`), writes a Notion calendar page (`lib/notion/bookings.js`), emails via Resend (`lib/mail/booking.js`), and runs optional Firecrawl/Gemini/OpenAI research after the response via `after()` (`lib/book/research.js`). `GET /api/book/availability` and `/api/book/draft` support the flow. Independent of the project/ring pipeline except for sharing `lib/notion/client.js` and `lib/env.js`.
 
-### Authoring-time side path: media generation (not reachable from `app/`)
+### Authoring-time side path: media (`scripts/media.mjs`)
 
-`scripts/generate-project-media.mjs` is run by hand (`node scripts/generate-project-media.mjs ...`). It is new and has never been executed live.
+`scripts/media.mjs` is run by hand (`node scripts/media.mjs check | import-live | verify | generate`). It is the only writer of `content/media.json` and of R2 objects under `projects/`.
 
 1. Loads env itself (`scripts/lib/load-env.mjs`), not through `lib/env.js`.
-2. Dynamically imports the placeholder list from `components/ring/projects.js` (not from Notion).
-3. For each project not already in `scripts/media-manifest.json` (or with `--force`): build a prompt (`scripts/lib/art-direction.mjs`, directions `concrete` | `chrome` | `flatbed`, accent colour walked across 18 slots), call Higgsfield through `@higgsfield/client/v2` (`scripts/lib/higgsfield.mjs`, Soul text2image at `2016x1344`, optional DoP image2video with `--video`), download the result.
+2. Dynamically imports the project list from `content/projects/index.mjs`.
+3. For each slot not already in `content/media.json` (or with `--force`): build a prompt (`scripts/lib/art-direction.mjs`), call Higgsfield through `@higgsfield/client/v2` (`scripts/lib/higgsfield.mjs`), download the result.
 4. `sharp` produces two WebP renditions: `cell` (512x341, the atlas cell ratio) and `cover` (1536x1024).
 5. Upload to Cloudflare R2 with content-addressed keys `projects/<slug>/cell-<sha8>.webp`, `cover-<sha8>.webp`, `loop-<sha8>.mp4` and `Cache-Control: public, max-age=31536000, immutable` via a hand-rolled SigV4 signer (`scripts/lib/r2.mjs`, no AWS SDK).
 6. Record request id, prompt, keys and URLs in the manifest and write it after every project.
@@ -206,20 +192,20 @@ Modes: `--probe` (one 720p image to `.media-probe/`, no R2, no manifest), `--che
 Deliberate isolation: nothing under `app/`, `components/` or `lib/` imports `scripts/`. A visitor cannot trigger a generation (money, tens of seconds). `lib/env.js` defines `r2PublicBase()`, `isR2Configured()`, `higgsfieldKeyId()`, `isHiggsfieldConfigured()` but no app code calls them yet, and nothing connects R2 URLs to the Notion Cover column or `project.file`. If R2 URLs are later served through `next/image`, `next.config.mjs` needs `images.remotePatterns` (only `localPatterns` exist). The earlier Notion seed script was removed in Phase 1 and remains in git history.
 
 **State Management:**
-- Server: React `cache()` per request, `unstable_cache` (tag `projects`) across requests, module-level `lastGood` and PDF byte map per instance.
+- Server: none for projects (resolved once at module evaluation). Legacy Notion path, removed in Phase 3: `unstable_cache` (tag `projects`) and a PDF byte map per instance.
 - Client: ring state is closure variables inside the `Carousel` effect (see `AGENTS.md`); app-level state is React context (`HomeRingContext`, shared transition, pager).
 
 ## Key Abstractions
 
 **Project record:**
-- Purpose: Shape shared by the ring, detail pages, SEO and fallback data.
-- Fields: `id` (Notion page id; absent on fallback), `updatedAt`, `file`, `slug`, `name`, `type`, `year`, `liveUrl`, `order`, `index` (added by `indexProjects`), `detail { summary, overview, challenge, outcome, gallery[{file,alt,kind,page?,pages?}], testimonial{quote,author,role}, tools[] }`.
-- Examples: `components/ring/projects.js` (fallback), `lib/notion/projects.js` `mapPage` (live).
+- Purpose: Shape shared by the ring, detail pages and SEO.
+- Fields: `slug`, `name`, `type`, `year`, `liveUrl`, `order`, `file`, `index` (added by `indexProjects`), `detail { summary, overview, challenge, outcome, gallery[], testimonial{quote,author,role}, tools[] }`. Media URLs are https://media.koussay.online/projects/<slug>/<slot>-<sha8>.webp.
+- Examples: `content/projects/<slug>.mjs`, resolved by `lib/content-schema.mjs`.
 - Pattern: slug is identity; ring order is `index`. Slugs survive reorders.
 
 **Media slot:**
 - Purpose: Address a file inside a Notion page: `cover`, `g<n>`, `g<n>p<m>`.
-- Examples: `lib/media.js`, `lib/notion/gallery-pdf.js` (`pagedFile`), `lib/notion/projects.js` (`mediaKey`).
+- Examples: `lib/media.js`, `lib/notion/gallery-pdf.js` (legacy, unreferenced by pages, removed in Phase 3).
 
 **Home ring context:**
 - Purpose: `{ setProjects, prepareHome, ready }` between server pages, `Carousel` and back-navigation.
@@ -231,7 +217,7 @@ Deliberate isolation: nothing under `app/`, `components/` or `lib/` imports `scr
 - Triggers: every request. Mounts `Providers` and global JSON-LD.
 
 **`app/page.js`:**
-- Triggers: `/`. Resolves projects, preloads covers, registers with the ring.
+- Triggers: `/`. Reads projects from `lib/content.js`, preloads covers, registers with the ring.
 
 **`app/project/[slug]/page.js`:**
 - Triggers: `/project/*`. ISR + on-demand params.
@@ -242,14 +228,14 @@ Deliberate isolation: nothing under `app/`, `components/` or `lib/` imports `scr
 **`app/api/revalidate/route.js`, `app/api/cms-stamp/route.js`:**
 - Triggers: Notion webhook; `CmsLive` poll.
 
-**`scripts/generate-project-media.mjs`:**
+**`scripts/media.mjs`:**
 - Triggers: manual CLI runs only.
 
 ## Architectural Constraints
 
-- **Threading:** Single-threaded browser main thread; the ring runs one `requestAnimationFrame` layout loop (see `AGENTS.md`). Server routes are stateless lambdas; per-instance module state (`lastGood`, PDF byte cache, Notion client singleton) must be treated as best-effort.
-- **Global state:** `lib/cms/projects.js` `lastGood`; `lib/pdf.js` `byteCache` and `pdfjsReady`; `lib/notion/client.js` `client`; `lib/project/warm.js` `retained` and `warmedRoutes` (client). In the ring, closure state inside `Carousel.jsx` (see `AGENTS.md`).
-- **Circular imports:** None detected. Note the unusual direction `lib/projects.js` and `lib/notion/projects.js` import `MAX_PLANES` from `components/shaders/planeShaders.js`, so server code depends on a shader module (the GLSL string is bundled with it). `lib/cms/projects.js` and `lib/projects.js` import fallback data from `components/ring/projects.js`; the ring in turn imports `lib/projects.js` helpers.
+- **Threading:** Single-threaded browser main thread; the ring runs one `requestAnimationFrame` layout loop (see `AGENTS.md`). Server routes are stateless lambdas; per-instance module state (PDF byte cache and Notion client in the legacy path, removed in Phase 3) is best-effort.
+- **Global state:** `lib/pdf.js` `byteCache` and `pdfjsReady` and `lib/notion/client.js` `client` (legacy, removed in Phase 3); `lib/project/warm.js` `retained` and `warmedRoutes` (client). In the ring, closure state inside `Carousel.jsx` (see `AGENTS.md`).
+- **Circular imports:** None detected. Note the unusual direction `lib/projects.js` and `lib/content.js` import `MAX_PLANES` from `components/shaders/planeShaders.js`, so server code depends on a shader module (the GLSL string is bundled with it).
 - **Project count:** capped at `MAX_PLANES` (packed uniform budget, `AGENTS.md`). Ring radius follows count (`radiusForCount` in `components/ring/utils.js`).
 - **Notion rate limits:** `retry: false`, 4s timeout; avoid per-cover `pages.retrieve` fan-out and sub-20s polling.
 - **Vercel vs Docker:** `output: "standalone"` is set only when `VERCEL !== "1"` (`next.config.mjs`, `Dockerfile`, `compose.yaml`).
@@ -257,11 +243,11 @@ Deliberate isolation: nothing under `app/`, `components/` or `lib/` imports `scr
 
 ## Anti-Patterns
 
-### Caching the placeholder fallback
+### Reintroducing a fallback list (resolved in Phase 2, removed files remain in git history)
 
-**What happens:** Returning `FALLBACK` from inside `unstable_cache`/`loadProjectBundle` stores 18 placeholders as the project list.
+**What happens:** The old `lib/cms/projects.js` fallback returned 18 placeholders from inside `unstable_cache`. Resolved in Phase 2: that module and the placeholder list are removed and remain in git history.
 **Why it's wrong:** It replaced the live set until the cache expired.
-**Do this instead:** Throw from `loadProjectBundle` (`lib/notion/projects.js`) and let `getProjects` (`lib/cms/projects.js`) pick `lastGood` or `FALLBACK` outside the cache.
+**Do this instead:** Keep projects in `content/projects`; `lib/content.js` throws at build on a defect, so no partial or placeholder list can ship.
 
 ### Caching the upstream media fetch
 
@@ -273,7 +259,7 @@ Deliberate isolation: nothing under `app/`, `components/` or `lib/` imports `scr
 
 **What happens:** Importing `scripts/lib/higgsfield.mjs` or wiring a generate action into a route/server action.
 **Why it's wrong:** Each call costs credits and runs for tens of seconds; any visitor could trigger it.
-**Do this instead:** Keep generation a manual CLI gated by `scripts/media-manifest.json`; consume results only as already-uploaded R2 URLs.
+**Do this instead:** Keep generation a manual CLI gated by `content/media.json`; consume results only as already-uploaded R2 URLs.
 
 ### Remounting the ring per route
 
@@ -286,7 +272,7 @@ Deliberate isolation: nothing under `app/`, `components/` or `lib/` imports `scr
 **Strategy:** Degrade to the last good data, never throw to the user; log with a bracketed prefix.
 
 **Patterns:**
-- Content: try/catch in `getProjects`, `generateStaticParams`, `sitemap`, `llms.txt` (empty list on failure).
+- Content: `lib/content.js` throws at build on a missing key or unknown media; pages call `getProjects()` directly. `sitemap` and `llms.txt` read the same list.
 - Media: any failure returns `404` with `Cache-Control: no-store`; logs `[media]`.
 - Client: atlas image failure leaves a blank cell and still counts toward load (`components/ring/atlas.js`); `CmsLive` swallows poll errors.
 - Cost control in scripts: per-project try/catch, non-zero exit if any failed, manifest written after each success.

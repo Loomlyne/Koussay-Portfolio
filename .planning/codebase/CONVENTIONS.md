@@ -11,7 +11,7 @@ Plain JavaScript (no TypeScript). `jsconfig.json` defines one alias, `@/*` -> `.
 - Non-component modules: camelCase `.js` (`components/ring/splitText.js`, `components/homeRingContext.js`, `lib/og-image.js` is the one kebab-case exception, as are `lib/notion/gallery-pdf.js` and `scripts/lib/load-env.mjs`).
 - Next.js route files use framework names: `page.js`, `route.js`, `loading.js`, `not-found.js`, `opengraph-image.js` under `app/`. Note `app/` pages and `route.js` use `.js`, not `.jsx`, even when they return JSX.
 - CSS Modules sit beside the route and are named `page.module.css` (`app/booking/page.module.css`, `app/project/[slug]/page.module.css`) and are imported by components via `@/app/...`.
-- Scripts: `.mjs`, kebab-case (`scripts/generate-project-media.mjs`); shared helpers in `scripts/lib/*.mjs`.
+- Scripts: `.mjs`, kebab-case (`scripts/media.mjs`, `scripts/check-content.mjs`); shared helpers in `scripts/lib/*.mjs`.
 
 **Functions:**
 - camelCase. Predicates start `is`/`has` (`isNotionProjectsConfigured`, `isSlotOpen`, `hasAllFitChecks`, `hasCredentials`).
@@ -23,7 +23,7 @@ Plain JavaScript (no TypeScript). `jsconfig.json` defines one alias, `@/*` -> `.
 - camelCase locals; SCREAMING_SNAKE for module constants (`FAN_START`, `MAX_PLANES`, `IMAGE_ENDPOINT`, `MAX_ATTACHMENT_BYTES`, `NO_STORE`).
 - Math constants live in `components/ring/utils.js`: `TAU`, `HALF_PI`, `DEG`. Import them; do not recompute `Math.PI * 2`.
 - Shader uniforms are `uPascalCase` (`uAtlas`, `uResolution`, `uTagTex`).
-- `PROJECTS` is imported as `FALLBACK_PROJECTS` wherever the Notion list is the primary source (`lib/cms/projects.js`, `components/Carousel.jsx`).
+- Project content is a module per project in `content/projects/`; `lib/content.js` resolves it (`getProjects()`), and the old `PROJECTS` placeholder list and fallback import are removed (git history keeps them).
 
 **Types:**
 - Not applicable (no TypeScript, no JSDoc type annotations). Shapes are documented in prose comments only.
@@ -94,8 +94,7 @@ Add a family to all three together. `WEIGHTS` in `params.js` lists Light/Regular
 
 **Patterns:**
 - API routes (`app/api/**/route.js`) export `runtime = "nodejs"` (and `dynamic = "force-dynamic"` where the response must not cache), parse input in a `try/catch` that returns a 400 JSON body, and wrap the work in a `try/catch` that logs with a bracketed tag and returns a plain-language JSON error with a 502 or 500. Example: `app/api/book/draft/route.js` uses a local `json(data, status)` helper and `console.error("[book/draft]", error)`.
-- Degrade, do not throw, when an integration is absent: check `isXConfigured()` from `lib/env.js` first and return the local fallback (`lib/cms/projects.js` returns `FALLBACK` when Notion is unset).
-- Fallback precedence in `lib/cms/projects.js`: Notion bundle -> per-instance `lastGood` -> local `PROJECTS` placeholder. The comment there records why the placeholder list must never be returned from inside `unstable_cache`. Preserve that ordering.
+- Degrade, do not throw, when a booking integration is absent: check `isXConfigured()` from `lib/env.js` first. Project content is the exception: `lib/content.js` throws at build on a missing key or unknown media (`node scripts/check-content.mjs` is the sub-second gate), because no fallback list exists.
 - Best-effort side effects chain `.catch()` with a log (`sendDraftNotice(...).catch(error => console.error(...))`) so a mail failure cannot fail the request.
 - Intentionally swallowed errors use a bare `catch {}` with a comment saying what happens instead (`// Stay on the last good frame if Notion blips.` in `components/CmsLive.jsx`; `// The env var may already be a data source id.` in `lib/notion/client.js`).
 - External calls carry timeouts: `withTimeout(promise, ms, label)` in `lib/notion/client.js`, `AbortSignal.timeout(...)` in `scripts/lib/r2.mjs`, Notion client `timeoutMs: 4000, retry: false`.
@@ -118,11 +117,10 @@ Add a family to all three together. `WEIGHTS` in `params.js` lists Light/Regular
 - Comments explain **why**, not what. Short. They record constraints, the failure that motivated a number, or a trap (`// 0.38 left a postage-stamp card...`, the `forceContextLoss` block in `components/Carousel.jsx`, the rate-limit story in `lib/notion/client.js`).
 - The one long doc block is the top of `components/ring/meta.js` (the alpha-threshold morph and the third "plain" row), because that technique does not read off the code. Do not add similar essays elsewhere; extend that block if the technique changes.
 - Section dividers inside long closures use `/* --- name --- */` rules (`/* ------ dev controls */` in `components/Carousel.jsx`) and `// -- group ---` in `components/ring/params.js` and `components/ring/gui.js`.
-- `// TODO:` appears once, in `components/ring/projects.js`, flagging placeholder `type`/`year` data.
 - Third-party code keeps its licence notice (the MIT simplex noise in `components/shaders/planeShaders.js`); add a LICENSE and README Credits line for any new snippet.
 
 **JSDoc/TSDoc:**
-- `/** ... */` blocks are used as prose doc headers on exported factories and scripts (`mountGui`, `defaultParams`, `loadEnv`, `scripts/generate-project-media.mjs` header with usage lines). No `@param`/`@returns` tags.
+- `/** ... */` blocks are used as prose doc headers on exported factories and scripts (`mountGui`, `defaultParams`, `loadEnv`, `scripts/media.mjs` header with usage lines). No `@param`/`@returns` tags.
 
 ## Function Design
 
@@ -158,15 +156,15 @@ Plain ESM `.mjs` run directly with `node`, no dotenv dependency, top-level `awai
 
 - **Env loading:** `loadEnv()` reads `.env.local` then `.env`, a real process env var wins over the file, comment and blank lines skipped. Scripts import the shared `loadEnv`, `root`, `sleep`, `requireEnv` from `scripts/lib/load-env.mjs`.
 - **CLI flags:** hand-parsed from `process.argv.slice(2)` with `flag(name)` / `value(name, fallback)` helpers (`--only=a,b`, `--limit=3`, `--dry-run`, `--force`, `--probe`, `--check`); no argument library. Usage lines are in the file's header doc block.
-- **Idempotence:** `scripts/generate-project-media.mjs` skips anything already in `scripts/media-manifest.json` unless `--force`, because generations cost credits. Keep paid or destructive operations gated behind a manifest or an explicit flag.
-- **Importing app code:** scripts load app data via `await import(pathToFileURL(join(root, "components/ring/projects.js")).href)`; they do not use the `@/` alias.
+- **Idempotence:** `scripts/media.mjs` skips any slot already in `content/media.json` unless `--force`, because generations cost credits. It is the only writer of that manifest. Keep paid or destructive operations gated behind a manifest or an explicit flag.
+- **Importing app code:** scripts load content via `await import(pathToFileURL(join(root, "content/projects/index.mjs")).href)`; they do not use the `@/` alias.
 - **R2 access:** hand-rolled SigV4 in `scripts/lib/r2.mjs` using `node:crypto`, no AWS SDK. Config is read through `r2Config(env)` and checked with `isR2Configured(config)`.
 - **Output paths:** probe output goes to `.media-probe/` (gitignored).
 
 ## Public-repo obligations
 
 - Every face is Geist or Geist Mono under OFL 1.1. Add no face without a licence that allows redistribution in a public repo. Earlier fonts were removed in Phase 1 and remain only in git history.
-- Sample project art is third-party Behance work and is flagged as such; do not present it as the author's.
+- Project images and videos served from media.koussay.online belong to Koussay or to the clients named on each project page and are not MIT (see LICENSE). The old third-party placeholder art and `public/404.webp` are removed and remain in git history; the 404 mark is live Geist text.
 - `.env*` is gitignored except `.env.example`. Never commit or quote env values.
 
 ---

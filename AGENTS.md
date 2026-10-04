@@ -6,7 +6,7 @@ non-obvious in ways that look like bugs.
 
 ## What this is
 
-A single-page portfolio carousel. Eighteen project cards sit on a ring that is
+A single-page portfolio carousel. The project cards (eight today; the count follows `content/projects/`) sit on a ring that is
 mostly off-screen to the left; you see an arc of it. Scroll, drag or swipe
 turns the ring, and it snaps so a card faces front. The cards are not DOM
 elements or textured quads — the whole ring is **one full-screen fragment
@@ -42,11 +42,14 @@ app/
   layout.js            root layout + metadata
   globals.css          Tailwind v4 import, @font-face, page background
 
+content/
+  projects/            one module per project, plus index.mjs (ORDER)
+  media.json           machine-written media manifest (scripts/media.mjs)
+
 components/
   Carousel.jsx        the component. renderer, resize/fit, input, spin
                        physics, the per-frame layout loop, the entry timeline
   ring/
-    projects.js        the eighteen projects, in ring order
     params.js          every tunable, as a factory
     utils.js           TAU/DEG, easings, signedOffset, chase
     atlas.js           packs all art into one texture, incrementally
@@ -130,8 +133,8 @@ would cost 32 more rows against a guaranteed budget of 224.
 Negated because turning the ring forward walks the front slot _backwards_, and
 scrolling down should read _down_ the project list.
 
-**`PROJECTS` order is ring order, not filename order.** It reads shuffled
-against the file numbers and that is correct. Reordering rows moves the ring,
+**`ORDER` in `content/projects/index.mjs` is ring order, not filename order.**
+It need not match the project files and that is correct. Reordering entries moves the ring,
 the column and the numbering together — that is the only place to change the
 sequence. Do not use `imageOffset` for this; it rotates the art without moving
 the list.
@@ -202,19 +205,14 @@ is missing versus what is deliberate.
 1. **Clicking a card centres it but nothing opens.** The "View" tag promises a
    destination that does not exist. `pick()` returns early when the card is
    already at the front — that early return is where navigation belongs.
-2. **The art is webp but still oversized.** ~3.3 MB across eighteen files. The
-   atlas downsamples every one to a 512px cell, so resizing the sources to
-   match would cut it again by a large margin.
+2. **Cover size is settled.** Covers are 1600 px WebP on R2 at
+   media.koussay.online (26-208 KB each); the atlas downsamples them to
+   512px cells.
 3. **`prefers-reduced-motion` is unhandled.** Six seconds of animated blur with
    no escape hatch.
 4. **No keyboard control.** Arrow keys should step the ring; the project column
    is `pointer-events-none` and cannot be clicked to jump.
-5. **All the sample data is placeholder.** Every `type` and `year` in
-   `projects.js` is invented and names marked `(*)` are guesses. The images
-   are other people's work, collected from Behance to build the layout
-   against — not the author's, not licensed, and flagged as such in the README
-   and LICENSE. Do not present them as portfolio work or strip those notices.
-6. **Phone widths are approximate.** The `tight` band was tuned at the 640 end
+5. **Phone widths are approximate.** The `tight` band was tuned at the 640 end
    of its range. Below ~500px `minScale` pins the ring's size while `posX`
    keeps scaling, so the front card drifts back toward centre.
 

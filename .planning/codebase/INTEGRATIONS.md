@@ -6,13 +6,13 @@ All env var names below are read through accessors in `lib/env.js` (app) or `scr
 
 ## APIs & External Services
 
-**CMS (projects) - Notion:**
-- Notion database is the source of truth for project text and (currently) media. Row = one carousel card / `/project/[slug]` page.
+**Projects: repo content (Notion project path is legacy, removed in Phase 3):**
+- Project text lives in `content/projects/*.mjs` and changes only through this repo. The Notion projects database below is unreferenced by pages.
   - SDK/Client: `@notionhq/client` 5.26.0, singleton in `lib/notion/client.js` (`timeoutMs: 4000`, `retry: false` on purpose: a 429 with ~59s Retry-After once parked the loader).
   - Auth: `NOTION_TOKEN` (internal integration; needs Read content + Insert content).
   - DB: `NOTION_PROJECTS_DATABASE_ID`. `cachedDataSourceId()` resolves database -> data source id (cached 1h, tag `projects`), then `notion().dataSources.query` in `lib/notion/projects.js`.
   - Column names are matched case-insensitively by `findProp` (`lib/notion/props.js`): Name/title, Cover|Image|Thumbnail (files), Gallery (files), Published|Live on site (checkbox; unchecked hides), Slug, Type|Discipline, Year, Live|Live URL|URL, Order|Ring, Summary, Overview, Challenge, Outcome, Quote|Testimonial, Author, Role, Tools (multi-select). Rows without a title or cover are dropped; capped at `MAX_PLANES` (from `components/shaders/planeShaders.js`).
-  - Read path: `lib/cms/projects.js` `getProjects()` (React `cache`) -> `getCachedProjectBundle()` (`unstable_cache`, key `cms-projects-v2`, `revalidate: 60`, tag `projects`) in `lib/notion/projects.js`. Returns `{ projects, media, stamp }`. Falls back to per-instance `lastGood`, then to the 18 placeholders in `components/ring/projects.js`. Never cache the fallback inside `unstable_cache`.
+  - Legacy read path (unreferenced by pages): `lib/notion/projects.js` `getCachedProjectBundle()`. Pages read `lib/content.js` `getProjects()` instead; no fallback list exists.
 - Staleness signal: `app/api/cms-stamp/route.js` (GET, `force-dynamic`, `no-store`). Returns newest `last_edited_time` via `cachedProjectsStamp` (`unstable_cache`, 20s). If the stamp is newer than the bundle's, it calls `bustProjectsCache()`. Polled every 20s by `components/CmsLive.jsx`, which calls `router.refresh()` on change.
 
 **Media delivery (Notion-backed, current):**
@@ -40,11 +40,11 @@ All env var names below are read through accessors in `lib/env.js` (app) or `scr
   - Order: Gemini, then OpenAI, then Firecrawl extract, then raw site summary. No SDKs; plain `fetch`.
 
 **Authoring-time media generation (NEW, committed but never executed live):**
-- `scripts/generate-project-media.mjs` with `scripts/lib/{higgsfield,r2,art-direction,load-env}.mjs`. Never runs inside the app; a visitor cannot trigger it. Flags: `--probe` (one image to `.media-probe/`, no R2, gitignored), `--check` (PUT/HEAD/GET a `_healthcheck/` object), `--dry-run`, `--only=<slug,...>`, `--direction=concrete|chrome|flatbed`, `--limit=N`, `--video`, `--force`.
-- Higgsfield: SDK `@higgsfield/client/v2` (`config`, `higgsfield.subscribe(endpoint, { input, withPolling: true })`). Auth `HF_CREDENTIALS` as `id:secret` (or `HIGGSFIELD_API_KEY_ID` + `HIGGSFIELD_API_KEY_SECRET`). Defaults: image `/v1/text2image/soul` at `2016x1344` (exact 3:2), quality `1080p`; video `/v1/image2video/dop` model `dop-standard`. Overridable via `HIGGSFIELD_IMAGE_ENDPOINT`, `HIGGSFIELD_VIDEO_ENDPOINT`, `HIGGSFIELD_IMAGE_PARAMS`, `HIGGSFIELD_VIDEO_PARAMS` (read in `scripts/generate-project-media.mjs`, documented in `.env.example`). Output normalised by `outputUrls()` (images array vs single `video` object). Per auto memory `higgsfield-free-plan-cannot-generate.md`, the free plan gates generation regardless of credit balance.
-- Prompts: `scripts/lib/art-direction.mjs` (three directions, 18-colour accent wheel, no-text/no-people negative prompt). Reads the project list from `components/ring/projects.js`.
+- `scripts/media.mjs` (check, import-live, verify, generate) with `scripts/lib/{higgsfield,r2,art-direction,load-env}.mjs`. Never runs inside the app; a visitor cannot trigger it. Flags: `--dry-run`, `--force`, `--only=<slug,...>`, `--limit=N`, `--direction=`, `--video`, `--probe`.
+- Higgsfield: SDK `@higgsfield/client/v2` (`config`, `higgsfield.subscribe(endpoint, { input, withPolling: true })`). Auth `HF_CREDENTIALS` as `id:secret` (or `HIGGSFIELD_API_KEY_ID` + `HIGGSFIELD_API_KEY_SECRET`). Defaults: image `/v1/text2image/soul` at `2016x1344` (exact 3:2), quality `1080p`; video `/v1/image2video/dop` model `dop-standard`. Overridable via `HIGGSFIELD_IMAGE_ENDPOINT`, `HIGGSFIELD_VIDEO_ENDPOINT`, `HIGGSFIELD_IMAGE_PARAMS`, `HIGGSFIELD_VIDEO_PARAMS` (read in `scripts/media.mjs`, documented in `.env.example`). Output normalised by `outputUrls()` (images array vs single `video` object). Per auto memory `higgsfield-free-plan-cannot-generate.md`, the free plan gates generation regardless of credit balance.
+- Prompts: `scripts/lib/art-direction.mjs` (three directions, no-text/no-people negative prompt). Reads the project list from `content/projects/index.mjs`.
 - Cloudflare R2: hand-rolled AWS SigV4 (`scripts/lib/r2.mjs`: `putObject`, `headObject`) against `https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com/<bucket>/<key>`, region `auto`, service `s3`, no AWS SDK. Public reads go through the custom domain `R2_PUBLIC_BASE`. Keys are content-addressed: `projects/<slug>/<name>-<sha8>.webp` (cell 512x341 and cover 1536x1024, WebP q82) and `projects/<slug>/loop-<sha8>.mp4`, uploaded with `Cache-Control: public, max-age=31536000, immutable`. Never add `?v=` to these URLs.
-- Manifest: `scripts/media-manifest.json` is the skip gate (recorded entries are not regenerated without `--force`). It does not exist yet and is not gitignored, so it is expected to be committed after the first run.
+- Manifest: `content/media.json` is the skip gate and is machine-written by `scripts/media.mjs`, its only writer. Images are served from https://media.koussay.online.
 - Env: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` (write credentials, scripts only), `R2_PUBLIC_BASE` (the only R2 value the app side is meant to read, `r2PublicBase()` in `lib/env.js`).
 - Status: nothing in the app consumes R2 URLs or the manifest yet. Treat the pipeline as unverified until `--probe` and `--check` have run against real credentials.
 
@@ -57,11 +57,11 @@ All env var names below are read through accessors in `lib/env.js` (app) or `scr
 **File Storage:**
 - Notion file properties (current media source, signed expiring URLs) proxied through `/api/media`.
 - Cloudflare R2 (planned media host; scripts write, app does not yet read).
-- Local `public/` for fonts, logo, placeholder art. Fonts are Geist and Geist Mono woff2 under `public/fonts/` with `OFL.txt`.
+- Local `public/` for fonts and logo. Fonts are Geist and Geist Mono woff2 under `public/fonts/` with `OFL.txt`. The old placeholder art and `404.webp` are removed and remain in git history.
 
 **Caching:**
 - Next data cache via `unstable_cache` with tag `projects` (`lib/notion/projects.js`, `lib/notion/client.js`); ISR `revalidate = 60` on pages; HTTP immutable caching on versioned media URLs.
-- Per-instance memory: `lastGood` project list (`lib/cms/projects.js`), PDF byte cache (`lib/pdf.js`), booking busy cache and pending slots (`lib/notion/bookings.js`, `lib/book/time.js`). None are shared across serverless instances.
+- Per-instance memory (legacy PDF path removed in Phase 3): PDF byte cache (`lib/pdf.js`), booking busy cache and pending slots (`lib/notion/bookings.js`, `lib/book/time.js`). None are shared across serverless instances.
 - Invalidation: `bustProjectsCache()` in `lib/cms/bust.js` calls `revalidateTag("projects", { expire: 0 })` and `revalidatePath` for `/`, `/project` (layout) and `/api/media` (layout).
 
 ## Authentication & Identity
@@ -91,7 +91,7 @@ All env var names below are read through accessors in `lib/env.js` (app) or `scr
 ## Environment Configuration
 
 **Required env vars (app):**
-- Projects CMS: `NOTION_TOKEN`, `NOTION_PROJECTS_DATABASE_ID`. Without them the 18 placeholders are served.
+- Projects: no keys needed, content is in the repo. `NOTION_PROJECTS_DATABASE_ID` and `NOTION_WEBHOOK_SECRET` only serve the legacy media proxy until Phase 3 removes it.
 - Booking: `NOTION_BOOKINGS_DATABASE_ID` and/or (`RESEND_API_KEY`, `RESEND_FROM`, `BOOKING_NOTIFY_EMAIL`).
 - Webhook: `NOTION_WEBHOOK_SECRET`.
 
