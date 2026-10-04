@@ -44,6 +44,7 @@ export default async function Page() {
           rel="preload"
           href={projectImageSrc(file)}
           as="image"
+          crossOrigin="anonymous"
           fetchPriority={index === 0 ? "high" : "low"}
         />
       ))}

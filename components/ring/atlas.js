@@ -6,6 +6,8 @@ import { signedOffset } from "./utils";
 const load = (src, priority, ms = 12000) =>
   new Promise((resolve, reject) => {
     const img = new Image();
+    // R2 is another origin; must precede src or the canvas is tainted.
+    img.crossOrigin = "anonymous";
     // Must be set before src or the request is already away.
     if (priority) img.fetchPriority = priority;
     img.decoding = "async";
@@ -133,7 +135,7 @@ export function buildAtlas(files = IMAGE_FILES, onProgress, options = {}) {
         paint(img, i);
         markDirty();
       })
-      .catch((err) => console.warn("[atlas]", err.message))
+      .catch((err) => console.error("[atlas]", err.message))
       .finally(() => {
         settled++;
         tick();

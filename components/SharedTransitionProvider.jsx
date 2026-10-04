@@ -49,6 +49,7 @@ function preloadImage(src) {
     img.decoding = "async";
     img.onload = () => resolve(img);
     img.onerror = reject;
+    img.crossOrigin = "anonymous";
     img.src = src;
   });
 }
@@ -241,7 +242,13 @@ export function SharedTransitionProvider({ children }) {
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={active.src} alt="" draggable={false} decoding="sync" />
+              <img
+                src={active.src}
+                alt=""
+                crossOrigin="anonymous"
+                draggable={false}
+                decoding="sync"
+              />
             </div>
           </div>,
           document.body,

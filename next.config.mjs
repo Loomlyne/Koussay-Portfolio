@@ -34,6 +34,15 @@ const nextConfig = {
     ];
   },
   images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "media.koussay.online",
+        port: "",
+        pathname: "/projects/**",
+        search: "",
+      },
+    ],
     localPatterns: [
       // Notion covers are versioned (`?v=`) so CMS edits bust the cache.
       // Next 16 blocks query strings on local images unless listed here.
