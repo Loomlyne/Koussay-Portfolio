@@ -225,10 +225,10 @@ All plans run sequentially in the main checkout (control session).
   2. Approve the DNS switch from the Vercel records to the Worker route.
   3. Remove the Vercel project after the week of clean running.
 
-**Plans**: 16 plans
+**Plans**: 17 plans
 
 Plans:
-All plans run in the main checkout (control session). Commits stay local until 03.1-14 (pushing main deploys Vercel); earlier deploys go to workers.dev only, from a clean clone. Same-wave plans share no files; in one checkout they run one after another.
+All plans run in the main checkout (control session). Commits stay local until 03.1-15 (pushing main deploys Vercel); earlier deploys go to workers.dev only, from a clean clone. Every pushed SHA is gated in a clean clone of that exact SHA first. Same-wave plans share no files; in one checkout they run one after another.
 
 **Wave 1**
 
@@ -237,7 +237,7 @@ All plans run in the main checkout (control session). Commits stay local until 0
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03.1-03-PLAN.md — wrangler login (Koussay), Web Analytics replaces Speed Insights, D1 and private R2 created, live on workers.dev
+- [ ] 03.1-03-PLAN.md — wrangler login (Koussay), workers.dev name (Koussay, only if none exists), Web Analytics replaces Speed Insights, D1 and private R2 created, live on workers.dev
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -251,36 +251,40 @@ All plans run in the main checkout (control session). Commits stay local until 0
 **Wave 5** *(blocked on Wave 4 completion)*
 
 - [ ] 03.1-07-PLAN.md — Zero Trust and Access for /admin (Koussay), remote migration, Worker secrets (Koussay)
-- [ ] 03.1-08-PLAN.md — /admin guard that fails closed, admin shell and bookings list
+- [ ] 03.1-08-PLAN.md — /admin guard that fails closed: Access JWT verifier, test key harness, 403 skeleton
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 03.1-09-PLAN.md — Notion import script; Koussay names test rows; early import to the live D1
-- [ ] 03.1-10-PLAN.md — Booking detail and Access-checked file download
+- [ ] 03.1-09-PLAN.md — Admin shell and bookings list from the signed pictures
+- [ ] 03.1-10-PLAN.md — Notion import script; Koussay names test rows; early import to the live D1
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 03.1-11-PLAN.md — Status change and cancel (frees the slot, emails the visitor)
+- [ ] 03.1-11-PLAN.md — Booking detail and Access-checked file download
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
-- [ ] 03.1-12-PLAN.md — Blocked time and drafts on /admin
+- [ ] 03.1-12-PLAN.md — Status change and cancel (frees the slot, emails the visitor)
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 03.1-13-PLAN.md — Deploy to workers.dev, D-14 UAT by Koussay, CPU measured (D-17)
+- [ ] 03.1-13-PLAN.md — Blocked time and drafts on /admin
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 03.1-14-PLAN.md — Koussay approves; DNS switch to the Worker, production smoke, final Notion import after propagation
+- [ ] 03.1-14-PLAN.md — Deploy to workers.dev, D-14 UAT by Koussay, CPU measured per request type (D-17)
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 03.1-15-PLAN.md — Notion removed completely, docs, phase-end gate, Ship
+- [ ] 03.1-15-PLAN.md — Vercel protection proven; Koussay approves; gated push, DNS switch to the Worker, production smoke, final Notion import after max(5 min, TTL + 60 s)
 
-**Wave 12** *(blocked on Wave 11 completion, and at least 7 days after the switch)*
+**Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 03.1-16-PLAN.md — Koussay signs; Vercel project removed, workers.dev off
+- [ ] 03.1-16-PLAN.md — Notion removed from the app (importer kept until Plan 17 only if Vercel is open), docs, phase-end gate, Ship
+
+**Wave 13** *(blocked on Wave 12 completion, and at least 7 days after the switch)*
+
+- [ ] 03.1-17-PLAN.md — Koussay signs; last Notion import if Vercel is open, Vercel project removed, importer gone, workers.dev off
 
 ### Phase 4: R2 media delivery (MERGED into Phase 2)
 
