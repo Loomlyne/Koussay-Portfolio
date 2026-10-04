@@ -13,6 +13,9 @@ const eslintConfig = defineConfig([
     // Playwright output
     "playwright-report/**",
     "test-results/**",
+    // Local, generated Obsidian board (never committed)
+    ".obsidian/**",
+    "Board/**",
   ]),
 ]);
 
