@@ -139,7 +139,17 @@ export async function headObject(config, key) {
   return { size: Number(response.headers.get("content-length") || 0) };
 }
 
+/**
+ * The only deletable keys are throwaway health-check objects. Everything under
+ * projects/ is content-addressed and served live, so the guard lives here, at
+ * the point of the DELETE, not in a caller.
+ */
 export async function deleteObject(config, key) {
+  if (!/^_healthcheck\/[\w-][\w.-]*$/.test(String(key))) {
+    throw new Error(
+      `r2 delete refused for ${key}: only _healthcheck/ objects may be deleted`,
+    );
+  }
   const { url, headers } = signedRequest(config, { method: "DELETE", key });
   const response = await fetch(url, {
     method: "DELETE",

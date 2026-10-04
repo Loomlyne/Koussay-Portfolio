@@ -218,12 +218,17 @@ async function check() {
       `acao (Origin): ${withOrigin.response.headers.get("access-control-allow-origin")}`,
     );
   } finally {
-    if (key.startsWith("_healthcheck/")) await deleteObject(r2, key);
-    console.log(
-      (await headObject(r2, key)) === null
-        ? "cleanup ok"
-        : "cleanup FAILED object still present",
-    );
+    // Cleanup must log, never replace the error that got us here.
+    try {
+      await deleteObject(r2, key);
+      console.log(
+        (await headObject(r2, key)) === null
+          ? "cleanup ok"
+          : "cleanup FAILED object still present",
+      );
+    } catch (error) {
+      console.error(`cleanup FAILED ${error.message || error}`);
+    }
   }
 }
 
