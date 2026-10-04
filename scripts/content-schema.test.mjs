@@ -160,3 +160,92 @@ test("two problems are reported together", () => {
   const m = msg(() => validateContent(projects, manifest, opts));
   assert.equal(m.split("\n").length, 2);
 });
+
+test("WR-01: cover and gallery entries need positive integer width and height", () => {
+  const a = fixture();
+  delete a.manifest.projects.alpha.gallery.p01.height;
+  assert.match(
+    msg(() => validateContent(a.projects, a.manifest, opts)),
+    /alpha\.gallery\[0\]\.media "p01": width\/height missing/,
+  );
+  const b = fixture();
+  b.manifest.projects.beta.cover.width = 0;
+  assert.match(
+    msg(() => validateContent(b.projects, b.manifest, opts)),
+    /beta\.cover: width\/height missing/,
+  );
+  const c = fixture();
+  c.manifest.projects.beta.cover.height = "900";
+  assert.match(
+    msg(() => validateContent(c.projects, c.manifest, opts)),
+    /beta\.cover: width\/height missing/,
+  );
+});
+
+test("WR-02: name must be a non-empty string", () => {
+  for (const bad of [null, "", "  ", 5]) {
+    const { projects, manifest } = fixture();
+    projects[0].name = bad;
+    assert.match(
+      msg(() => validateContent(projects, manifest, opts)),
+      /alpha\.name: must be a non-empty string/,
+    );
+  }
+});
+
+test("WR-02: updated must be an ISO date", () => {
+  for (const bad of ["1", "2026-09-14", "", null, "not a date"]) {
+    const { projects, manifest } = fixture();
+    projects[0].updated = bad;
+    assert.match(
+      msg(() => validateContent(projects, manifest, opts)),
+      /alpha\.updated/,
+    );
+  }
+});
+
+test("WR-02: services and tools hold non-empty strings only", () => {
+  for (const key of ["services", "tools"]) {
+    for (const bad of [[null, 5], [{}], [""]]) {
+      const { projects, manifest } = fixture();
+      projects[0][key] = bad;
+      assert.match(
+        msg(() => validateContent(projects, manifest, opts)),
+        new RegExp(`alpha\\.${key}: every item must be a non-empty string`),
+      );
+    }
+  }
+});
+
+test("WR-02: covers and gallery urls stay in the project's own folder", () => {
+  const a = fixture();
+  a.manifest.projects.beta.cover.url = entry("alpha", "cover").url;
+  assert.match(
+    msg(() => validateContent(a.projects, a.manifest, opts)),
+    /beta\.cover: url not under .*\/projects\/beta\//,
+  );
+  const b = fixture();
+  b.manifest.projects.alpha.gallery.p01.url = entry("beta", "p01").url;
+  assert.match(
+    msg(() => validateContent(b.projects, b.manifest, opts)),
+    /alpha\.gallery\[0\]\.media "p01": url not under/,
+  );
+});
+
+test("D-10: Phase 7 fields may stay empty", () => {
+  const { projects, manifest } = fixture();
+  Object.assign(projects[1], {
+    kind: null,
+    client: null,
+    industry: null,
+    location: null,
+    role: null,
+    approach: null,
+    summary: null,
+    services: [],
+    tools: [],
+    identity: null,
+    testimonial: null,
+  });
+  assert.doesNotThrow(() => validateContent(projects, manifest, opts));
+});
