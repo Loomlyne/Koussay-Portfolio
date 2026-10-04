@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { PagerAbort } from "@/components/project/ProjectPagerTransition";
@@ -11,7 +10,9 @@ export default function ProjectNotFound() {
       <h1 className="sr-only">404</h1>
       <section className={styles.notFoundState}>
         <Link href="/" aria-label="Home" className={styles.notFoundMark}>
-          <Image src="/404.webp" alt="404" width={908} height={636} priority />
+          <span className={styles.notFoundText} aria-hidden="true">
+            404
+          </span>
         </Link>
       </section>
     </main>

@@ -211,7 +211,7 @@ test("a placeholder slug is gone", async ({ request }) => {
 });
 
 test("removed files are gone", async ({ request }) => {
-  for (const path of ["/1.webp", "/18.webp"]) {
+  for (const path of ["/1.webp", "/18.webp", "/404.webp"]) {
     expect((await request.get(path)).status(), path).toBe(404);
   }
   const stamp = await request.get("/api/cms-stamp");

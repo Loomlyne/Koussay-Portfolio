@@ -119,7 +119,7 @@
 .heroIndex {
   margin: 0;
   font-size: clamp(1rem, 1.3vw, 1.35rem);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.12em;
 }
 
 .heroMedia {
@@ -251,7 +251,7 @@ html[data-project-pager] .mediaFigure,
 
 .mediaFallbackLabel {
   font-size: clamp(1rem, 1.8vw, 1.5rem);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.12em;
 }
 
 .mediaFallbackFile,
@@ -618,10 +618,19 @@ html[data-project-pager] .mediaFigure,
   line-height: 0;
 }
 
-.notFoundMark img {
+/* 0.40 of the mark width matches the old image glyph height (about 29% of its box); the padding re-creates the old image's left-of-centre glyph position */
+.notFoundText {
   display: block;
   width: 100%;
-  height: auto;
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: min(16.8rem, 34.4vw);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.12em;
+  text-align: center;
+  box-sizing: border-box;
+  padding-right: 9.2%;
+  color: #0a0a0a;
 }
 
 .loadingState {
@@ -659,7 +668,7 @@ html[data-project-pager] .mediaFigure,
 .loadingNumber {
   flex: 0 0 auto;
   font-size: clamp(1rem, 1.3vw, 1.35rem);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.12em;
 }
 
 .loadingHero {
