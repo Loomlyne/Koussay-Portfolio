@@ -196,6 +196,7 @@ function checkPublic({ response, body }, expectedSha) {
 /** Put a throwaway object, read it back through the public host, remove it. */
 async function check() {
   const key = `_healthcheck/${Date.now()}.txt`;
+  const failures = [];
   try {
     await putObject(r2, key, Buffer.from("ok\n"), "text/plain", {
       cacheControl: "no-store",
@@ -205,31 +206,44 @@ async function check() {
     console.log(`r2 head ok     size=${head?.size ?? "?"}`);
     const url = publicUrl(r2, key);
     const plain = await getPublic(url);
+    const publicOk =
+      plain.response.status === 200 && plain.body.toString() === "ok\n";
     console.log(
-      plain.response.ok && plain.body.toString() === "ok\n"
-        ? "public ok"
-        : `public FAILED ${plain.response.status}`,
+      publicOk ? "public ok" : `public FAILED ${plain.response.status}`,
     );
-    console.log(
-      `acao (no Origin): ${plain.response.headers.get("access-control-allow-origin")}`,
-    );
+    if (!publicOk) failures.push(`public read ${plain.response.status}`);
+    const acao = plain.response.headers.get("access-control-allow-origin");
+    console.log(`acao (no Origin): ${acao}`);
+    if (acao !== "*") failures.push(`acao without Origin: ${acao}`);
     const withOrigin = await getPublic(url, SITE);
-    console.log(
-      `acao (Origin): ${withOrigin.response.headers.get("access-control-allow-origin")}`,
+    const acaoOrigin = withOrigin.response.headers.get(
+      "access-control-allow-origin",
     );
+    console.log(`acao (Origin): ${acaoOrigin}`);
+    if (acaoOrigin !== "*") failures.push(`acao with Origin: ${acaoOrigin}`);
+  } catch (error) {
+    failures.push(error.message || String(error));
+    console.error(`[media] check: ${error.message || error}`);
   } finally {
     // Cleanup must log, never replace the error that got us here.
     try {
       await deleteObject(r2, key);
-      console.log(
-        (await headObject(r2, key)) === null
-          ? "cleanup ok"
-          : "cleanup FAILED object still present",
-      );
+      if ((await headObject(r2, key)) === null) {
+        console.log("cleanup ok");
+      } else {
+        console.log("cleanup FAILED object still present");
+        failures.push("object still present after cleanup");
+      }
     } catch (error) {
       console.error(`cleanup FAILED ${error.message || error}`);
+      failures.push(`cleanup: ${error.message || error}`);
     }
   }
+  if (failures.length) {
+    console.error(`check FAILED: ${failures.join("; ")}`);
+    process.exit(1);
+  }
+  console.log("check ok");
 }
 
 async function importLive() {
