@@ -119,7 +119,7 @@
 .heroIndex {
   margin: 0;
   font-size: clamp(1rem, 1.3vw, 1.35rem);
-  letter-spacing: -0.12em;
+  letter-spacing: -0.04em;
 }
 
 .heroMedia {
@@ -251,7 +251,7 @@ html[data-project-pager] .mediaFigure,
 
 .mediaFallbackLabel {
   font-size: clamp(1rem, 1.8vw, 1.5rem);
-  letter-spacing: -0.12em;
+  letter-spacing: -0.04em;
 }
 
 .mediaFallbackFile,
@@ -668,7 +668,7 @@ html[data-project-pager] .mediaFigure,
 .loadingNumber {
   flex: 0 0 auto;
   font-size: clamp(1rem, 1.3vw, 1.35rem);
-  letter-spacing: -0.12em;
+  letter-spacing: -0.04em;
 }
 
 .loadingHero {
