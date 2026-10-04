@@ -225,7 +225,7 @@ All plans run sequentially in the main checkout (control session).
   2. Approve the DNS switch from the Vercel records to the Worker route.
   3. Remove the Vercel project after the week of clean running.
 
-**Plans**: 17 plans
+**Plans**: 18 plans
 
 Plans:
 All plans run in the main checkout (control session). Commits stay local until 03.1-15 (pushing main deploys Vercel); earlier deploys go to workers.dev only, from a clean clone. Every pushed SHA is gated in a clean clone of that exact SHA first. Same-wave plans share no files; in one checkout they run one after another.
@@ -280,11 +280,15 @@ All plans run in the main checkout (control session). Commits stay local until 0
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 03.1-16-PLAN.md — Notion removed from the app (importer kept until Plan 17 only if Vercel is open), docs, phase-end gate, Ship
+- [ ] 03.1-16-PLAN.md — Notion removed from the app (importer kept until Plan 18 only if Vercel is open); local commits, no push
 
-**Wave 13** *(blocked on Wave 12 completion, and at least 7 days after the switch)*
+**Wave 13** *(blocked on Wave 12 completion)*
 
-- [ ] 03.1-17-PLAN.md — Koussay signs; last Notion import if Vercel is open, Vercel project removed, importer gone, workers.dev off
+- [ ] 03.1-17-PLAN.md — Docs and PROJECT.md match Workers, D1 and Access; phase-end gate in a clean clone; Ship (the single push of Plans 16 and 17)
+
+**Wave 14** *(blocked on Wave 13 completion, and at least 7 days after the switch)*
+
+- [ ] 03.1-18-PLAN.md — Koussay signs; last Notion import if Vercel is open, Vercel project removed; on Q3 ship: importer gone, workers.dev off (on hold: nothing pushed)
 
 ### Phase 4: R2 media delivery (MERGED into Phase 2)
 
