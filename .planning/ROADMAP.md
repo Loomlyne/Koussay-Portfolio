@@ -16,7 +16,7 @@ Every phase leaves the live site deployable and no worse than before. Koussay si
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Baseline and licence hygiene** - Prettier-only commit first, a green smoke test, Geist for every face, licence notices correct, dead files gone (completed 2026-10-03)
-- [ ] **Phase 2: Projects served from the repo, media on R2** - The live eight read from content modules with the full schema and build-time validation; placeholders gone; no visible change
+- [x] **Phase 2: Projects served from the repo, media on R2** - The live eight read from content modules with the full schema and build-time validation; placeholders gone; no visible change (completed 2026-10-04)
 - [ ] **Phase 3: Notion projects path removed** - Proxy, PDF renderer, CMS cache and runtime `sharp` deleted; OG images static; bookings proven still working
 - [ ] **Phase 3.1: Hosting on Cloudflare Workers** (INSERTED) - The site runs on Workers in Koussay's Cloudflare account; Vercel serves nothing
 - [x] **Phase 4: R2 media delivery** - Merged into Phase 2 (2026-10-04); DNS done 2026-10-03
@@ -151,7 +151,7 @@ Plans:
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 02-11-PLAN.md — TEST-02 and build mutation proofs, phase-end gate, rendered comparison, after-screenshots, media proof
+- [x] 02-11-PLAN.md — TEST-02 and build mutation proofs, phase-end gate, rendered comparison, after-screenshots, media proof
 
 ### Phase 3: Notion projects path removed
 
@@ -312,7 +312,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
-| 2. Projects served from the repo | 10/11 | In Progress|  |
+| 2. Projects served from the repo | 11/11 | Complete   | 2026-10-04 |
 | 3. Notion projects path removed | 0/TBD | Not started | - |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |
