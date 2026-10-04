@@ -113,12 +113,26 @@ function sortDeep(node) {
   return node;
 }
 
+/** Start empty only when the file is absent; anything else must fail loudly. */
 function readManifest() {
+  if (!existsSync(MANIFEST)) return { host: HOST, projects: {} };
+  let manifest;
   try {
-    return JSON.parse(readFileSync(MANIFEST, "utf8"));
-  } catch {
-    return { host: HOST, projects: {} };
+    manifest = JSON.parse(readFileSync(MANIFEST, "utf8"));
+  } catch (error) {
+    console.error(`[media] content/media.json unreadable: ${error.message}`);
+    process.exit(1);
   }
+  if (
+    !manifest ||
+    typeof manifest !== "object" ||
+    !manifest.projects ||
+    typeof manifest.projects !== "object"
+  ) {
+    console.error("[media] content/media.json has no projects object");
+    process.exit(1);
+  }
+  return manifest;
 }
 
 function writeManifest(manifest) {
@@ -139,10 +153,13 @@ function appendProvenance(slug, record) {
   mkdirSync(dir, { recursive: true });
   const file = join(dir, "provenance.json");
   let list = [];
-  try {
-    list = JSON.parse(readFileSync(file, "utf8"));
-  } catch {
-    // First record for this project.
+  if (existsSync(file)) {
+    try {
+      list = JSON.parse(readFileSync(file, "utf8"));
+    } catch (error) {
+      console.error(`[media] ${file} unreadable: ${error.message}`);
+      process.exit(1);
+    }
   }
   list.push(record);
   writeFileSync(file, `${JSON.stringify(list, null, 2)}\n`);
