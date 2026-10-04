@@ -46,7 +46,7 @@ Requirements for this milestone. Each maps to a roadmap phase.
 - [ ] **MEDIA-05**: Higgsfield generation runs through the repo script against the current API with the key from `HF_CREDENTIALS` in `.env.local`, uses an idempotency key per submit, and prints a cost estimate in `--dry-run` that Koussay approves before any paid run
 - [x] **MEDIA-06**: `next.config.mjs` allows the R2 host in `images.remotePatterns`; ring stills and hero posters bypass the Vercel optimiser, gallery screenshots use `next/image`
 - [x] **MEDIA-07**: Open Graph and Twitter images are pre-rendered by the script and served as static files; no `sharp` runs at request time
-- [ ] **MEDIA-08**: The Notion projects path is deleted: `/api/media/*`, `/api/cms-stamp`, `/api/revalidate`, `CmsLive`, `lib/pdf.js`, `lib/notion/gallery-pdf.js`, `lib/notion/projects.js`, the `unstable_cache` layer, `pdfjs-dist`, `unpdf`, `@napi-rs/canvas`, the canvas `outputFileTracingIncludes`; `sharp` leaves `dependencies`
+- [x] **MEDIA-08**: The Notion projects path is deleted: `/api/media/*`, `/api/cms-stamp`, `/api/revalidate`, `CmsLive`, `lib/pdf.js`, `lib/notion/gallery-pdf.js`, `lib/notion/projects.js`, the `unstable_cache` layer, `pdfjs-dist`, `unpdf`, `@napi-rs/canvas`, the canvas `outputFileTracingIncludes`; `sharp` leaves `dependencies`
 - [ ] **MEDIA-09**: Bookings and blocked time keep working through Notion and Resend after the removal; `lib/notion/client.js` and `lib/notion/bookings.js` stay; Koussay removes the dead Vercel env vars and the Notion webhook in one numbered step
 
 ### Ring (RING)

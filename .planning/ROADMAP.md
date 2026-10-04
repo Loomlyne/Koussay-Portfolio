@@ -198,7 +198,7 @@ All plans run sequentially in the main checkout (control session).
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 03-06-PLAN.md — CLAUDE.md, README and codebase docs match the tree; phase-end gate on one recorded commit
+- [x] 03-06-PLAN.md — CLAUDE.md, README and codebase docs match the tree; phase-end gate on one recorded commit
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
@@ -344,7 +344,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 |-------|----------------|--------|-----------|
 | 1. Baseline and licence hygiene | 6/6 | Complete    | 2026-10-03 |
 | 2. Projects served from the repo | 11/11 | Complete    | 2026-10-04 |
-| 3. Notion projects path removed | 5/7 | In Progress|  |
+| 3. Notion projects path removed | 6/7 | In Progress|  |
 | 3.1. Hosting on Cloudflare Workers | 0/TBD | Not started | - |
 | 4. R2 media delivery | - | Merged into Phase 2 | 2026-10-04 |
 | 5. Case-study page that closes | 0/TBD | Not started | - |
