@@ -17,7 +17,7 @@ export default defineConfig({
   testIgnore: "**/screens.spec.mjs",
   timeout: 120_000,
   expect: { timeout: 15_000 },
-  // Project media still comes through the live Notion proxy until Phase 3.
+  // Project media comes from media.koussay.online, so `npm test` needs network.
   retries: 1,
   // SwiftShader is CPU-bound; parallel pages starve each other.
   workers: 1,
