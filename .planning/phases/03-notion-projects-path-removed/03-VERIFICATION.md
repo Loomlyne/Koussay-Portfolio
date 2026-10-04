@@ -1,7 +1,7 @@
 ---
 phase: 03-notion-projects-path-removed
 verified: 2026-10-04T21:45:00+04:00
-status: human_needed
+status: passed
 score: 3/3 roadmap criteria verified in code (criterion 4 pending post-ship by design)
 overrides_applied: 0
 gaps: []
