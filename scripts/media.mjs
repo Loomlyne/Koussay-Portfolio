@@ -10,6 +10,8 @@
  *   node scripts/media.mjs verify
  *   node scripts/media.mjs generate [--dry-run] [--force] [--only=slug]
  *       [--limit=3] [--direction=chrome] [--video] [--probe]
+ *   node scripts/media.mjs share [--preview] [--booking] [--only=slug,...]
+ *       [--force] [--dry-run] [--labels=slug:Label,...]
  */
 import { createHash } from "node:crypto";
 import {
@@ -39,6 +41,9 @@ import {
   VIDEO_ENDPOINT,
 } from "./lib/higgsfield.mjs";
 import { loadEnv, root, sleep } from "./lib/load-env.mjs";
+import { homeLines, OWNER, projectLines } from "../lib/share.mjs";
+import { SITE_DESCRIPTION, SITE_MARK_ALT, SITE_NAME } from "../lib/site.js";
+import { renderBooking, renderCard } from "./lib/share.mjs";
 import {
   deleteObject,
   headObject,
@@ -68,6 +73,9 @@ const only = value("only")
   .filter(Boolean);
 const force = flag("force");
 const dryRun = flag("dry-run");
+const preview = flag("preview");
+const booking = flag("booking");
+const labels = value("labels");
 
 const USAGE = [
   "usage: node scripts/media.mjs <command>",
@@ -75,17 +83,27 @@ const USAGE = [
   "  import-live [--force] [--only=slug,...] [--dry-run]",
   "  verify",
   "  generate [--dry-run] [--force] [--only=slug] [--limit=n] [--direction=key] [--video] [--probe]",
+  "  share [--preview] [--booking] [--only=slug,...] [--force] [--dry-run] [--labels=slug:Label,...]",
 ].join("\n");
 
-if (!["check", "import-live", "verify", "generate"].includes(command)) {
+if (
+  !["check", "import-live", "verify", "generate", "share"].includes(command)
+) {
   console.error(USAGE);
+  process.exit(1);
+}
+
+if (labels && !preview) {
+  console.error("[media] --labels is preview-only (D-03)");
   process.exit(1);
 }
 
 const env = loadEnv();
 const r2 = r2Config(env);
 
-const needsR2 = !(["generate", "import-live"].includes(command) && dryRun);
+const needsR2 =
+  !(["generate", "import-live"].includes(command) && dryRun) &&
+  !(command === "share" && (preview || booking || dryRun));
 if (needsR2) {
   if (!isR2Configured(r2)) {
     console.error(
@@ -581,7 +599,196 @@ async function generateMedia() {
   if (failed) process.exit(1);
 }
 
-if (command === "check") await check();
+/** Cover bytes come only from the public media host and must match the manifest. */
+async function fetchCover(slug, cover) {
+  if (new URL(cover.url).host !== "media.koussay.online") {
+    throw new Error(`[share] ${slug}: cover host is not media.koussay.online`);
+  }
+  const { body } = await getPublic(cover.url);
+  if (sha256(body) !== cover.sha256) {
+    throw new Error(`[share] ${slug}: cover sha mismatch`);
+  }
+  return body;
+}
+
+const esc = (text) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+/**
+ * D-07 sign-off pictures. Preview only: writes under .media-probe/share/,
+ * never R2, never the manifest. Proposed labels (D-03) exist only here.
+ */
+async function share() {
+  if (!preview && !booking) {
+    console.error("[media] share upload lands after the D-07 signature");
+    process.exit(1);
+  }
+  const out = join(root, ".media-probe", "share");
+  mkdirSync(out, { recursive: true });
+  const printed = [];
+  const write = (name, buffer) => {
+    writeFileSync(join(out, name), buffer);
+    printed.push([name, buffer.length]);
+    console.log(`preview ${name} ${buffer.length}`);
+  };
+
+  if (!preview) {
+    // Plan 05 runs this once app/booking/opengraph-image.js is deleted.
+    const png = await renderBooking(
+      readFileSync(join(root, "public", "logo.png")),
+    );
+    writeFileSync(join(root, "app", "booking", "opengraph-image.png"), png);
+    writeFileSync(
+      join(root, "app", "booking", "opengraph-image.alt.txt"),
+      `${SITE_MARK_ALT}\n`,
+    );
+    console.log(`booking opengraph-image.png ${png.length}`);
+    return;
+  }
+
+  const proposals = new Map();
+  for (const pair of labels.split(",").filter(Boolean)) {
+    const at = pair.indexOf(":");
+    if (at < 1) {
+      console.error(`[media] --labels entry "${pair}" is not slug:Label`);
+      process.exit(1);
+    }
+    proposals.set(pair.slice(0, at).trim(), pair.slice(at + 1).trim());
+  }
+
+  const { PROJECTS_IN_ORDER, ORDER } = await import(
+    pathToFileURL(join(root, "content", "projects", "index.mjs")).href
+  );
+  for (const slug of proposals.keys()) {
+    if (!ORDER.includes(slug)) {
+      console.error(`[media] --labels: unknown slug ${slug}`);
+      process.exit(1);
+    }
+  }
+  const manifest = readManifest();
+  const covers = new Map();
+  const coverOf = async (slug) => {
+    if (!covers.has(slug)) {
+      const cover = manifest.projects[slug]?.cover;
+      if (!cover) throw new Error(`[share] ${slug}: no cover in manifest`);
+      covers.set(slug, await fetchCover(slug, cover));
+    }
+    return covers.get(slug);
+  };
+
+  // name -> { lines, line2, slug, kind }
+  const jobs = [];
+  jobs.push({
+    name: "home",
+    slug: ORDER[0],
+    lines: homeLines(SITE_NAME, SITE_DESCRIPTION),
+    kind: "home",
+  });
+  for (const project of PROJECTS_IN_ORDER) {
+    if (only.length && !only.includes(project.slug)) continue;
+    jobs.push({
+      name: project.slug,
+      slug: project.slug,
+      lines: projectLines(project),
+      kind: "current",
+    });
+    if (proposals.has(project.slug)) {
+      jobs.push({
+        name: `${project.slug}-proposal`,
+        slug: project.slug,
+        lines: [project.name, `${proposals.get(project.slug)} · ${OWNER}`],
+        kind: "proposal",
+      });
+    }
+  }
+
+  const sizes = new Map();
+  for (const job of jobs) {
+    const jpg = await renderCard(await coverOf(job.slug), job.lines, {
+      label: job.name,
+    });
+    write(`${job.name}.jpg`, jpg);
+    const feed = await sharp(jpg)
+      .resize(600, 315)
+      .jpeg({ quality: 86, mozjpeg: true })
+      .toBuffer();
+    write(`${job.name}-feed.jpg`, feed);
+    const square = await sharp(jpg)
+      .extract({ left: 285, top: 0, width: 630, height: 630 })
+      .jpeg({ quality: 86, mozjpeg: true })
+      .toBuffer();
+    write(`${job.name}-square.jpg`, square);
+    sizes.set(job.name, {
+      full: jpg.length,
+      feed: feed.length,
+      square: square.length,
+    });
+  }
+
+  const sheetNames = PROJECTS_IN_ORDER.map((p) => p.slug).filter((slug) =>
+    sizes.has(slug),
+  );
+  const sheet = await sharp({
+    create: {
+      width: 1200,
+      height: 315 * Math.ceil(sheetNames.length / 2),
+      channels: 3,
+      background: "#111111",
+    },
+  })
+    .composite(
+      await Promise.all(
+        sheetNames.map(async (slug, i) => ({
+          input: readFileSync(join(out, `${slug}-feed.jpg`)),
+          left: (i % 2) * 600,
+          top: Math.floor(i / 2) * 315,
+        })),
+      ),
+    )
+    .jpeg({ quality: 86, mozjpeg: true })
+    .toBuffer();
+  write("contact-sheet.jpg", sheet);
+
+  const bookingPng = await renderBooking(
+    readFileSync(join(root, "public", "logo.png")),
+  );
+  write("booking.png", bookingPng);
+
+  const section = (job, note) => {
+    const sz = sizes.get(job.name);
+    if (!sz) return "";
+    const img = (suffix, label, bytes, width) =>
+      `<figure><img src="${job.name}${suffix}.jpg" width="${width}"><figcaption>${label} ${bytes} bytes</figcaption></figure>`;
+    return (
+      `<section><h2>${esc(job.name)}${note ? ` (${note})` : ""}</h2>` +
+      `<p>${esc(job.lines[0])}<br>${esc(job.lines[1])}</p>` +
+      img("", "full 1200x630", sz.full, 1200) +
+      img("-feed", "feed 600x315", sz.feed, 600) +
+      img("-square", "square 630x630 centre crop", sz.square, 630) +
+      `</section>`
+    );
+  };
+  const order = ["home", "vamos-taxi", "looma-kitchen", "clickit-story"];
+  const html = [];
+  for (const slug of order) {
+    for (const job of jobs.filter((j) => j.slug === slug || j.name === slug)) {
+      if (slug === "home" && job.name !== "home") continue;
+      if (slug !== "home" && job.name === "home") continue;
+      html.push(
+        section(job, slug === "clickit-story" ? "reference, unsigned" : ""),
+      );
+    }
+  }
+  html.push(
+    `<section><h2>contact sheet (current labels)</h2><img src="contact-sheet.jpg" width="1200"></section>`,
+    `<section><h2>booking card</h2><img src="booking.png" width="1200"></section>`,
+  );
+  const page = `<!doctype html><meta charset="utf-8"><title>D-07 share sign-off</title><body style="background:#222;color:#eee;font:14px system-ui;padding:24px">${html.join("")}</body>`;
+  writeFileSync(join(out, "index.html"), page);
+  console.log("nothing uploaded, manifest untouched");
+}
+
+if (command === "share") await share();
+else if (command === "check") await check();
 else if (command === "import-live") await importLive();
 else if (command === "verify") await verify();
 else await generateMedia();
