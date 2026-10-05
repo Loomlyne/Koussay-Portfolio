@@ -1,7 +1,7 @@
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: "standalone" only for Docker; Vercel handles its own output
-  ...(process.env.VERCEL !== "1" ? { output: "standalone" } : {}),
   productionBrowserSourceMaps: false,
   compiler: {
     removeConsole:
@@ -33,23 +33,9 @@ const nextConfig = {
       },
     ];
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "media.koussay.online",
-        port: "",
-        pathname: "/projects/**",
-        search: "",
-      },
-    ],
-    localPatterns: [
-      {
-        pathname: "/**",
-        search: "",
-      },
-    ],
-  },
+  // R2 images are sized at authoring time; no request-time image work.
+  images: { unoptimized: true },
 };
 
 export default nextConfig;
+initOpenNextCloudflareForDev();

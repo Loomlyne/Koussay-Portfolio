@@ -1,0 +1,16 @@
+// Secrets and private emails never go in this file: the repo is public.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "koussay-portfolio",
+  "account_id": "4afee478d464878bd7c06b92b6b526c3",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-30",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "koussay-portfolio" },
+  ],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+}

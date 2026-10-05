@@ -58,3 +58,15 @@ next-env.d.ts
 
 # third-party agent skills; skills-lock.json restores them
 /.agents/skills/
+
+# OpenNext build output
+.open-next/
+
+# wrangler local state
+.wrangler/
+
+# wrangler local secrets
+.dev.vars*
+
+# one-off import workspace
+/.import/

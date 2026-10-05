@@ -15,3 +15,8 @@ Board/
 
 # scripts/media.mjs is the only writer of this manifest
 content/media.json
+
+# Build output and local workspaces
+.open-next/
+.wrangler/
+.import/

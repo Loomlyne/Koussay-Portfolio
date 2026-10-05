@@ -164,7 +164,7 @@ test("every project page renders", async ({ page, request }) => {
   }
 });
 
-test("gallery items come from R2 through the optimizer", async ({ page }) => {
+test("gallery items come raw from R2", async ({ page }) => {
   // Pick by data, not ring position: any project may have an empty gallery.
   const project = PROJECTS_IN_ORDER.find((p) => p.gallery.length > 0);
   test.skip(!project, "no project has gallery items");
@@ -178,11 +178,13 @@ test("gallery items come from R2 through the optimizer", async ({ page }) => {
     else expect(alts[n]).not.toBe("");
   }
   // Attributes, not currentSrc: most items are lazy and have not loaded.
-  const marker = "/_next/image?url=https%3A%2F%2Fmedia.koussay.online";
   const attrs = await imgs.evaluateAll((els) =>
-    els.map((e) => `${e.getAttribute("src")} ${e.getAttribute("srcset")}`),
+    els.map((e) => [e.getAttribute("src"), e.getAttribute("crossorigin")]),
   );
-  for (const a of attrs) expect(a).toContain(marker);
+  for (const [src, cors] of attrs) {
+    expect(src.startsWith("https://media.koussay.online/projects/")).toBe(true);
+    expect(cors).toBe("anonymous");
+  }
   await imgs.first().scrollIntoViewIfNeeded();
   await expect
     .poll(() => imgs.first().evaluate((img) => img.naturalWidth), {

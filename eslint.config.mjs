@@ -16,6 +16,10 @@ const eslintConfig = defineConfig([
     // Local, generated Obsidian board (never committed)
     ".obsidian/**",
     "Board/**",
+    // Worker build output and local workspaces
+    ".open-next/**",
+    ".wrangler/**",
+    ".import/**",
   ]),
 ]);
 

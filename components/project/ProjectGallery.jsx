@@ -30,6 +30,7 @@ export default function ProjectGallery({ project, gallery = [], index }) {
                 <Image
                   src={src}
                   alt={alt}
+                  crossOrigin="anonymous"
                   width={item.width}
                   height={item.height}
                   sizes={GALLERY_IMAGE_SIZES}
