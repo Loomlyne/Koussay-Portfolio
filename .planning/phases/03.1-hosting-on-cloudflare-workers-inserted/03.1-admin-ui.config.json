@@ -1,0 +1,24 @@
+{
+  "name": "Koussay Admin",
+  "brand": {
+    "wordmark": "Koussay Zayani",
+    "caption": "Admin",
+    "mark": "custom",
+    "markSrc": "logo.png",
+    "variant": "lockup",
+    "placement": "left",
+    "markTone": "current"
+  },
+  "color": {
+    "primary": "#0A0A0A",
+    "accent": "#0A0A0A",
+    "neutral": "#737373",
+    "danger": "#9A2F2F",
+    "mode": "light"
+  },
+  "radius": { "roundness": 80, "pill": true },
+  "type": { "preset": "geometric", "buttonCase": "normal" },
+  "density": "comfortable",
+  "surface": { "float": "solid", "shadow": "soft", "border": "hairline" },
+  "nav": { "back": "topbar" }
+}
