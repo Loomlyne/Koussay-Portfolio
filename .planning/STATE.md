@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3.1 UI-SPEC approved
-last_updated: "2026-10-04T22:08:36.465Z"
-last_activity: 2026-10-04 -- Phase 3.1 planning complete
+last_updated: "2026-10-05T08:19:24.361Z"
+last_activity: 2026-10-05 -- Phase 3.1 execution started
 progress:
   total_phases: 9
   completed_phases: 3
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-03)
 
 **Core value:** A prospect can go from the ring to a true case study to a booked call without meeting one fake thing.
-**Current focus:** Phase 3.1 — Hosting on Cloudflare Workers
+**Current focus:** Phase 3.1 — Hosting on Cloudflare Workers (INSERTED)
 
 ## Current Position
 
-Phase: 3 (Notion projects path removed) — COMPLETE (shipped 2026-10-04 22:02 +04, main e7bdb60)
-Plan: 7 of 7
-Status: Ready to execute
-Last activity: 2026-10-04 -- Phase 3.1 planning complete
+Phase: 3.1 (Hosting on Cloudflare Workers (INSERTED)) — EXECUTING
+Plan: 3 of 22 (01, 02 done)
+Status: Executing Phase 3.1
+Last activity: 2026-10-05 -- Plans 01 (signed round-2 dashboard) and 02 (Workers runtime locally) done; plans 19-22 added
 
 Progress: [███░░░░░░░] 33%
 
